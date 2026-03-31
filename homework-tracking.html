@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>តាមដានកិច្ចការផ្ទះ - Parent Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            background-color: #121212; 
+            color: #ffffff;
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .kh-moul { font-family: 'Moul', cursive; }
+        
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
+        
+        .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
+        .bg-card-dark { background-color: #2c2c2e; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+        .bg-header-green { background: linear-gradient(135deg, #4338ca 0%, #312e81 100%); }
+        
+        /* Light Mode Adjustments */
+        body.light-mode { background-color: #f9fafb; color: #1f2937; }
+        body.light-mode .bg-app-dark { background-color: #f9fafb; }
+        body.light-mode .bg-card-dark { background-color: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
+        body.light-mode .text-gray-400 { color: #6b7280; }
+        body.light-mode .text-gray-300 { color: #4b5563; }
+        body.light-mode .border-gray-800 { border-color: #e5e7eb; }
+        body.light-mode .border-gray-700 { border-color: #e5e7eb; }
+        body.light-mode .bg-gray-800 { background-color: #f3f4f6; }
+        body.light-mode .text-white-light-mode { color: #111827; }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #6366f1;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        body.light-mode .spinner { border-color: rgba(0, 0, 0, 0.1); border-top-color: #4f46e5; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Select */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+        }
+        body.light-mode select { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
+
+        /* Timeline styling */
+        .timeline-line {
+            position: absolute;
+            left: 23px;
+            top: 40px;
+            bottom: 0;
+            width: 2px;
+            background-color: #4f46e5;
+            opacity: 0.3;
+        }
+        body.light-mode .timeline-line { background-color: #c7d2fe; }
+    </style>
+</head>
+<body class="bg-app-dark min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <div class="bg-header-green pt-safe pb-6 px-4 rounded-b-[2rem] shadow-lg relative z-20">
+        <div class="flex justify-between items-center mb-4">
+            <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-sm">
+                <i data-lucide="arrow-left" class="w-6 h-6 text-white"></i>
+            </button>
+            <h1 class="text-white font-bold text-lg kh-moul">កិច្ចការផ្ទះ</h1>
+            <div class="w-10"></div>
+        </div>
+
+        <div class="flex items-center gap-4 bg-white/10 p-4 rounded-2xl border border-white/20 backdrop-blur-sm">
+            <div class="bg-indigo-500/30 p-3 rounded-xl">
+                <i data-lucide="book-open-check" class="w-8 h-8 text-indigo-100"></i>
+            </div>
+            <div>
+                <p class="text-indigo-200 text-xs font-semibold mb-1">តាមដានកិច្ចការ និងពិន្ទុ</p>
+                <h2 class="text-white font-bold text-sm" id="student-name-display">កំពុងទាញយក...</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 px-4 py-6 flex flex-col gap-5 relative z-10 w-full max-w-md mx-auto pb-safe">
+        
+        <!-- Custom Tabs -->
+        <div class="flex p-1 bg-card-dark rounded-xl border border-gray-700 shadow-sm">
+            <button id="tab-tasks" onclick="switchTab('tasks')" class="flex-1 py-2.5 text-sm font-bold bg-indigo-500 text-white rounded-lg transition shadow-sm flex items-center justify-center gap-2">
+                <i data-lucide="inbox" class="w-4 h-4"></i> កិច្ចការពីគ្រូ
+            </button>
+            <button id="tab-scores" onclick="switchTab('scores')" class="flex-1 py-2.5 text-sm font-bold text-gray-400 hover:text-white-light-mode transition flex items-center justify-center gap-2">
+                <i data-lucide="bar-chart-2" class="w-4 h-4"></i> ពិន្ទុប្រចាំខែ
+            </button>
+        </div>
+
+        <!-- ==================== VIEW 1: ASSIGNMENTS (TASKS) ==================== -->
+        <div id="assignments-view" class="flex flex-col gap-4">
+            
+            <div id="tasks-loading" class="py-10 flex flex-col items-center justify-center gap-3">
+                <div class="spinner"></div>
+                <p class="text-gray-400 text-xs font-bold">កំពុងទាញយកកិច្ចការថ្មីៗ...</p>
+            </div>
+
+            <div id="tasks-empty" class="hidden py-10 bg-card-dark border border-gray-700 rounded-2xl flex flex-col items-center justify-center text-center px-4">
+                <div class="bg-gray-800 p-4 rounded-full mb-3">
+                    <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
+                </div>
+                <p class="text-white-light-mode font-bold text-sm mb-1">មិនមានកិច្ចការថ្មីទេ</p>
+                <p class="text-gray-400 text-xs">សិស្សមិនមានកិច្ចការផ្ទះដែលត្រូវធ្វើពេលនេះទេ។</p>
+            </div>
+
+            <div id="tasks-list" class="flex flex-col gap-4 hidden">
+                <!-- Task Cards Injected via JS -->
+            </div>
+
+        </div>
+
+        <!-- ==================== VIEW 2: SCORES ==================== -->
+        <div id="scores-view" class="hidden flex flex-col gap-5">
+            <!-- Filters -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="relative">
+                    <select id="yearSelect" class="w-full bg-card-dark border border-gray-700 text-white-light-mode text-sm rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-semibold" onchange="loadHomeworkData()">
+                        <option value="2024-2025">២០២៤-២០២៥</option>
+                        <option value="2025-2026" selected>២០២៥-២០២៦</option>
+                        <option value="2026-2027">២០២៦-២០២7</option>
+                    </select>
+                </div>
+                <div class="relative">
+                    <select id="monthSelect" class="w-full bg-card-dark border border-gray-700 text-white-light-mode text-sm rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-semibold" onchange="loadHomeworkData()">
+                        <!-- Options generated by JS -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="bg-card-dark border border-gray-700 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                    <i data-lucide="award" class="w-24 h-24 text-indigo-500"></i>
+                </div>
+                <h3 class="text-gray-400 text-xs font-bold mb-4 uppercase tracking-wider">សរុបលទ្ធផលប្រចាំខែ</h3>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-gray-400 text-[11px] mb-1">ពិន្ទុសរុប</p>
+                        <div class="flex items-end gap-1">
+                            <span id="total-score" class="text-3xl font-bold text-indigo-500 leading-none">0</span>
+                            <span class="text-gray-500 text-xs mb-1 font-bold">ពិន្ទុ</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-[11px] mb-1">មធ្យមភាគ</p>
+                        <div class="flex items-end gap-1">
+                            <span id="average-score" class="text-3xl font-bold text-emerald-500 leading-none">0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center">
+                    <span class="text-gray-400 text-xs">ចំនួនដងដែលបានធ្វើ៖</span>
+                    <span id="submit-count" class="text-white-light-mode font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">0 ដង</span>
+                </div>
+            </div>
+
+            <!-- Info Banner -->
+            <div class="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-3 flex gap-3 items-start">
+                <i data-lucide="info" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
+                <p class="text-xs text-indigo-200/80 leading-relaxed light:text-indigo-800">
+                    ទិន្នន័យប្រចាំខែគិតចាប់ពី <span class="font-bold text-indigo-400">ថ្ងៃទី២៦ ខែមុន</span> ដល់ <span class="font-bold text-indigo-400">ថ្ងៃទី២៥ ខែនេះ</span>។
+                </p>
+            </div>
+
+            <!-- Timeline / Detailed List -->
+            <div>
+                <h3 class="text-gray-400 text-sm font-bold mb-4 ml-1">កាលបរិច្ឆេទលម្អិត</h3>
+                
+                <div id="scores-loading" class="py-10 flex flex-col items-center justify-center gap-3">
+                    <div class="spinner"></div>
+                    <p class="text-gray-400 text-xs">កំពុងទាញយកទិន្នន័យ...</p>
+                </div>
+
+                <div id="scores-empty" class="hidden py-8 bg-card-dark border border-gray-700 rounded-2xl flex flex-col items-center justify-center text-center px-4">
+                    <div class="bg-gray-800 p-4 rounded-full mb-3">
+                        <i data-lucide="calendar-x" class="w-8 h-8 text-gray-500"></i>
+                    </div>
+                    <p class="text-white-light-mode font-bold text-sm mb-1">មិនមានទិន្នន័យទេ</p>
+                    <p class="text-gray-400 text-xs">សិស្សមិនមានពិន្ទុកិច្ចការផ្ទះក្នុងខែនេះឡើយ។</p>
+                </div>
+
+                <div id="score-list" class="hidden relative pb-6">
+                    <div class="timeline-line hidden" id="timeline-line"></div>
+                    <div id="score-items" class="space-y-4 relative z-10">
+                        <!-- Items generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Image Modal for Homework with Download Option -->
+    <div id="photoModal" class="fixed inset-0 bg-black/95 z-[9999] hidden flex-col justify-center items-center p-4 backdrop-blur-sm transition-opacity duration-300" onclick="closePhotoModal()">
+        <button class="absolute top-4 right-4 md:top-8 md:right-8 text-white p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors z-10" onclick="closePhotoModal()">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        
+        <img id="modalImg" src="" onerror="this.onerror=null; this.src='https://placehold.co/600x400/1c1c1e/ffffff?text=រូបភាពមិនដំណើរការ';" class="w-full h-auto max-h-[70vh] object-contain rounded-xl shadow-2xl mb-6" onclick="event.stopPropagation()">
+        
+        <div class="flex gap-4 w-full max-w-sm px-4" onclick="event.stopPropagation()">
+            <button onclick="closePhotoModal()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-3.5 rounded-xl transition-colors border border-gray-700">បិទ</button>
+            <button onclick="downloadHomeworkImage()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-colors flex justify-center items-center gap-2 shadow-lg shadow-indigo-900/50">
+                <i data-lucide="download" class="w-5 h-5"></i> ទាញយក
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
+            authDomain: "classroom-management-82382.firebaseapp.com",
+            projectId: "classroom-management-82382",
+            storageBucket: "classroom-management-82382.firebasestorage.app",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const PTEC_APP_ID = "ptec-app";
+
+        let tid = localStorage.getItem('savedTid');
+        let sid = localStorage.getItem('savedSid');
+        let studentDataCache = null;
+        let unsubscribeTasks = null;
+
+        const allMonthsMap = [
+            { id: 'nov', label: 'វិច្ឆិកា', isNextYear: false, khIndex: 11 },
+            { id: 'dec', label: 'ធ្នូ', isNextYear: false, khIndex: 12 },
+            { id: 'jan', label: 'មករា', isNextYear: true, khIndex: 1 },
+            { id: 'feb', label: 'កុម្ភៈ', isNextYear: true, khIndex: 2 },
+            { id: 'mar', label: 'មីនា', isNextYear: true, khIndex: 3 },
+            { id: 'apr', label: 'មេសា', isNextYear: true, khIndex: 4 },
+            { id: 'may', label: 'ឧសភា', isNextYear: true, khIndex: 5 },
+            { id: 'jun', label: 'មិថុនា', isNextYear: true, khIndex: 6 },
+            { id: 'jul', label: 'កក្កដា', isNextYear: true, khIndex: 7 },
+            { id: 'aug', label: 'សីហា', isNextYear: true, khIndex: 8 },
+            { id: 'sep', label: 'កញ្ញា', isNextYear: true, khIndex: 9 },
+            { id: 'oct', label: 'តុលា', isNextYear: true, khIndex: 10 }
+        ];
+
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+
+        lucide.createIcons();
+
+        // 1. Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!tid || !sid) {
+                alert("មិនមានព័ត៌មានគណនីទេ។ សូមចូលប្រព័ន្ធ (Login) ឡើងវិញ។");
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            setupMonthOptions();
+            authenticateAndLoad();
+        });
+
+        // 2. Tab Switching Logic
+        window.switchTab = function(tabName) {
+            const tabTasks = document.getElementById('tab-tasks');
+            const tabScores = document.getElementById('tab-scores');
+            const viewTasks = document.getElementById('assignments-view');
+            const viewScores = document.getElementById('scores-view');
+
+            if (tabName === 'tasks') {
+                tabTasks.className = "flex-1 py-2.5 text-sm font-bold bg-indigo-500 text-white rounded-lg transition shadow-sm flex items-center justify-center gap-2";
+                tabScores.className = "flex-1 py-2.5 text-sm font-bold text-gray-400 hover:text-white-light-mode transition flex items-center justify-center gap-2";
+                viewTasks.classList.remove('hidden');
+                viewScores.classList.add('hidden');
+            } else {
+                tabScores.className = "flex-1 py-2.5 text-sm font-bold bg-indigo-500 text-white rounded-lg transition shadow-sm flex items-center justify-center gap-2";
+                tabTasks.className = "flex-1 py-2.5 text-sm font-bold text-gray-400 hover:text-white-light-mode transition flex items-center justify-center gap-2";
+                viewScores.classList.remove('hidden');
+                viewTasks.classList.add('hidden');
+                
+                // Ensure scores are loaded if switching to score tab
+                window.loadHomeworkData();
+            }
+        };
+
+        // 3. Setup Auth
+        async function authenticateAndLoad() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    await fetchStudentInfo();
+                    loadAssignmentsData(); // Load Tasks by default
+                    window.loadHomeworkData(); // Preload scores
+                } else {
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (error) {
+                        console.error("Auth error:", error);
+                        document.getElementById('tasks-loading').classList.add('hidden');
+                        document.getElementById('tasks-empty').classList.remove('hidden');
+                    }
+                }
+            });
+        }
+
+        async function fetchStudentInfo() {
+            try {
+                const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
+                const snap = await getDoc(studentRef);
+                if (snap.exists()) {
+                    studentDataCache = snap.data();
+                    let name = studentDataCache.name || studentDataCache['ឈ្មោះ'] || studentDataCache['គោត្តនាម និងនាម'] || "មិនស្គាល់ឈ្មោះ";
+                    document.getElementById('student-name-display').textContent = name;
+                }
+            } catch(e) {
+                console.error("Error fetching student", e);
+            }
+        }
+
+        // ==========================================
+        // FEATURE: LOAD ASSIGNMENTS (TASKS FROM TEACHER)
+        // ==========================================
+        function loadAssignmentsData() {
+            const loading = document.getElementById('tasks-loading');
+            const empty = document.getElementById('tasks-empty');
+            const list = document.getElementById('tasks-list');
+
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            list.classList.add('hidden');
+
+            const hwRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'homework_assignments');
+            const q = query(hwRef, orderBy('createdAt', 'desc'));
+
+            if(unsubscribeTasks) unsubscribeTasks();
+
+            unsubscribeTasks = onSnapshot(q, (snapshot) => {
+                loading.classList.add('hidden');
+
+                if (snapshot.empty) {
+                    empty.classList.remove('hidden');
+                    list.innerHTML = '';
+                    return;
+                }
+
+                empty.classList.add('hidden');
+                list.classList.remove('hidden');
+                
+                let html = '';
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    
+                    // Format Date
+                    let displayDate = '-';
+                    if (data.dueDate) {
+                        const d = new Date(data.dueDate);
+                        displayDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                    }
+
+                    // Assign subject colors
+                    let subjectBg = 'bg-indigo-500/20';
+                    let subjectText = 'text-indigo-400';
+                    let isLight = document.body.classList.contains('light-mode');
+
+                    if (data.subject && data.subject.includes('គណិត')) { subjectBg = 'bg-rose-500/20'; subjectText = isLight ? 'text-rose-600' : 'text-rose-400'; }
+                    else if (data.subject && data.subject.includes('ខ្មែរ')) { subjectBg = 'bg-amber-500/20'; subjectText = isLight ? 'text-amber-600' : 'text-amber-400'; }
+                    else if (data.subject && data.subject.includes('វិទ្យាសាស្ត្រ')) { subjectBg = 'bg-emerald-500/20'; subjectText = isLight ? 'text-emerald-600' : 'text-emerald-400'; }
+                    else if (isLight) { subjectText = 'text-indigo-600'; }
+
+                    const imageHtml = data.imageUrl 
+                        ? `<div class="mt-3 relative w-full h-40 rounded-xl overflow-hidden border border-gray-700 cursor-pointer" onclick="openPhotoModal('${data.imageUrl}')">
+                               <img src="${data.imageUrl}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/1c1c1e/ffffff?text=មិនមានរូបភាព';" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition">
+                               <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity">
+                                    <i data-lucide="zoom-in" class="text-white w-8 h-8 drop-shadow-lg"></i>
+                               </div>
+                           </div>` 
+                        : '';
+
+                    html += `
+                        <div class="bg-card-dark border border-gray-700 rounded-2xl p-4 md:p-5 shadow-sm">
+                            <div class="flex justify-between items-start mb-3 gap-2">
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-md ${subjectBg} ${subjectText} whitespace-nowrap">
+                                    ${data.subject || 'កិច្ចការ'}
+                                </span>
+                                <span class="text-[11px] font-bold text-red-500 flex items-center gap-1.5 bg-red-500/10 px-2.5 py-1 rounded-md">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> ផុតកំណត់៖ ${displayDate}
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-white-light-mode text-base leading-snug mb-2">${data.title}</h3>
+                            <p class="text-sm text-gray-400 leading-relaxed">${data.description || '<span class="italic opacity-50">មិនមានការណែនាំបន្ថែម...</span>'}</p>
+                            ${imageHtml}
+                        </div>
+                    `;
+                });
+                
+                list.innerHTML = html;
+                lucide.createIcons();
+            }, (error) => {
+                console.error("Error fetching assignments:", error);
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+                empty.innerHTML = `<p class="text-red-400 text-sm font-bold">មានបញ្ហាទាញយកទិន្នន័យ</p>`;
+            });
+        }
+
+        // Image Modal Functions
+        window.openPhotoModal = function(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('photoModal').classList.remove('hidden');
+            document.getElementById('photoModal').classList.add('flex');
+        };
+        
+        window.closePhotoModal = function() {
+            document.getElementById('photoModal').classList.add('hidden');
+            document.getElementById('photoModal').classList.remove('flex');
+        };
+
+        // Custom Download Image Function
+        window.downloadHomeworkImage = async function() {
+            const imgSrc = document.getElementById('modalImg').src;
+            if (!imgSrc || imgSrc.includes('placehold.co')) return;
+            
+            const btn = document.querySelector('button[onclick="downloadHomeworkImage()"]');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> ទាញយក...';
+            if (window.lucide) window.lucide.createIcons();
+            
+            try {
+                // Try fetching as Blob to force direct download (Depends on Firebase CORS config)
+                const response = await fetch(imgSrc, { mode: 'cors' });
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `PTEC_Homework_${Date.now()}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                btn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> រួចរាល់';
+                if (window.lucide) window.lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    if (window.lucide) window.lucide.createIcons();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('CORS error or Fetch failed. Falling back to open in new tab:', error);
+                
+                // Fallback for strict CORS: Open image in new tab so parent can long-press to save
+                const a = document.createElement('a');
+                a.href = imgSrc;
+                a.download = `PTEC_Homework_${Date.now()}.jpg`;
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                btn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> បានបើកក្នុង Tab ថ្មី';
+                if (window.lucide) window.lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    if (window.lucide) window.lucide.createIcons();
+                }, 2500);
+            }
+        };
+
+        // ==========================================
+        // FEATURE: LOAD SCORES (EXISTING LOGIC)
+        // ==========================================
+        function setupMonthOptions() {
+            const d = new Date();
+            let dMonth = d.getMonth(); 
+            let dDay = d.getDate();
+            
+            let targetMonth = dMonth;
+            if (dDay >= 26) {
+                targetMonth += 1;
+                if (targetMonth > 11) targetMonth = 0;
+            }
+
+            const monthIds = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            const currentMonthId = monthIds[targetMonth];
+
+            const monthSelect = document.getElementById('monthSelect');
+            let optionsHTML = '';
+            allMonthsMap.forEach(m => {
+                const selected = m.id === currentMonthId ? 'selected' : '';
+                optionsHTML += `<option value="${m.id}" ${selected}>ខែ${m.label}</option>`;
+            });
+            monthSelect.innerHTML = optionsHTML;
+        }
+
+        function generateDateRange(mId, yearStr) {
+            const selectedMonthObj = allMonthsMap.find(m => m.id === mId);
+            const [startYearStr, endYearStr] = yearStr.split('-');
+            
+            let currentYear = parseInt(selectedMonthObj.isNextYear ? endYearStr : startYearStr);
+            let selectedMonthIndex = selectedMonthObj.khIndex - 1;
+
+            let prevMonthIndex = selectedMonthIndex - 1;
+            let prevYear = currentYear;
+            if (prevMonthIndex < 0) {
+                prevMonthIndex = 11;
+                prevYear--;
+            }
+
+            const dates = [];
+            const daysInPrevMonth = new Date(prevYear, prevMonthIndex + 1, 0).getDate();
+            
+            for (let d = 26; d <= daysInPrevMonth; d++) {
+                dates.push(new Date(prevYear, prevMonthIndex, d));
+            }
+            for (let d = 1; d <= 25; d++) {
+                dates.push(new Date(currentYear, selectedMonthIndex, d));
+            }
+            
+            return dates;
+        }
+
+        function formatKhmerDate(date) {
+            const khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+            const khmerDays = ['អាទិត្យ', 'ច័ន្ទ', 'អង្គារ', 'ពុធ', 'ព្រហស្បតិ៍', 'សុក្រ', 'សៅរ៍'];
+            
+            return {
+                dayName: khmerDays[date.getDay()],
+                dayNum: date.getDate(),
+                monthName: khmerMonths[date.getMonth()],
+                year: date.getFullYear()
+            };
+        }
+
+        window.loadHomeworkData = async function() {
+            const year = document.getElementById('yearSelect').value;
+            const month = document.getElementById('monthSelect').value;
+            const storageKey = `hw_scores_v2_${year}_${month}`;
+
+            document.getElementById('scores-loading').classList.remove('hidden');
+            document.getElementById('scores-empty').classList.add('hidden');
+            document.getElementById('score-list').classList.add('hidden');
+            document.getElementById('timeline-line').classList.add('hidden');
+
+            try {
+                const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'homework_scores', storageKey);
+                const docSnap = await getDoc(docRef);
+
+                let myScoreData = { days: {}, total: 0 };
+                
+                if (docSnap.exists() && docSnap.data().scores) {
+                    const allScores = docSnap.data().scores;
+                    if (allScores[sid]) {
+                        myScoreData = allScores[sid];
+                    }
+                }
+
+                renderScores(myScoreData, month, year);
+
+            } catch (error) {
+                console.error("Error fetching scores:", error);
+                document.getElementById('scores-loading').classList.add('hidden');
+                document.getElementById('scores-empty').classList.remove('hidden');
+                document.getElementById('scores-empty').innerHTML = `<p class="text-red-400 text-sm font-bold">មានបញ្ហាទាញយកពិន្ទុ</p>`;
+            }
+        }
+
+        function renderScores(scoreData, mId, yearStr) {
+            document.getElementById('scores-loading').classList.add('hidden');
+            
+            const daysData = scoreData.days || {};
+            
+            let totalScore = 0;
+            let count = 0;
+            
+            for (let key in daysData) {
+                if (!isNaN(daysData[key])) {
+                    totalScore += parseFloat(daysData[key]);
+                    count++;
+                }
+            }
+
+            document.getElementById('total-score').textContent = totalScore;
+            document.getElementById('submit-count').textContent = `${count} ដង`;
+            document.getElementById('average-score').textContent = count > 0 ? (totalScore / count).toFixed(2) : '0.00';
+
+            if (count === 0) {
+                document.getElementById('scores-empty').classList.remove('hidden');
+                return;
+            }
+
+            const dateRange = generateDateRange(mId, yearStr);
+            const listContainer = document.getElementById('score-items');
+            listContainer.innerHTML = '';
+            
+            let hasItemsRendered = false;
+
+            dateRange.forEach(dateObj => {
+                const dayNum = dateObj.getDate();
+                if (daysData[dayNum] !== undefined) {
+                    hasItemsRendered = true;
+                    const val = daysData[dayNum];
+                    const khDate = formatKhmerDate(dateObj);
+                    
+                    let scoreColor = 'text-emerald-500';
+                    let bgIconColor = 'bg-emerald-500/20';
+                    let iconColor = 'text-emerald-400';
+                    let iconName = 'check-circle-2';
+                    
+                    if (val === 0) {
+                        scoreColor = 'text-red-500';
+                        bgIconColor = 'bg-red-500/20';
+                        iconColor = 'text-red-400';
+                        iconName = 'x-circle';
+                    } else if (val < 1) {
+                        scoreColor = 'text-amber-500';
+                        bgIconColor = 'bg-amber-500/20';
+                        iconColor = 'text-amber-400';
+                        iconName = 'check-circle';
+                    }
+
+                    const itemHtml = `
+                        <div class="flex items-center gap-4 relative">
+                            <div class="w-12 flex flex-col items-center justify-center shrink-0">
+                                <span class="text-xs text-gray-500 font-bold">${khDate.dayName}</span>
+                                <span class="text-xl font-bold text-white-light-mode leading-none">${khDate.dayNum}</span>
+                            </div>
+                            
+                            <div class="w-10 h-10 rounded-full ${bgIconColor} flex items-center justify-center shrink-0 relative z-10 border border-gray-700">
+                                <i data-lucide="${iconName}" class="w-5 h-5 ${iconColor}"></i>
+                            </div>
+                            
+                            <div class="flex-1 bg-card-dark border border-gray-700 rounded-xl p-3 flex justify-between items-center shadow-sm">
+                                <div>
+                                    <p class="text-sm font-bold text-white-light-mode">កិច្ចការផ្ទះ</p>
+                                    <p class="text-[11px] text-gray-400">ខែ${khDate.monthName} ${khDate.year}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-lg font-bold ${scoreColor}">${val}</span>
+                                    <span class="text-xs text-gray-500 font-bold ml-0.5">ពិន្ទុ</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.insertAdjacentHTML('beforeend', itemHtml);
+                }
+            });
+
+            if (hasItemsRendered) {
+                document.getElementById('score-list').classList.remove('hidden');
+                if (count > 1) {
+                    document.getElementById('timeline-line').classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('scores-empty').classList.remove('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+    </script>
+</body>
+</html>

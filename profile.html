@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ប្រវត្តិរូបសិស្ស - Parent Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            background-color: #1c1c1e; 
+            color: #ffffff;
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .kh-moul { font-family: 'Moul', cursive; }
+        
+        /* Mobile Safe Areas */
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
+        
+        .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
+        .bg-card-dark { background-color: #2c2c2e; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+        .bg-header-green { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); }
+        
+        /* Light Mode Adjustments */
+        body.light-mode { background-color: #f9fafb; color: #1f2937; }
+        body.light-mode .bg-app-dark { background-color: #f9fafb; }
+        body.light-mode .bg-card-dark { background-color: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        body.light-mode .text-gray-400 { color: #6b7280; }
+        body.light-mode .text-gray-300 { color: #4b5563; }
+        body.light-mode .text-gray-200 { color: #1f2937; }
+        body.light-mode .border-gray-800 { border-color: #e5e7eb; }
+        
+        /* Loader */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #10b981;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        body.light-mode .spinner { border-color: rgba(0, 0, 0, 0.1); border-top-color: #10b981; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-app-dark min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <div class="bg-header-green pt-safe pb-4 px-4 shadow-md sticky top-0 z-50 flex items-center gap-3">
+        <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </button>
+        <h1 class="text-white font-bold text-lg kh-moul flex-1">ប្រវត្តិរូបសិស្ស</h1>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="flex-1 flex flex-col items-center justify-center py-20">
+        <div class="spinner mb-4"></div>
+        <p class="text-gray-400 text-sm animate-pulse">កំពុងទាញយកទិន្នន័យ...</p>
+    </div>
+
+    <!-- Content -->
+    <div id="main-content" class="hidden flex-1 p-4 pb-safe space-y-4">
+        
+        <!-- Profile Header -->
+        <div class="bg-card-dark rounded-3xl p-6 border border-gray-800 flex flex-col items-center shadow-sm text-center relative overflow-hidden">
+            <div class="w-24 h-24 rounded-full border-4 border-emerald-500/30 overflow-hidden mb-4 bg-gray-200 shadow-md">
+                <img id="p-photo" src="" alt="Profile" class="w-full h-full object-cover">
+            </div>
+            <h2 id="p-name" class="text-xl font-bold text-gray-200 kh-moul mb-1">...</h2>
+            <div class="flex items-center gap-2 justify-center">
+                <span id="p-gender" class="bg-emerald-500/10 text-emerald-500 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">...</span>
+                <span class="bg-blue-500/10 text-blue-500 px-3 py-1 rounded-full text-xs font-bold border border-blue-500/20 font-mono" id="p-id">ID: ...</span>
+            </div>
+        </div>
+
+        <!-- General Info -->
+        <div class="bg-card-dark rounded-2xl p-5 border border-gray-800 shadow-sm">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-300 mb-4 border-b border-gray-800 pb-3">
+                <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i> ព័ត៌មានទូទៅ
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-400">ថ្ងៃខែឆ្នាំកំណើត</span>
+                    <span id="p-dob" class="text-sm font-semibold text-gray-200">-</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-400">អាយុ</span>
+                    <span id="p-age" class="text-sm font-semibold text-gray-200">-</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-400">សញ្ជាតិ/ជនជាតិ</span>
+                    <span id="p-ethnicity" class="text-sm font-semibold text-gray-200">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Birth Place -->
+        <div class="bg-card-dark rounded-2xl p-5 border border-gray-800 shadow-sm">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-300 mb-4 border-b border-gray-800 pb-3">
+                <i data-lucide="map-pin" class="w-4 h-4 text-orange-400"></i> ទីកន្លែងកំណើត
+            </h3>
+            <p id="p-birthplace" class="text-sm text-gray-200 leading-relaxed">-</p>
+        </div>
+
+        <!-- Current Address -->
+        <div class="bg-card-dark rounded-2xl p-5 border border-gray-800 shadow-sm mb-6">
+            <h3 class="flex items-center gap-2 text-sm font-bold text-gray-300 mb-4 border-b border-gray-800 pb-3">
+                <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i> អាសយដ្ឋានបច្ចុប្បន្ន
+            </h3>
+            <p id="p-address" class="text-sm text-gray-200 leading-relaxed">-</p>
+        </div>
+
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
+            authDomain: "classroom-management-82382.firebaseapp.com",
+            projectId: "classroom-management-82382",
+            storageBucket: "classroom-management-82382.firebasestorage.app",
+            messagingSenderId: "146641865620",
+            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const PTEC_APP_ID = "ptec-app";
+
+        // Check Theme
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+
+        lucide.createIcons();
+
+        const tid = localStorage.getItem('savedTid');
+        const sid = localStorage.getItem('savedSid');
+
+        if (!tid || !sid) {
+            window.location.href = 'index.html';
+        }
+
+        const initAuth = async () => {
+            if (!auth.currentUser) await signInAnonymously(auth);
+        };
+
+        initAuth().then(() => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    fetchStudentData();
+                }
+            });
+        });
+
+        function calculateAge(dobStr) {
+            if(!dobStr || dobStr === '-') return '-';
+            const dob = new Date(dobStr);
+            if(isNaN(dob)) return '-';
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            return age + ' ឆ្នាំ';
+        }
+
+        function formatLocation(v, c, d, p) {
+            let parts = [];
+            const clean = (str, regex) => str ? str.replace(regex, '').trim() : '';
+            
+            let village = clean(v, /^(ភូមិទី|ភូមិ)\s*/);
+            let commune = clean(c, /^(ឃុំ\/សង្កាត់|សង្កាត់|ឃុំ)\s*/);
+            let district = clean(d, /^(ស្រុក\/ខណ្ឌ|ក្រុង\/ស្រុក\/ខណ្ឌ|ខណ្ឌ|ស្រុក|ក្រុង)\s*/);
+            let province = clean(p, /^(ខេត្ត\/ក្រុង|រាជធានី\/ខេត្ត|រាជធានី|ខេត្ត)\s*/);
+
+            if(village) parts.push('ភូមិ' + village);
+            if(commune) parts.push('ឃុំ/សង្កាត់' + commune);
+            if(district) parts.push('ស្រុក/ខណ្ឌ' + district);
+            if(province) parts.push('ខេត្ត/ក្រុង' + province);
+            
+            return parts.length > 0 ? parts.join(', ') : '-';
+        }
+
+        function formatDate(dobStr) {
+            if(!dobStr || dobStr === '-') return '-';
+            const parts = dobStr.split('-');
+            if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            return dobStr;
+        }
+
+        async function fetchStudentData() {
+            try {
+                const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
+                const snap = await getDoc(docRef);
+                
+                if (snap.exists()) {
+                    const s = snap.data();
+                    
+                    document.getElementById('p-photo').src = s.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${sid}`;
+                    document.getElementById('p-name').textContent = s.name || '-';
+                    document.getElementById('p-gender').textContent = s.gender || '-';
+                    document.getElementById('p-id').textContent = `ID: ${sid}`;
+                    
+                    document.getElementById('p-dob').textContent = formatDate(s.dob);
+                    document.getElementById('p-age').textContent = calculateAge(s.dob);
+                    document.getElementById('p-ethnicity').textContent = s.ethnicity || 'ខ្មែរ';
+                    
+                    const birthPlace = formatLocation(s.village, s.commune, s.district, s.province);
+                    document.getElementById('p-birthplace').textContent = birthPlace;
+                    
+                    const currPlace = formatLocation(s.currVillage, s.currCommune, s.currDistrict, s.currProvince);
+                    document.getElementById('p-address').textContent = currPlace !== '-' ? currPlace : (s.currentAddress || '-');
+
+                    document.getElementById('loading-state').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                } else {
+                    alert('រកមិនឃើញទិន្នន័យសិស្សទេ!');
+                    window.location.href = 'index.html';
+                }
+            } catch (e) {
+                console.error(e);
+                alert('មានបញ្ហាក្នុងការទាញយកទិន្នន័យ។');
+            }
+        }
+    </script>
+</body>
+</html>

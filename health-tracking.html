@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>តាមដានសុខភាព - Parent Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            background-color: #121212; 
+            color: #ffffff;
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent; 
+        }
+        .kh-moul { font-family: 'Moul', cursive; }
+        
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1.5rem); }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
+        
+        .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
+        .bg-card-dark { background-color: #2c2c2e; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+        .bg-header-green { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); }
+        
+        /* Light Mode Adjustments */
+        body.light-mode { background-color: #f9fafb; color: #1f2937; }
+        body.light-mode .bg-app-dark { background-color: #f9fafb; }
+        body.light-mode .bg-card-dark { background-color: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        
+        body.light-mode .text-dynamic { color: #111827; }
+        body.light-mode .text-dynamic-sub { color: #4b5563; }
+        
+        ::-webkit-scrollbar { display: none; }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #10b981;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-app-dark min-h-screen flex flex-col">
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="spinner w-12 h-12 mb-4 border-t-emerald-500"></div>
+        <p class="text-white text-sm animate-pulse">កំពុងទាញយកទិន្នន័យ...</p>
+    </div>
+
+    <!-- Header Section -->
+    <div class="bg-header-green pt-safe pb-6 px-6 rounded-b-[2rem] shadow-md relative z-20">
+        <div class="flex justify-between items-center mb-5">
+            <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-sm">
+                <i data-lucide="arrow-left" class="w-6 h-6 text-white"></i>
+            </button>
+            <h1 class="text-white font-bold text-xl kh-moul">តាមដានសុខភាព</h1>
+            <div class="w-10"></div> <!-- Spacer -->
+        </div>
+
+        <div class="flex items-center gap-4 bg-white/10 p-3 rounded-2xl border border-white/20 backdrop-blur-sm">
+            <div class="relative">
+                <div class="w-14 h-14 rounded-full border-2 border-white overflow-hidden bg-gray-300">
+                    <img id="student-photo" src="" alt="Student" class="w-full h-full object-cover">
+                </div>
+            </div>
+            <div class="flex-1">
+                <h2 id="student-name" class="text-white font-bold text-base kh-moul mb-1">...</h2>
+                <div class="flex items-center gap-2">
+                    <span id="student-age" class="bg-black/20 px-2 py-0.5 rounded text-[11px] text-emerald-100 border border-white/10">អាយុ: -</span>
+                    <span id="student-gender" class="bg-black/20 px-2 py-0.5 rounded text-[11px] text-emerald-100 border border-white/10">ភេទ: -</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 px-5 pt-6 pb-safe overflow-y-auto hidden opacity-0 transition-opacity duration-500" id="main-content">
+        
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-card-dark rounded-2xl p-4 border border-gray-800/50 flex flex-col items-center justify-center text-center shadow-sm">
+                <i data-lucide="ruler" class="w-6 h-6 text-blue-400 mb-2"></i>
+                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1">កម្ពស់</p>
+                <p id="val-height" class="text-dynamic text-white font-bold text-lg">...</p>
+            </div>
+            <div class="bg-card-dark rounded-2xl p-4 border border-gray-800/50 flex flex-col items-center justify-center text-center shadow-sm">
+                <i data-lucide="weight" class="w-6 h-6 text-orange-400 mb-2"></i>
+                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1">ទម្ងន់</p>
+                <p id="val-weight" class="text-dynamic text-white font-bold text-lg">...</p>
+            </div>
+            <div class="bg-card-dark rounded-2xl p-4 border border-gray-800/50 flex flex-col items-center justify-center text-center shadow-sm relative overflow-hidden">
+                <div id="bmi-bg-glow" class="absolute inset-0 opacity-10"></div>
+                <i data-lucide="activity" class="w-6 h-6 text-emerald-400 mb-2 relative z-10"></i>
+                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1 relative z-10">BMI</p>
+                <p id="val-bmi" class="text-dynamic text-white font-bold text-lg relative z-10">...</p>
+            </div>
+        </div>
+
+        <!-- Status Banner -->
+        <div id="status-banner" class="rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm transition-colors">
+            <div id="status-icon" class="p-3 rounded-full shrink-0">
+                <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-semibold mb-0.5 opacity-80">ស្ថានភាពសុខភាព (BMI)</p>
+                <h3 id="status-text" class="font-bold text-[17px] kh-moul leading-tight">...</h3>
+            </div>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="bg-card-dark rounded-2xl p-4 lg:p-5 border border-gray-800/50 mb-6 shadow-sm">
+            <h3 class="text-dynamic text-gray-200 font-bold text-sm mb-4 flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-5 h-5 text-indigo-400"></i>
+                ក្រាបចំណាត់ថ្នាក់ BMI (WHO)
+            </h3>
+            <div class="relative w-full h-[280px]">
+                <canvas id="bmiChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Info Note -->
+        <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 flex gap-3 shadow-sm mb-4">
+            <i data-lucide="info" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+            <p class="text-dynamic-sub text-gray-300 text-[12px] leading-relaxed">
+                ទិន្នន័យនេះត្រូវបានវាស់វែងដោយគ្រូបន្ទុកថ្នាក់។ ក្រាបចំណាត់ថ្នាក់គឺផ្អែកលើស្តង់ដារអង្គការសុខភាពពិភពលោក (WHO) សម្រាប់កុមារ និងយុវវ័យអាយុ ៥ ដល់ ១៥ឆ្នាំ។ ចំណុចនៅលើក្រាបតំណាងឲ្យស្ថានភាពកូនរបស់អ្នកបច្ចុប្បន្ន។
+            </p>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs & Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
+            authDomain: "classroom-management-82382.firebaseapp.com",
+            projectId: "classroom-management-82382",
+            storageBucket: "classroom-management-82382.firebasestorage.app",
+            messagingSenderId: "146641865620",
+            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81",
+            measurementId: "G-PX867PB723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const PTEC_APP_ID = "ptec-app";
+
+        let isDarkMode = localStorage.getItem('theme') !== 'light';
+        if (!isDarkMode) document.body.classList.add('light-mode');
+
+        const tid = localStorage.getItem('savedTid');
+        const sid = localStorage.getItem('savedSid');
+
+        if (!tid || !sid) {
+            window.location.href = 'index.html';
+        }
+
+        // Data arrays from Data Analysis app
+        const labels = ['៥', '៦', '៧', '៨', '៩', '១០', '១១', '១២', '១៣', '១៤', '១៥'];
+        const boysData = {
+            underweight: [13.0, 13.3, 13.6, 13.8, 14.0, 14.2, 14.6, 15.0, 15.4, 16.0, 16.5],
+            overweight:  [16.6, 17.0, 17.3, 17.7, 18.3, 19.0, 19.9, 20.8, 21.8, 22.7, 23.6],
+            obese:       [18.3, 18.5, 19.0, 19.7, 20.5, 21.4, 22.5, 23.6, 24.8, 25.9, 27.0]
+        };
+        const girlsData = {
+            underweight: [12.7, 13.0, 13.2, 13.5, 13.8, 14.0, 14.4, 14.8, 15.3, 15.8, 16.3],
+            overweight:  [16.9, 17.1, 17.6, 18.3, 19.1, 20.0, 21.1, 22.3, 23.3, 24.3, 25.0],
+            obese:       [18.9, 18.8, 19.6, 20.6, 21.7, 22.9, 24.3, 25.9, 27.1, 28.2, 29.1]
+        };
+
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+        };
+
+        initAuth().then(() => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    await loadStudentHealthData();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+
+        async function loadStudentHealthData() {
+            try {
+                const studentsRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students');
+                const studentSnap = await getDocs(studentsRef);
+                let students = [];
+                studentSnap.forEach(doc => {
+                    let data = doc.data();
+                    data.id = doc.id;
+                    students.push(data);
+                });
+                
+                students.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                const sIndex = students.findIndex(s => s.id === sid);
+                
+                if (sIndex === -1) throw new Error("Student not found");
+                const student = students[sIndex];
+                
+                const healthRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'settings', 'health_tracking');
+                const healthSnap = await getDoc(healthRef);
+                const healthData = healthSnap.exists() ? healthSnap.data() : {};
+                
+                const hVal = healthData[`h_${sIndex}`] || null;
+                const wVal = healthData[`w_${sIndex}`] || null;
+                
+                renderUI(student, hVal, wVal);
+                
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading-overlay').innerHTML = `
+                    <div class="text-red-400 bg-red-400/10 p-4 rounded-xl text-center max-w-xs mx-4 border border-red-500/20">
+                        <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
+                        <p class="font-bold text-sm">មិនអាចទាញយកទិន្នន័យបានទេ។</p>
+                        <button onclick="window.history.back()" class="mt-4 px-4 py-2 bg-red-500/20 rounded-lg text-xs hover:bg-red-500/30">ត្រឡប់ក្រោយ</button>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+        }
+
+        function renderUI(student, hVal, wVal) {
+            // Profile Info
+            document.getElementById('student-name').textContent = student.name || 'មិនស្គាល់ឈ្មោះ';
+            document.getElementById('student-photo').src = student.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${student.id}`;
+            document.getElementById('student-gender').textContent = `ភេទ: ${student.gender || '-'}`;
+            
+            let age = 9; 
+            if (student.dob) {
+                const yearMatch = student.dob.toString().match(/\d{4}/);
+                if (yearMatch) {
+                    const currentYear = new Date().getFullYear();
+                    const calcAge = currentYear - parseInt(yearMatch[0]);
+                    if(calcAge >= 5 && calcAge <= 18) age = calcAge;
+                }
+            }
+            document.getElementById('student-age').textContent = `អាយុ: ${age} ឆ្នាំ`;
+            
+            // Metrics
+            document.getElementById('val-height').textContent = hVal ? `${hVal} cm` : '-';
+            document.getElementById('val-weight').textContent = wVal ? `${wVal} kg` : '-';
+            
+            const isBoy = !(student.gender && (student.gender.includes('ស្រី') || student.gender.toLowerCase() === 'f'));
+            const dataCutoffs = isBoy ? boysData : girlsData;
+            const bmiData = calcBMIStatus(hVal, wVal, age, dataCutoffs);
+            
+            document.getElementById('val-bmi').textContent = bmiData.raw ? bmiData.val : '-';
+            
+            // Status Banner Styling
+            const banner = document.getElementById('status-banner');
+            const statusText = document.getElementById('status-text');
+            const statusIcon = document.getElementById('status-icon');
+            const glow = document.getElementById('bmi-bg-glow');
+            
+            if (!bmiData.raw) {
+                banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-gray-500/10 border-gray-500/20 text-gray-500';
+                statusText.textContent = 'មិនទាន់វាស់វែង';
+                statusIcon.className = 'p-3 rounded-full bg-gray-500/20';
+                glow.className = 'absolute inset-0 opacity-10 bg-gray-500';
+            } else {
+                statusText.textContent = bmiData.text;
+                if (bmiData.text === 'ស្គម') {
+                    banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-500';
+                    statusIcon.className = 'p-3 rounded-full bg-yellow-500/20';
+                    glow.className = 'absolute inset-0 opacity-20 bg-yellow-500';
+                } else if (bmiData.text === 'ធម្មតា') {
+                    banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-500';
+                    statusIcon.className = 'p-3 rounded-full bg-emerald-500/20';
+                    glow.className = 'absolute inset-0 opacity-20 bg-emerald-500';
+                } else if (bmiData.text === 'លើសទម្ងន់') {
+                    banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-500';
+                    statusIcon.className = 'p-3 rounded-full bg-orange-500/20';
+                    glow.className = 'absolute inset-0 opacity-20 bg-orange-500';
+                } else {
+                    banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-500';
+                    statusIcon.className = 'p-3 rounded-full bg-red-500/20';
+                    glow.className = 'absolute inset-0 opacity-20 bg-red-500';
+                }
+            }
+            
+            // Hide Loader & Show Content
+            const loader = document.getElementById('loading-overlay');
+            const main = document.getElementById('main-content');
+            loader.classList.add('opacity-0');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                main.classList.remove('hidden');
+                lucide.createIcons();
+                setTimeout(() => main.classList.remove('opacity-0'), 50);
+                
+                // Render Chart after unhiding to ensure correct dimensions
+                renderChart(age, bmiData.raw, dataCutoffs);
+            }, 300);
+        }
+
+        function calcBMIStatus(h_cm, w_kg, age, cutoffs) {
+            const h = parseFloat(h_cm);
+            const w = parseFloat(w_kg);
+            
+            if (!h || !w || isNaN(h) || isNaN(w) || h < 50 || w < 5) {
+                return { val: '-', text: '-', raw: null };
+            }
+            
+            const h_m = h / 100;
+            const bmiRaw = w / (h_m * h_m);
+            const bmi = bmiRaw.toFixed(1);
+            
+            let lookupAge = age;
+            if (lookupAge < 5) lookupAge = 5;
+            if (lookupAge > 15) lookupAge = 15;
+            const ageIdx = lookupAge - 5;
+
+            let text = '';
+            if (bmiRaw < cutoffs.underweight[ageIdx]) { 
+                text = 'ស្គម'; 
+            } else if (bmiRaw >= cutoffs.underweight[ageIdx] && bmiRaw < cutoffs.overweight[ageIdx]) { 
+                text = 'ធម្មតា'; 
+            } else if (bmiRaw >= cutoffs.overweight[ageIdx] && bmiRaw < cutoffs.obese[ageIdx]) { 
+                text = 'លើសទម្ងន់'; 
+            } else { 
+                text = 'ធាត់ខ្លាំង'; 
+            }
+            
+            return { val: bmi, text: text, raw: bmiRaw };
+        }
+
+        function renderChart(age, bmiRaw, cutoffs) {
+            const ctx = document.getElementById('bmiChart').getContext('2d');
+            Chart.defaults.font.family = "'Kantumruy Pro', sans-serif";
+            Chart.defaults.color = isDarkMode ? '#9ca3af' : '#6b7280'; 
+
+            const alpha = isDarkMode ? 0.25 : 0.65;
+            const studentPointData = Array(11).fill(null);
+            
+            let xIndex = age - 5;
+            if (xIndex < 0) xIndex = 0;
+            if (xIndex > 10) xIndex = 10;
+            if (bmiRaw) studentPointData[xIndex] = bmiRaw;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'កូនរបស់អ្នក',
+                            data: studentPointData,
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#ffffff',
+                            borderWidth: 3,
+                            pointRadius: 6,
+                            pointHoverRadius: 9,
+                            showLine: false,
+                            order: 0
+                        },
+                        {
+                            label: 'Max',
+                            data: Array(11).fill(32),
+                            borderColor: 'transparent',
+                            backgroundColor: `rgba(239, 68, 68, ${alpha})`,
+                            fill: 1,
+                            pointRadius: 0,
+                            tooltip: false
+                        },
+                        {
+                            label: 'ធាត់ខ្លាំង (Obese ≥)',
+                            data: cutoffs.obese,
+                            borderColor: '#ef4444',
+                            borderWidth: 2,
+                            backgroundColor: `rgba(249, 115, 22, ${alpha})`,
+                            fill: 2,
+                            tension: 0.3,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'លើសទម្ងន់ (Overweight ≥)',
+                            data: cutoffs.overweight,
+                            borderColor: '#f97316',
+                            borderWidth: 2,
+                            backgroundColor: `rgba(34, 197, 94, ${alpha})`,
+                            fill: 3,
+                            tension: 0.3,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'ធម្មតា (Normal ≥)',
+                            data: cutoffs.underweight,
+                            borderColor: '#22c55e',
+                            borderWidth: 2,
+                            backgroundColor: `rgba(234, 179, 8, ${alpha})`,
+                            fill: 'origin',
+                            tension: 0.3,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                            titleColor: isDarkMode ? '#fff' : '#111',
+                            bodyColor: isDarkMode ? '#cbd5e1' : '#475569',
+                            borderColor: isDarkMode ? '#374151' : '#e2e8f0',
+                            borderWidth: 1,
+                            titleFont: { family: "'Kantumruy Pro', sans-serif", size: 13, weight: 'bold' },
+                            bodyFont: { family: "'Kantumruy Pro', sans-serif", size: 12 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            filter: function(tooltipItem) { return tooltipItem.datasetIndex !== 1; },
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        return ` បច្ចុប្បន្ន: ${context.parsed.y.toFixed(1)} BMI`;
+                                    }
+                                    return ' ' + context.dataset.label.replace(' ≥', '') + ': ' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 10, max: 32,
+                            ticks: { stepSize: 4 },
+                            title: { display: true, text: 'BMI (សន្ទស្សន៍ម៉ាសរាងកាយ)', font: { size: 11, family: "'Kantumruy Pro', sans-serif" } },
+                            grid: { color: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            title: { display: true, text: 'អាយុ (ឆ្នាំ)', font: { size: 11, family: "'Kantumruy Pro', sans-serif" } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

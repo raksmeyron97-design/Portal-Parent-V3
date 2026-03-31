@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ប្រព័ន្ធអាណាព្យាបាល - Parent Portal</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <link rel="stylesheet" href="style_index/style.css">
+</head>
+<body class="bg-app-dark min-h-screen flex flex-col">
+
+    <div id="loading-overlay" role="alert" aria-busy="true" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="spinner w-12 h-12 mb-4 border-t-emerald-500"></div>
+        <p class="text-white text-sm animate-pulse" id="loading-text" data-i18n="loading_data">កំពុងរៀបចំទិន្នន័យ...</p>
+    </div>
+
+    <main id="auth-section" class="fixed inset-0 z-50 flex flex-col items-center justify-center login-bg transition-opacity duration-500 hidden opacity-0" aria-hidden="true">
+        <div class="absolute inset-0 login-overlay"></div>
+        
+        <div class="relative z-10 w-full max-w-sm px-6 flex flex-col items-center">
+            <div class="bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/20 mb-6 shadow-2xl">
+                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-inner">
+                    <i data-lucide="graduation-cap" class="w-10 h-10 text-emerald-700" aria-hidden="true"></i>
+                </div>
+            </div>
+            
+            <h1 class="text-3xl font-bold text-white mb-2">Parent Portal</h1>
+            <p class="text-gray-300 text-sm mb-8" data-i18n="auth_subtitle">សម្រាប់អាណាព្យាបាលសិស្ស</p>
+
+            <div class="glass-card w-full p-6 shadow-2xl">
+                <form id="login-form" class="space-y-4" novalidate>
+                    
+                    <div class="space-y-1">
+                        <label for="teacher-code" class="text-sm font-semibold text-gray-200 ml-1 block" data-i18n="class_code_label">លេខកូដថ្នាក់រៀន</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="key" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
+                            </div>
+                            <input value="KS9lutduPQZambSiLyZzFgh0xDh1" type="text" id="teacher-code" required placeholder="ឧទាហរណ៍៖ KS9lut..." aria-describedby="teacher-helper teacher-error" data-i18n-placeholder="placeholder_teacher"
+                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition">
+                        </div>
+                        <p id="teacher-helper" class="text-[11px] text-gray-300 ml-1" data-i18n="class_code_helper">សួរគ្រូរបស់អ្នកសម្រាប់លេខកូដនេះ</p>
+                        <p id="teacher-error" class="text-[11px] text-red-400 ml-1 hidden" role="alert"></p>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <label for="student-code" class="text-sm font-semibold text-gray-200 ml-1 block" data-i18n="student_id_label">អត្តលេខសិស្ស</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="user" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
+                            </div>
+                            <input type="text" id="student-code" required placeholder="ឧទាហរណ៍៖ STU001" aria-describedby="student-helper student-error" data-i18n-placeholder="placeholder_student"
+                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition">
+                        </div>
+                        <p id="student-helper" class="text-[11px] text-gray-300 ml-1" data-i18n="student_id_helper">អត្តលេខសម្គាល់កូនរបស់អ្នក</p>
+                        <p id="student-error" class="text-[11px] text-red-400 ml-1 hidden" role="alert"></p>
+                    </div>
+                    
+                    <div id="login-error" class="hidden bg-red-500/20 text-red-100 border border-red-500/50 p-3 rounded-lg text-xs text-center flex items-center gap-2" role="alert">
+                        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+                        <span id="login-error-text" data-i18n="login_error_default">ព័ត៌មានមិនត្រឹមត្រូវ។</span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                        <button type="button" onclick="scanQR()" aria-label="ស្កេន QR Code" class="flex-1 sm:flex-[0.4] flex items-center justify-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-500/50 text-white py-3 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none">
+                            <i data-lucide="qr-code" class="w-5 h-5"></i>
+                            <span class="text-sm font-bold sm:hidden" data-i18n="scan_qr_btn">ស្កេន QR</span>
+                        </button>
+                        
+                        <button type="submit" id="btn-login" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-white outline-none disabled:opacity-70 disabled:cursor-not-allowed">
+                            <span id="btn-login-text" data-i18n="login_btn">ចូលប្រើប្រាស់</span>
+                            <i data-lucide="log-in" id="btn-login-icon" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <p class="mt-8 text-xs text-gray-300 text-center flex items-center gap-1 justify-center">
+                <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                <span data-i18n="login_footer">ស្កេន QR Code ពីសាលាដើម្បីចូលដោយស្វ័យប្រវត្តិ។</span>
+            </p>
+        </div>
+    </main>
+
+
+    <div id="main-content" class="hidden opacity-0 transition-opacity duration-500 flex-1 flex flex-col h-full w-full" aria-hidden="true">
+        
+        <main id="dashboard-view" class="flex flex-col flex-1 w-full pb-20 focus:outline-none" tabindex="-1">
+            <header class="bg-header-green pt-safe pb-6 px-6 rounded-b-[2rem] shadow-md relative z-20">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 id="header-school-name" class="text-white font-bold text-lg">សាលាបឋមសិក្សា</h2>
+                        <p id="header-academic-year" class="text-emerald-100/80 text-xs">ឆ្នាំសិក្សា ២០២៥-២០២៦</p>
+                    </div>
+                    
+                    <button onclick="toggleNotifications()" aria-label="បើកការជូនដំណឹង" aria-haspopup="dialog" class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                        <i data-lucide="bell" class="w-6 h-6 text-white" aria-hidden="true"></i>
+                        <span id="notif-badge" class="absolute top-1 right-1 flex h-2.5 w-2.5 hidden">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-emerald-800"></span>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4 bg-white/10 p-3 rounded-2xl border border-white/20 backdrop-blur-sm">
+                    <div class="relative">
+                        <div class="w-14 h-14 rounded-full border-2 border-white overflow-hidden bg-gray-300 flex items-center justify-center">
+                            <img id="display-photo" loading="lazy" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student1&backgroundColor=b6e3f4" alt="រូបថតសិស្ស" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-emerald-100 text-[11px] font-semibold mb-0.5" data-i18n="student_info_label">ព័ត៌មានកូនរបស់អ្នក៖</p>
+                        <h3 id="display-name" class="text-white font-bold text-base kh-moul">កំពុងទាញយក...</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span id="display-gender" class="bg-black/20 px-2 py-0.5 rounded text-xs text-white border border-white/10">-</span>
+                            <span class="bg-black/20 px-2 py-0.5 rounded text-xs text-white border border-white/10 font-mono flex items-center gap-1">
+                                ID: <span id="display-id" aria-live="polite">***</span>
+                            </span>
+                            <button onclick="toggleID()" aria-label="បង្ហាញអត្តលេខ" class="text-emerald-200 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-white outline-none">
+                                <i data-lucide="eye" id="eye-icon" class="w-3.5 h-3.5" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="flex-1 px-5 -mt-2 pt-6 pb-6 relative z-10" aria-label="ម៉ឺនុយមុខងារ">
+                <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1" id="track-heading" data-i18n="tracking_features">មុខងារតាមដាន</h3>
+                <nav class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4" id="tracking-grid" aria-labelledby="track-heading">
+                    </nav>
+
+                <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1 mt-8" id="info-heading" data-i18n="student_info_heading">ព័ត៌មានសិស្ស</h3>
+                <nav class="grid grid-cols-2 gap-3 md:gap-4" id="info-grid" aria-labelledby="info-heading">
+                    </nav>
+            </section>
+        </main>
+
+        <main id="settings-view" class="hidden flex-col flex-1 w-full pb-20 overflow-y-auto focus:outline-none" tabindex="-1">
+            <header class="bg-header-green pt-safe pb-6 px-6 relative z-20 overflow-hidden">
+                <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay"></div>
+                <h1 class="text-white font-bold text-2xl kh-moul relative z-10 mt-4 mb-2" data-i18n="settings_title">ការកំណត់</h1>
+            </header>
+
+            <section class="px-4 py-6 space-y-4 relative z-10" aria-label="ជម្រើសការកំណត់">
+                <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-gray-700/50 p-2 rounded-lg" aria-hidden="true"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-gray-300"></i></div>
+                        <h3 class="font-bold text-gray-200 text-sm" data-i18n="preferences">ចំណូលចិត្ត</h3>
+                    </div>
+                    <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
+                    
+                    <button type="button" role="switch" aria-checked="true" id="btn-dark-mode" onclick="toggleDarkMode()" class="w-full flex justify-between items-center mb-5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-1 transition-colors hover:bg-gray-700/30">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="moon" id="dark-mode-icon" class="w-5 h-5 text-gray-400 transition-colors group-hover:text-emerald-400" aria-hidden="true"></i>
+                            <div class="text-left">
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="theme">រូបរាង (Theme)</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5" id="dark-mode-text" data-i18n="dark_mode_active">កំពុងប្រើ Dark Mode</p>
+                            </div>
+                        </div>
+                        <div id="dark-mode-toggle" class="w-10 h-6 bg-emerald-500 rounded-full relative mr-1 transition-colors duration-300">
+                            <div id="dark-mode-circle" class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform duration-300"></div>
+                        </div>
+                    </button>
+                    
+                    <button type="button" onclick="toggleLanguage()" class="w-full flex justify-between items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-1 transition-colors hover:bg-gray-700/30">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="languages" class="w-5 h-5 text-gray-400 transition-colors group-hover:text-emerald-400" aria-hidden="true"></i>
+                            <div class="text-left">
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="language_label">ភាសា</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5" id="lang-text" data-i18n="lang_name">ខ្មែរ</p>
+                            </div>
+                        </div>
+                        <div class="mr-1 text-lg" id="lang-flag" aria-hidden="true">🇰🇭</div>
+                    </button>
+                </div>
+
+                <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-gray-700/50 p-2 rounded-lg" aria-hidden="true"><i data-lucide="shield" class="w-5 h-5 text-gray-300"></i></div>
+                        <h3 class="font-bold text-gray-200 text-sm" data-i18n="account_info">ព័ត៌មានគណនី</h3>
+                    </div>
+                    <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
+                    <div class="flex justify-between items-center mb-5 px-1">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="key" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
+                            <div>
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="class_code_label">លេខកូដថ្នាក់រៀន</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5 font-mono" id="setting-tid">***</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center px-1">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="user" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
+                            <div>
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="student_id_label">អត្តលេខសិស្ស</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5 font-mono" id="setting-sid">***</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="logout()" class="w-full bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50 hover:bg-red-500/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 text-left group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-red-500/10 p-2 rounded-lg transition-colors group-hover:bg-red-500/20" aria-hidden="true"><i data-lucide="log-out" class="w-5 h-5 text-red-500"></i></div>
+                        <h3 class="font-bold text-red-400 text-sm" data-i18n="logout_btn">ចាកចេញ</h3>
+                    </div>
+                    <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
+                    <p class="text-[13px] text-gray-400 px-1" data-i18n="logout_desc">ចាកចេញពីគណនីដោយសុវត្ថិភាព។ អ្នកនឹងត្រូវបញ្ចូលលេខកូដម្តងទៀតនៅពេលក្រោយ។</p>
+                </button>
+            </section>
+        </main>
+
+        <nav class="fixed bottom-0 left-0 w-full bg-[#1c1c1e]/95 backdrop-blur-lg border-t border-gray-800 pb-safe pt-2 px-6 z-40" aria-label="ម៉ឺនុយខាងក្រោម">
+            <div class="flex justify-around items-center max-w-sm mx-auto pb-2" role="tablist">
+                <button role="tab" aria-selected="true" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="flex flex-col items-center gap-1 text-emerald-500 w-16 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1">
+                    <i data-lucide="layout-dashboard" class="w-6 h-6" aria-hidden="true"></i>
+                    <span class="text-[10px] font-bold" data-i18n="nav_home">ទំព័រដើម</span>
+                </button>
+                <button role="tab" aria-selected="false" onclick="switchTab('settings')" id="tab-btn-settings" class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-300 w-16 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1">
+                    <i data-lucide="settings" class="w-6 h-6" aria-hidden="true"></i>
+                    <span class="text-[10px] font-bold" data-i18n="nav_settings">ការកំណត់</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <div id="notification-modal" role="dialog" aria-modal="true" aria-labelledby="notif-title" class="fixed inset-0 z-[70] hidden flex-col justify-end sm:justify-center items-center px-0 sm:px-4 pb-0 sm:pb-4 transition-opacity duration-300 opacity-0" aria-hidden="true">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleNotifications()" aria-hidden="true"></div>
+        <div class="bg-card-dark w-full sm:max-w-md rounded-t-[2rem] sm:rounded-[2rem] border border-gray-700 relative z-10 shadow-2xl flex flex-col max-h-[85vh] transform transition-transform duration-300 translate-y-full sm:translate-y-0" id="notification-content">
+            <header class="p-5 border-b border-gray-700/50 flex justify-between items-center bg-gray-800/30 rounded-t-[2rem] sm:rounded-t-[2rem]">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500/20 p-2.5 rounded-xl text-emerald-400" aria-hidden="true">
+                        <i data-lucide="bell-ring" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 id="notif-title" class="text-white font-bold text-lg kh-moul leading-tight" data-i18n="notif_title">ការជូនដំណឹង</h3>
+                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="notif_subtitle">សារពីសាលារៀន</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-dismiss-all" onclick="dismissAllNotifications()" class="hidden text-xs text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-lg transition font-medium focus-visible:ring-2 focus-visible:ring-red-400 outline-none" data-i18n="notif_dismiss_all">លុបទាំងអស់</button>
+                    <button onclick="toggleNotifications()" aria-label="បិទការជូនដំណឹង" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                        <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </header>
+            <div id="notification-list" class="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar" aria-live="polite">
+                <div class="text-center py-10">
+                    <div class="spinner w-8 h-8 mx-auto border-t-emerald-500 mb-4"></div>
+                    <p class="text-gray-400 text-sm" data-i18n="loading">កំពុងទាញយក...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title" class="fixed inset-0 z-[70] hidden flex-col items-center justify-center px-4" aria-hidden="true">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeQRScanner()" aria-hidden="true"></div>
+        <div class="bg-card-dark w-full max-w-sm rounded-[2rem] border border-gray-700 relative z-10 shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300" id="qr-scanner-content">
+            <header class="flex justify-between items-center mb-4">
+                <h3 id="qr-title" class="text-white font-bold text-xl" data-i18n="qr_title">ស្កេន QR Code</h3>
+                <button onclick="closeQRScanner()" aria-label="បិទកាមេរ៉ា" class="text-gray-400 hover:text-white bg-gray-800 p-1.5 rounded-full transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                    <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
+                </button>
+            </header>
+            <p class="text-gray-400 text-[13px] mb-4 text-center" data-i18n="qr_desc">សូមដាក់កាមេរ៉ារបស់អ្នកឱ្យចំ QR Code របស់គ្រូ។</p>
+            
+            <div class="w-full bg-black rounded-2xl overflow-hidden border-2 border-emerald-500/50 relative flex items-center justify-center min-h-[250px]">
+                <div id="qr-reader" class="w-full"></div>
+            </div>
+            
+            <p id="qr-status" aria-live="polite" class="text-emerald-500 text-xs text-center mt-4 animate-pulse" data-i18n="qr_opening">កំពុងបើកកាមេរ៉ា...</p>
+        </div>
+    </div>
+
+    <script src="style_index/app.js"></script>
+    <script type="module" src="style_index/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>កាតសិស្ស - Parent Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Battambang:wght@400;700&family=Moul&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2canvas សម្រាប់ទាញយកកាតជារូបភាព -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        body { 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            background-color: #121212; 
+            color: #ffffff;
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .kh-moul { font-family: 'Moul', cursive; font-weight: normal; }
+        .kh-battambang { font-family: 'Battambang', cursive; }
+        
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1.5rem); }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
+        
+        .bg-app-dark { background-color: #1c1c1e; }
+        .bg-card-dark { background-color: #2c2c2e; }
+
+        /* Loader */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #10b981;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Card Container Styles */
+        #card-wrapper {
+            width: 378px; /* ប្រហែល 100mm */
+            height: 529px; /* ប្រហែល 140mm */
+            transform-origin: top center;
+            position: relative;
+            background-color: white;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .card-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-app-dark min-h-screen flex flex-col">
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="spinner w-12 h-12 mb-4 border-t-amber-500"></div>
+        <p class="text-white text-sm animate-pulse">កំពុងរៀបចំកាតសិស្ស...</p>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="fixed inset-0 z-[110] bg-black/80 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 px-4">
+        <div class="bg-card-dark border border-red-500/30 p-6 rounded-2xl max-w-sm w-full text-center shadow-2xl">
+            <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8 text-red-500"></i>
+            </div>
+            <h3 class="text-white font-bold text-lg mb-2">មានបញ្ហា!</h3>
+            <div id="error-message" class="text-gray-400 text-sm mb-6 space-y-2">
+                <!-- Error content will be injected here -->
+            </div>
+            <button onclick="window.location.href='index.html'" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 rounded-xl transition">
+                ត្រឡប់ទៅកាន់ទំព័រដើម
+            </button>
+        </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="pt-safe pb-4 px-5 bg-[#1c1c1e] sticky top-0 z-50 border-b border-gray-800/60 shadow-md">
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="p-2 -ml-2 bg-gray-800/50 hover:bg-gray-700 rounded-full transition text-gray-300">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <h1 class="text-white font-bold text-lg kh-moul">កាតសិស្ស</h1>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto pb-safe flex flex-col items-center w-full">
+        
+        <div class="w-full px-4 py-6 flex flex-col items-center justify-center flex-1">
+            <!-- Dynamic Card Container -->
+            <div id="responsive-container" class="w-full flex justify-center items-start transition-all duration-300">
+                <div id="card-wrapper" class="kh-battambang opacity-0 transition-opacity duration-500">
+                    <!-- Card HTML នឹងត្រូវបញ្ចូលតាមរយៈ JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="w-full max-w-sm px-6 pb-6 space-y-3 mt-auto relative z-10">
+            <!-- Background Toggle -->
+            <div class="bg-card-dark rounded-xl p-1.5 flex justify-between border border-gray-700 shadow-lg">
+                <button onclick="switchTemplate('1_id-student.jpg')" id="btn-tpl-1" class="flex-1 py-2 rounded-lg text-sm font-semibold text-gray-400 transition-all">
+                    ទម្រង់ទី ១
+                </button>
+                <button onclick="switchTemplate('2_id-student.jpg')" id="btn-tpl-2" class="flex-1 py-2 rounded-lg text-sm font-semibold bg-gray-700 text-white shadow transition-all">
+                    ទម្រង់ទី ២
+                </button>
+            </div>
+
+            <!-- Download Button -->
+            <button onclick="downloadCard()" id="btn-download" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-amber-900/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span>រក្សាទុករូបភាពកាត</span>
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
+            authDomain: "classroom-management-82382.firebaseapp.com",
+            projectId: "classroom-management-82382",
+            storageBucket: "classroom-management-82382.firebasestorage.app",
+            messagingSenderId: "146641865620",
+            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81",
+            measurementId: "G-PX867PB723"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const PTEC_APP_ID = "ptec-app";
+
+        let currentBgImage = "2_id-student.jpg";
+        let studentData = null;
+        let profileData = {}; 
+        let isAppInit = false;
+
+        lucide.createIcons();
+
+        function showError(message, isAuthError = false) {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            const errorModal = document.getElementById('error-modal');
+            const errorContainer = document.getElementById('error-message');
+            
+            if (isAuthError && message.includes('admin-restricted-operation')) {
+                errorContainer.innerHTML = `
+                    <p class="text-white font-bold">កំហុសការកំណត់ Firebase!</p>
+                    <p>សូមចូលទៅកាន់ Firebase Console រួចបើក (Enable) មុខងារ <b>Anonymous Sign-in</b> នៅក្នុងផ្នែក Authentication ជាមុនសិន។</p>
+                    <p class="text-[10px] opacity-50 font-mono">${message}</p>
+                `;
+            } else {
+                errorContainer.innerHTML = `<p>${message}</p>`;
+            }
+            
+            errorModal.classList.remove('hidden');
+            setTimeout(() => errorModal.classList.remove('opacity-0'), 10);
+        }
+
+        // Global Timeout
+        const loadingTimeout = setTimeout(() => {
+            const loader = document.getElementById('loading-overlay');
+            if (!loader.classList.contains('hidden') && !isAppInit) {
+                showError("ការទាញយកមានភាពយឺតយ៉ាវ។ សូមពិនិត្យមើលសេវាអុីនធឺណិត ឬបិទ Brave Shields (រូបតោ)។");
+            }
+        }, 15000); 
+
+        const khNumbers = ['០','១','២','៣','៤','៥','៦','៧','៨','៩'];
+        function toKhmerNum(str) {
+            if (!str) return '';
+            return str.toString().split('').map(char => {
+                if (char >= '0' && char <= '9') return khNumbers[parseInt(char)];
+                return char;
+            }).join('');
+        }
+
+        function formatKhmerDate(dateStr) {
+            if (!dateStr || dateStr === '-') return '-';
+            const parts = dateStr.split('-');
+            if(parts.length !== 3) return toKhmerNum(dateStr);
+            const year = parts[0];
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            const khMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
+            return `${toKhmerNum(day)} ${khMonths[month-1]} ${toKhmerNum(year)}`;
+        }
+
+        function formatLocationShort(s) {
+            const clean = (str, regex) => str ? str.replace(regex, '').trim() : '';
+            let v = clean(s.village, /^(ភូមិទី|ភូមិ)\s*/);
+            let c = clean(s.commune, /^(ឃុំ\/សង្កាត់|សង្កាត់|ឃុំ)\s*/);
+            let d = clean(s.district, /^(ស្រុក\/ខណ្ឌ|ក្រុង\/ស្រុក\/ខណ្ឌ|ខណ្ឌ|ស្រុក|ក្រុង)\s*/);
+            let p = clean(s.province, /^(ខេត្ត\/ក្រុង|រាជធានី\/ខេត្ត|រាជធានី|ខេត្ត)\s*/);
+            
+            let parts = [];
+            if(v) parts.push(v);
+            if(c) parts.push(c);
+            if(d) parts.push(d);
+            if(p) parts.push(p);
+            return parts.join(' ') || '-';
+        }
+
+        const initData = async () => {
+            clearTimeout(loadingTimeout);
+            const tid = localStorage.getItem('savedTid');
+            const sid = localStorage.getItem('savedSid');
+
+            if (!tid || !sid) {
+                showError("រកមិនឃើញព័ត៌មាន Login ទេ។ សូមចូលតាមរយៈទំព័រដើម index.html សារជាថ្មី។");
+                return;
+            }
+
+            try {
+                // ១. ទាញយកទិន្នន័យសិស្ស
+                const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid.toString());
+                const studentSnap = await getDoc(studentRef);
+
+                if (!studentSnap.exists()) {
+                    showError("រកមិនឃើញទិន្នន័យសិស្សក្នុងប្រព័ន្ធទេ។ លេខកូដថ្នាក់ ឬអត្តលេខអាចនឹងខុស។");
+                    return;
+                }
+                studentData = studentSnap.data();
+
+                // ២. ព្យាយាមទាញយកព័ត៌មានសាលា
+                try {
+                    const profileRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'profile', 'data');
+                    const profileSnap = await getDoc(profileRef);
+                    if (profileSnap.exists()) {
+                        profileData = profileSnap.data();
+                    }
+                } catch (pErr) {
+                    console.warn("Profile fetch restricted:", pErr);
+                }
+
+                renderCard();
+                
+                const loader = document.getElementById('loading-overlay');
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.classList.add('hidden'), 300);
+                isAppInit = true;
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                showError("មានបញ្ហាភ្ជាប់ទៅកាន់ Database៖ " + error.message);
+            }
+        };
+
+        function renderCard() {
+            const wrapper = document.getElementById('card-wrapper');
+            
+            const unit1 = profileData.management_unit_1 || 'ក្រសួងអប់រំ យុវជន និងកីឡា'; 
+            const school = profileData.school_name_admin || 'សាលាបឋមសិក្សា';
+            const year = toKhmerNum(profileData.academic_year || '២០២៥-២០២៦');
+            const cls = profileData.class_name || '១';
+            const role = profileData.manager_role || 'នាយកសាលា';
+            const provDate = profileData.province_for_date || 'រាជធានីភ្នំពេញ';
+            
+            const dob = formatKhmerDate(studentData.dob);
+            const pob = formatLocationShort(studentData);
+            const fName = studentData.father || '-';
+            const mName = studentData.mother || '-';
+            
+            const photoSrc = studentData.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${studentData.id}`;
+            const photoHtml = `<img src="${photoSrc}" crossorigin="anonymous" class="w-full h-full object-cover">`;
+
+            wrapper.innerHTML = `
+                <img src="${currentBgImage}" class="card-bg template-bg" onerror="this.style.display='none'">
+                
+                <div class="absolute w-[70%] left-[22%] text-center text-[#ff0000] kh-moul text-[11px] top-[16%] leading-tight px-2 flex items-center justify-center h-[5%] z-10">
+                    ${unit1}
+                </div>
+
+                <div class="absolute w-full text-center text-[#0000ff] kh-moul text-[18px] top-[24%] z-10">
+                    ប័ណ្ណសម្គាល់ខ្លួនសិស្ស
+                </div>
+
+                <div class="absolute w-full text-center text-black kh-moul text-[14px] top-[30%] z-10">
+                    ឆ្នាំសិក្សា ${year}
+                </div>
+                
+                <div class="absolute w-full text-center text-[#0000ff] kh-moul text-[15px] top-[34%] z-10">
+                    ថ្នាក់ទី ${cls}
+                </div>
+
+                <div class="absolute w-[88%] left-[6%] top-[40%] text-[13px] flex flex-col gap-[7px] z-10 text-black">
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap mb-[1px]">គោត្តនាម និងនាម:</span>
+                        <span class="text-[#ff0000] kh-moul text-[14px] ml-2 flex-grow text-center">${studentData.name || '-'}</span>
+                        <span class="whitespace-nowrap mb-[1px] ml-2">ភេទ</span>
+                        <span class="text-[#ff0000] kh-moul text-[14px] ml-2 w-[40px] text-center">${studentData.gender || '-'}</span>
+                    </div>
+
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap mb-[1px]">ថ្ងៃខែឆ្នាំកំណើត :</span>
+                        <span class="text-[#ff0000] kh-moul text-[14px] ml-4 flex-grow">${dob}</span>
+                    </div>
+
+                    <div class="flex items-start mt-[2px]">
+                        <span class="whitespace-nowrap">ទីកន្លែងកំណើត :</span>
+                        <span class="text-[#ff0000] text-[14px] leading-[1.4] line-clamp-2 ml-2 flex-grow">${pob}</span>
+                    </div>
+
+                    <div class="flex items-end mt-[2px]">
+                        <span class="whitespace-nowrap mb-[1px]">ឈ្មោះឪពុក</span>
+                        <span class="text-[#ff0000] kh-moul text-[13px] ml-2 w-[30%] truncate text-center">${fName}</span>
+                        <span class="whitespace-nowrap mb-[1px] ml-2">ឈ្មោះម្តាយ</span>
+                        <span class="text-[#ff0000] kh-moul text-[13px] ml-2 flex-grow truncate text-center">${mName}</span>
+                    </div>
+                </div>
+
+                <div class="absolute w-full top-[62%] flex justify-center items-end text-[14px] z-10 text-black">
+                    <span class="mb-[2px]">ជាសិស្ស</span>
+                    <span class="text-[#0000ff] kh-moul text-[14px] ml-3 max-w-[64%] truncate">${school}</span>
+                </div>
+
+                <div class="absolute left-[9%] bottom-[8%] w-[25mm] h-[33mm] border-[1.5px] border-[#0000ff] bg-white flex items-center justify-center overflow-hidden z-20">
+                    ${photoHtml}
+                </div>
+
+                <div class="absolute right-[4%] bottom-[5%] w-[58%] flex flex-col items-center z-10">
+                    <div class="text-black text-[10px] text-center mb-[2px]">
+                        ថ្ងៃពុធ ១៤រោច ខែពិសាខ ឆ្នាំរោង ឆស័ក ព.ស.២៥៦៨
+                    </div>
+                    <div class="text-black text-[11px] text-center mb-1">
+                        ${provDate} ថ្ងៃទី១១ ខែមីនា ឆ្នាំ២០២៦
+                    </div>
+                    <div class="text-black kh-moul text-[14px] text-center z-20 mt-1">
+                        ${role}
+                    </div>
+                </div>
+            `;
+            
+            wrapper.classList.remove('opacity-0');
+            resizeCard();
+        }
+
+        function resizeCard() {
+            const container = document.getElementById('responsive-container');
+            const wrapper = document.getElementById('card-wrapper');
+            if(!container || !wrapper) return;
+
+            const maxWidth = container.clientWidth - 32; 
+            const cardOrigWidth = 378;
+            const cardOrigHeight = 529;
+
+            if(maxWidth < cardOrigWidth) {
+                const scale = maxWidth / cardOrigWidth;
+                wrapper.style.transform = `scale(${scale})`;
+                container.style.height = `${cardOrigHeight * scale}px`;
+            } else {
+                wrapper.style.transform = `scale(1)`;
+                container.style.height = `${cardOrigHeight}px`;
+            }
+        }
+
+        window.addEventListener('resize', resizeCard);
+
+        window.switchTemplate = function(bgFile) {
+            currentBgImage = bgFile;
+            const btn1 = document.getElementById('btn-tpl-1');
+            const btn2 = document.getElementById('btn-tpl-2');
+            
+            if(bgFile === '1_id-student.jpg') {
+                btn1.classList.add('bg-gray-700', 'text-white', 'shadow');
+                btn1.classList.remove('text-gray-400');
+                btn2.classList.remove('bg-gray-700', 'text-white', 'shadow');
+                btn2.classList.add('text-gray-400');
+            } else {
+                btn2.classList.add('bg-gray-700', 'text-white', 'shadow');
+                btn2.classList.remove('text-gray-400');
+                btn1.classList.remove('bg-gray-700', 'text-white', 'shadow');
+                btn1.classList.add('text-gray-400');
+            }
+            renderCard();
+        }
+
+        window.downloadCard = async function() {
+            const wrapper = document.getElementById('card-wrapper');
+            const btn = document.getElementById('btn-download');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<span class="spinner w-5 h-5 border-t-white"></span> កំពុងទាញយក...`;
+            btn.disabled = true;
+
+            try {
+                const origTransform = wrapper.style.transform;
+                wrapper.style.transform = 'scale(1)';
+                
+                const canvas = await html2canvas(wrapper, { 
+                    scale: 3, 
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                wrapper.style.transform = origTransform;
+
+                const link = document.createElement('a');
+                link.download = `Student_Card_${studentData.name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch(e) {
+                console.error("Download error:", e);
+                alert("មិនអាចទាញយករូបភាពបានទេ។ សូមពិនិត្យមើលរូបថតសិស្ស។");
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        // --- Start App Logic ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                if (!isAppInit) {
+                    initData();
+                }
+            } else {
+                try {
+                    await signInAnonymously(auth);
+                } catch (err) {
+                    showError(err.message, true);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
