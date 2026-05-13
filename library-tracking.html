@@ -215,11 +215,7 @@
 
     <!-- Firebase Scripts -->
     <script type="module">
-        // នាំចូល Instance ដែលមាន Offline Caching ស្រាប់ពីមុខងាររួម
-        import { auth, db, PTEC_APP_ID } from './firebase-config.js';
-        
-        // នាំចូល Function បន្ថែមសម្រាប់ប្រើក្នុងទំព័រនេះ
-        import { signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { db, PTEC_APP_ID } from './firebase-config.js';
         import { doc, getDoc, collection, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // State variables
@@ -260,7 +256,6 @@
             btnFailed: { km: "បរាជ័យ", en: "Failed" }
         };
 
-        // Constants 
         const khmerNums = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
         const khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
         const englishMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -347,7 +342,6 @@
             localStorage.setItem('appLang', window.currentLang);
             window.applyLanguageUI();
             
-            // Re-render select options and table
             window.updatePeriodOptions();
             if(studentProfile.id && document.getElementById('results-container').classList.contains('flex')){
                 window.fetchScores();
@@ -356,11 +350,8 @@
 
         window.applyLanguageUI = () => {
             const lang = window.currentLang;
-            
-            // Update Toggle Button Text (Show the opposite language)
             document.getElementById('langToggleBtn').textContent = lang === 'km' ? 'EN' : 'KM';
             
-            // Update UI Elements
             document.getElementById('ui-title').textContent = i18n.title[lang];
             document.getElementById('ui-student-lbl').textContent = i18n.studentLbl[lang];
             if(document.getElementById('student-name').textContent === i18n.loadingStudent['km'] || document.getElementById('student-name').textContent === i18n.loadingStudent['en']) {
@@ -372,16 +363,13 @@
             document.getElementById('ui-empty-desc').textContent = i18n.emptyDesc[lang];
             document.getElementById('ui-zoom-hint').innerHTML = `<i data-lucide="move-horizontal" class="w-3 h-3 inline"></i> ${i18n.zoomHint[lang]}`;
             
-            // Update Type Select options
             const typeSelect = document.getElementById('typeSelect');
             typeSelect.options[0].text = i18n.optMonthly[lang];
             typeSelect.options[1].text = i18n.optSemester[lang];
             typeSelect.options[2].text = i18n.optYearly[lang];
             
-            // Re-init icons if needed
             if (typeof lucide !== 'undefined') lucide.createIcons();
             
-            // Apply font class dynamically
             if(lang === 'en') {
                 document.getElementById('ui-title').classList.remove('kh-moul');
                 document.getElementById('student-name').classList.remove('kh-moul');
@@ -391,7 +379,6 @@
             }
         };
 
-        // Ensure Theme is applied
         const initTheme = () => {
             if (localStorage.getItem('theme') === 'light') {
                 document.body.classList.add('light-mode');
@@ -399,7 +386,6 @@
             window.applyLanguageUI();
         };
 
-        // UI Helpers
         const setUIState = (state) => {
             const loading = document.getElementById('loading-state');
             const empty = document.getElementById('empty-state');
@@ -423,7 +409,6 @@
             const periodSelect = document.getElementById('periodSelect');
             const lang = window.currentLang;
             
-            // Also update Year select format based on language
             const yearSelect = document.getElementById('yearSelect');
             for(let i=0; i<yearSelect.options.length; i++) {
                 const val = yearSelect.options[i].value;
@@ -492,11 +477,25 @@
         };
 
         const loadStudentProfile = async () => {
+            // Check Cache
+            const cachedStudent = localStorage.getItem('offline_student_' + sid);
+            if (cachedStudent) {
+                try {
+                    studentProfile = JSON.parse(cachedStudent);
+                    document.getElementById('student-name').textContent = studentProfile.name || (window.currentLang === 'en' ? 'Unknown Name' : 'មិនស្គាល់ឈ្មោះ');
+                    document.getElementById('student-id').textContent = `ID: ${sid}`;
+                    const photoEl = document.getElementById('student-photo');
+                    photoEl.src = studentProfile.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${sid}`;
+                } catch(e) {}
+            }
+
+            // Sync
             try {
                 const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
                 const snap = await getDoc(docRef);
                 if (snap.exists()) {
                     studentProfile = { id: snap.id, ...snap.data() };
+                    localStorage.setItem('offline_student_' + sid, JSON.stringify(studentProfile));
                     document.getElementById('student-name').textContent = studentProfile.name || (window.currentLang === 'en' ? 'Unknown Name' : 'មិនស្គាល់ឈ្មោះ');
                     document.getElementById('student-id').textContent = `ID: ${sid}`;
                     const photoEl = document.getElementById('student-photo');
@@ -590,7 +589,6 @@
             
             let data = {};
             try {
-                // ដោយសារយើងប្រើ db ដែលភ្ជាប់ជាមួយ LocalCache វានឹងទាញយកទិន្នន័យពី Cache មុនគេបើមាន
                 const ref = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'scores', key);
                 const snap = await getDoc(ref);
                 if (snap.exists()) {
@@ -665,7 +663,6 @@
             const scoresData = scoresCache[`${year}_${semKey}`] || {};
             const dbRecord = scoresData[studentId] || {};
             
-            // Prefer explicitly saved results
             if (dbRecord.results && dbRecord.results.examAverage !== undefined) {
                 return {
                     total: parseFloat(dbRecord.results.examTotal) || 0,
@@ -737,7 +734,6 @@
             const lang = window.currentLang;
             
             try {
-                // Pre-fetch all necessary data based on type
                 if (type === 'yearly') {
                     const allMonthsToFetch = ['nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug'];
                     await Promise.all([
@@ -775,7 +771,6 @@
                 let yearlyRank = '-';
                 let examTotalVal = 0, examAvgVal = 0, monthlyAvgVal = 0, semAvgVal = 0;
 
-                // --- DATA EXTRACTION ---
                 if (type === 'yearly') {
                     sem1ExamAvg = computeExamAvg(student.id, year, 'sem1').avg;
                     sem1Avg = computeSemAvg(student.id, year, 'sem1');
@@ -837,7 +832,7 @@
                     studentGrade = window.calculateGrade(studentAvg, true, 'semester');
                     totalScore = examTotalVal;
 
-                } else { // monthly
+                } else { 
                     const sData = scoresCache[`${year}_${period}`] || {};
                     const dbRecord = sData[student.id] || {};
                     const studentScores = dbRecord.hasOwnProperty('scores') ? dbRecord.scores : dbRecord;
@@ -879,7 +874,6 @@
                     rank = getRank(student.id, allMonthlyAvgs);
                 }
 
-                // Show Empty State if no scores and no calculated average
                 if (type !== 'yearly' && displayRows.length === 0 && studentAvg === 0) {
                     setUIState('empty');
                     return;
@@ -890,7 +884,6 @@
                 const parentComment = targetDbRecord.parent_comment || "";
                 window.currentViewContext = { year, period, studentId: student.id };
 
-                // --- HTML CONSTRUCTION & TRANSLATIONS ---
                 let titleHtml = '';
                 if (type === 'yearly') {
                     titleHtml = lang === 'en' 
@@ -902,7 +895,6 @@
                     titleHtml = `${rLabel}${titlePrefix}${monthLabels[period][lang]}`;
                 }
 
-                // Comment Translation Logic (Simplified)
                 let commentText = "";
                 if (type === 'monthly' || type === 'semester') {
                     if (studentAvg <= 0) commentText = lang === 'en' ? "N/A" : "គ្មាន.ចំ";
@@ -917,7 +909,6 @@
                     else commentText = lang === 'en' ? "Promoted. Good morals. Keep studying hard." : "ត្រូវបានឡើងថ្នាក់ សិស្សមានវិន័យនិងសីលធម៌ល្អ ត្រូវប្រឹងប្រែងរៀនសូត្របន្ថែមទៀត";
                 }
 
-                // Common Table Headers Dictionary
                 const th = {
                     result: lang === 'en' ? 'Result' : 'លទ្ធផល',
                     avg: lang === 'en' ? 'Average' : 'មធ្យមភាគ',
@@ -1118,7 +1109,6 @@
                         tbodyHtml += `<tr><td colspan="6" class="text-center italic text-gray-500 border border-black py-4">${lbls.noData}</td></tr>`;
                     }
                     
-                    // Always show the summary as long as there is an average computed
                     tbodyHtml += `
                         <tr class="font-bold text-green-700">
                             <td rowspan="4" class="border border-black kh-moul" style="writing-mode: vertical-rl; transform: rotate(180deg); color: #000;">${lbls.semResult}</td>
@@ -1174,7 +1164,7 @@
                         </tr>
                     `;
 
-                } else { // Monthly
+                } else { 
                     const noDataTxt = lang === 'en' ? 'No score data available' : 'មិនមានទិន្នន័យពិន្ទុទេ';
 
                     displayRows.forEach((item, index) => {
@@ -1233,7 +1223,6 @@
                     `;
                 }
 
-                // --- GENERATE FULL HTML ---
                 const today = new Date();
                 let lunarDateStr = "";
                 if (typeof momentkh !== 'undefined') {
@@ -1329,12 +1318,9 @@
 
             } catch (error) {
                 console.error("Fetch Error:", error);
-                
-                // បង្ហាញសារ Error ទៅកាន់អ្នកប្រើប្រាស់
                 const lang = window.currentLang || 'km';
                 document.getElementById('ui-empty-title').textContent = lang === 'en' ? 'Data Fetch Error' : 'មានបញ្ហាក្នុងការទាញទិន្នន័យ';
                 document.getElementById('ui-empty-desc').textContent = lang === 'en' ? 'Please check your internet connection or start a Local Server.' : 'សូមពិនិត្យអ៊ីនធឺណិត ឬត្រូវប្រាកដថាអ្នកបើកវាតាមរយៈ Local Server។';
-                
                 setUIState('empty');
             }
         };
@@ -1360,7 +1346,6 @@
                     }
                 }, { merge: true });
 
-                // Update cache
                 if(scoresCache[`${year}_${period}`] && scoresCache[`${year}_${period}`][studentId]) {
                     scoresCache[`${year}_${period}`][studentId].parent_comment = comment;
                 } else if (!scoresCache[`${year}_${period}`]) {
@@ -1397,35 +1382,16 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
             if (!tid || !sid) {
-                // ដក Alert ចេញ ហើយប្រើការ Redirect ផ្ទាល់ដើម្បីជៀសវាងផ្អាកការដំណើរការរបស់ Browser
-                console.warn("មិនមានទិន្នន័យសម្គាល់គណនី សូមចូលប្រព័ន្ធឡើងវិញ។");
                 window.location.replace('index.html');
                 return;
             }
-
-            const initAuth = async () => {
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else if (!auth.currentUser) {
-                        await signInAnonymously(auth);
-                    }
-                } catch (error) {
-                    console.error("Auth error:", error);
-                }
-            };
-
-            initAuth().then(() => {
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        await loadStudentProfile();
-                        await loadTeacherConfig();
-                        window.updatePeriodOptions(); // This triggers fetchScores
-                    }
-                });
+            
+            // Trigger Data Fetches Immediately
+            loadStudentProfile();
+            loadTeacherConfig().then(() => {
+                window.updatePeriodOptions(); // This triggers fetchScores
             });
         });
-
     </script>
 </body>
 </html>

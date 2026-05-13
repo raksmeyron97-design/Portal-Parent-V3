@@ -183,53 +183,24 @@
 
     <!-- Firebase Configuration & Script -->
     <script type="module">
-        // ទាញយកមុខងារចាំបាច់ពីឯកសាររួម (មានរួមបញ្ចូលនូវមុខងារ Offline Caching រួចជាស្រេច)
-        import { 
-            auth, 
-            db, 
-            PTEC_APP_ID, 
-            signInAnonymously, 
-            onAuthStateChanged, 
-            doc, 
-            getDoc 
-        } from './firebase-config.js';
+        import { db, PTEC_APP_ID, doc, getDoc } from './firebase-config.js';
 
-        // Check Theme
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
         }
 
-        // Apply Language Texts
         applyTranslations();
-
-        // ត្រូវប្រាកដថា lucide ដំណើរការដោយសារយើងដាក់ defer
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) lucide.createIcons();
-        });
 
         const tid = localStorage.getItem('savedTid');
         const sid = localStorage.getItem('savedSid');
 
-        if (!tid || !sid) {
-            window.location.href = 'index.html';
-        }
-
-        const initAuth = async () => {
-            if (!auth.currentUser) {
-                try {
-                    await signInAnonymously(auth);
-                } catch(e) {
-                    console.error("Auth Error", e);
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+            if (!tid || !sid) {
+                window.location.href = 'index.html';
+                return;
             }
-        };
-
-        initAuth().then(() => {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    fetchStudentData();
-                }
-            });
+            fetchProfileData();
         });
 
         function calculateAge(dobStr) {
@@ -274,11 +245,9 @@
         async function fetchProfileData() {
             let isProfileCached = false;
             
-            // មុខងារសម្រាប់ Update UI
             const updateUI = (s) => {
                 const noDataTxt = translations[currentLang].no_data;
                 document.getElementById('p-name').textContent = s.name || noDataTxt;
-                document.getElementById('p-name-en').textContent = s.nameEn || noDataTxt;
                 
                 if (s.photo) {
                     document.getElementById('p-photo').src = s.photo;
@@ -303,7 +272,7 @@
                 document.getElementById('p-address').textContent = currPlace !== '-' ? currPlace : (s.currentAddress || '-');
             };
 
-            // ១. អានពី LocalStorage បង្ហាញភ្លាមៗ
+            // 1. Instant Load from LocalStorage Cache
             const cachedStudent = localStorage.getItem('offline_student_' + sid);
             if (cachedStudent) {
                 try {
@@ -315,14 +284,14 @@
                 } catch(e) { console.warn(e); }
             }
 
-            // ២. លួចទាញពី Firebase
+            // 2. Background Sync with Firebase
             try {
                 const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
                 const snap = await getDoc(docRef);
                 
                 if (snap.exists()) {
                     const s = snap.data();
-                    localStorage.setItem('offline_student_' + sid, JSON.stringify(s)); // Update Cache
+                    localStorage.setItem('offline_student_' + sid, JSON.stringify(s)); // Refresh Cache
                     updateUI(s);
 
                     if (!isProfileCached) {

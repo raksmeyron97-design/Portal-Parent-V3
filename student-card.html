@@ -133,59 +133,27 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81",
-            measurementId: "G-PX867PB723"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        // កែសម្រួលការទាញយក db និង PTEC_APP_ID ពី firebase-config.js ឲ្យត្រូវទីតាំង
+        import { db, PTEC_APP_ID, doc, getDoc } from './firebase-config.js';
 
         let currentBgImage = "2_id-student.jpg";
         let studentData = null;
         let profileData = {}; 
         let isAppInit = false;
 
-        lucide.createIcons();
+        if (window.lucide) {
+            lucide.createIcons();
+        }
 
-        function showError(message, isAuthError = false) {
+        function showError(message) {
             document.getElementById('loading-overlay').classList.add('hidden');
             const errorModal = document.getElementById('error-modal');
             const errorContainer = document.getElementById('error-message');
             
-            if (isAuthError && message.includes('admin-restricted-operation')) {
-                errorContainer.innerHTML = `
-                    <p class="text-white font-bold">កំហុសការកំណត់ Firebase!</p>
-                    <p>សូមចូលទៅកាន់ Firebase Console រួចបើក (Enable) មុខងារ <b>Anonymous Sign-in</b> នៅក្នុងផ្នែក Authentication ជាមុនសិន។</p>
-                    <p class="text-[10px] opacity-50 font-mono">${message}</p>
-                `;
-            } else {
-                errorContainer.innerHTML = `<p>${message}</p>`;
-            }
-            
+            errorContainer.innerHTML = `<p>${message}</p>`;
             errorModal.classList.remove('hidden');
             setTimeout(() => errorModal.classList.remove('opacity-0'), 10);
         }
-
-        // Global Timeout
-        const loadingTimeout = setTimeout(() => {
-            const loader = document.getElementById('loading-overlay');
-            if (!loader.classList.contains('hidden') && !isAppInit) {
-                showError("ការទាញយកមានភាពយឺតយ៉ាវ។ សូមពិនិត្យមើលសេវាអុីនធឺណិត ឬបិទ Brave Shields (រូបតោ)។");
-            }
-        }, 15000); 
 
         const khNumbers = ['០','១','២','៣','៤','៥','៦','៧','៨','៩'];
         function toKhmerNum(str) {
@@ -223,7 +191,6 @@
         }
 
         const initData = async () => {
-            clearTimeout(loadingTimeout);
             const tid = localStorage.getItem('savedTid');
             const sid = localStorage.getItem('savedSid');
 
@@ -232,18 +199,31 @@
                 return;
             }
 
+            // 1. Instant Load from LocalStorage Cache
+            const cacheKey = `offline_card_${sid}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            if (cachedData) {
+                try {
+                    const parsed = JSON.parse(cachedData);
+                    studentData = parsed.studentData;
+                    profileData = parsed.profileData;
+                    renderCard();
+                    document.getElementById('loading-overlay').classList.add('hidden', 'opacity-0');
+                    isAppInit = true;
+                } catch(e) { console.warn(e); }
+            }
+
+            // 2. Background Sync with Firebase
             try {
-                // ១. ទាញយកទិន្នន័យសិស្ស
                 const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid.toString());
                 const studentSnap = await getDoc(studentRef);
 
                 if (!studentSnap.exists()) {
-                    showError("រកមិនឃើញទិន្នន័យសិស្សក្នុងប្រព័ន្ធទេ។ លេខកូដថ្នាក់ ឬអត្តលេខអាចនឹងខុស។");
+                    if (!isAppInit) showError("រកមិនឃើញទិន្នន័យសិស្សក្នុងប្រព័ន្ធទេ។ លេខកូដថ្នាក់ ឬអត្តលេខអាចនឹងខុស។");
                     return;
                 }
                 studentData = studentSnap.data();
 
-                // ២. ព្យាយាមទាញយកព័ត៌មានសាលា
                 try {
                     const profileRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'profile', 'data');
                     const profileSnap = await getDoc(profileRef);
@@ -254,16 +234,21 @@
                     console.warn("Profile fetch restricted:", pErr);
                 }
 
+                // Update Cache
+                localStorage.setItem(cacheKey, JSON.stringify({ studentData, profileData }));
+
                 renderCard();
                 
-                const loader = document.getElementById('loading-overlay');
-                loader.classList.add('opacity-0');
-                setTimeout(() => loader.classList.add('hidden'), 300);
-                isAppInit = true;
+                if (!isAppInit) {
+                    const loader = document.getElementById('loading-overlay');
+                    loader.classList.add('opacity-0');
+                    setTimeout(() => loader.classList.add('hidden'), 300);
+                    isAppInit = true;
+                }
 
             } catch (error) {
                 console.error("Fetch error:", error);
-                showError("មានបញ្ហាភ្ជាប់ទៅកាន់ Database៖ " + error.message);
+                if (!isAppInit) showError("មានបញ្ហាភ្ជាប់ទៅកាន់ Database៖ " + error.message);
             }
         };
 
@@ -339,17 +324,6 @@
                     ${photoHtml}
                 </div>
 
-                <div class="absolute right-[4%] bottom-[5%] w-[58%] flex flex-col items-center z-10">
-                    <div class="text-black text-[10px] text-center mb-[2px]">
-                        ថ្ងៃពុធ ១៤រោច ខែពិសាខ ឆ្នាំរោង ឆស័ក ព.ស.២៥៦៨
-                    </div>
-                    <div class="text-black text-[11px] text-center mb-1">
-                        ${provDate} ថ្ងៃទី១១ ខែមីនា ឆ្នាំ២០២៦
-                    </div>
-                    <div class="text-black kh-moul text-[14px] text-center z-20 mt-1">
-                        ${role}
-                    </div>
-                </div>
             `;
             
             wrapper.classList.remove('opacity-0');
@@ -375,7 +349,6 @@
             }
         }
         
-
         window.addEventListener('resize', resizeCard);
 
         window.switchTemplate = function(bgFile) {
@@ -427,23 +400,13 @@
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
-                lucide.createIcons();
+                if (window.lucide) lucide.createIcons();
             }
         }
 
-        // --- Start App Logic ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                if (!isAppInit) {
-                    initData();
-                }
-            } else {
-                try {
-                    await signInAnonymously(auth);
-                } catch (err) {
-                    showError(err.message, true);
-                }
-            }
+        // Trigger Data Fetch Immediately without Auth dependency
+        document.addEventListener('DOMContentLoaded', () => {
+            initData();
         });
     </script>
 </body>

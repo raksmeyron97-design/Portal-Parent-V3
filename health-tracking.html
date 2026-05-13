@@ -142,13 +142,9 @@
 
     <!-- Firebase SDKs & Script -->
     <script type="module">
-        // ទាញយកការកំណត់ (Import) ពីឯកសារ firebase-config.js របស់អ្នក
-        import { auth, db, PTEC_APP_ID, onAuthStateChanged, doc, getDoc, collection, signInAnonymously } from './firebase-config.js';
         
-        // ទាញយកមុខងារបន្ថែមដែលមិនមាននៅក្នុង export នៃ firebase-config.js
+        import { db, PTEC_APP_ID, doc, getDoc, collection } from './firebase-config.js';
         import { getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
         let currentLang = localStorage.getItem('app_lang') || 'km';
         let isDarkMode = localStorage.getItem('theme') !== 'light';
         if (!isDarkMode) document.body.classList.add('light-mode');
@@ -252,66 +248,83 @@
             obese:       [18.9, 18.8, 19.6, 20.6, 21.7, 22.9, 24.3, 25.9, 27.1, 28.2, 29.1]
         };
 
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth error:", error);
-            }
-        };
 
-        initAuth().then(() => {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    await loadStudentHealthData();
-                } else {
-                    window.location.href = 'index.html';
-                }
-            });
-        });
+        // Delete the initAuth() and onAuthStateChanged blocks, and replace with this:
+document.addEventListener('DOMContentLoaded', () => {
+    if (!tid || !sid) {
+        window.location.href = 'index.html';
+        return;
+    }
+    loadStudentHealthData();
+});
 
-        async function loadStudentHealthData() {
-            try {
-                const studentsRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students');
-                const studentSnap = await getDocs(studentsRef);
-                let students = [];
-                studentSnap.forEach(docSnap => {
-                    let data = docSnap.data();
-                    data.id = docSnap.id;
-                    students.push(data);
-                });
-                
-                students.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                const sIndex = students.findIndex(s => s.id === sid);
-                
-                if (sIndex === -1) throw new Error("Student not found");
-                const student = students[sIndex];
-                
-                const healthRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'settings', 'health_tracking');
-                const healthSnap = await getDoc(healthRef);
-                const healthData = healthSnap.exists() ? healthSnap.data() : {};
-                
-                const hVal = healthData[`h_${sIndex}`] || null;
-                const wVal = healthData[`w_${sIndex}`] || null;
-                
-                renderUI(student, hVal, wVal);
-                
-            } catch (error) {
-                console.error(error);
-                document.getElementById('loading-overlay').innerHTML = `
-                    <div class="text-red-400 bg-red-400/10 p-4 rounded-xl text-center max-w-xs mx-4 border border-red-500/20">
-                        <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
-                        <p class="font-bold text-sm">${translations[currentLang].err_fetch}</p>
-                        <button onclick="window.history.back()" class="mt-4 px-4 py-2 bg-red-500/20 rounded-lg text-xs hover:bg-red-500/30">${translations[currentLang].btn_back}</button>
-                    </div>
-                `;
-                if(typeof lucide !== 'undefined') lucide.createIcons();
-            }
+async function loadStudentHealthData() {
+    let isDataCached = false;
+    const cacheKey = `offline_health_${sid}`;
+    
+    // 1. Check LocalStorage Cache First
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+        try {
+            const parsedData = JSON.parse(cachedData);
+            renderUI(parsedData.student, parsedData.hVal, parsedData.wVal);
+            isDataCached = true;
+        } catch (e) {
+            console.warn("Failed to parse health cache:", e);
         }
+    }
+
+    // 2. Background Sync with Firebase
+    try {
+        if (!isDataCached) {
+            // Only show loader if we have no cache to show the user
+            document.getElementById('loading-overlay').classList.remove('hidden', 'opacity-0');
+        }
+
+        const studentsRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students');
+        const studentSnap = await getDocs(studentsRef);
+        let students = [];
+        studentSnap.forEach(docSnap => {
+            let data = docSnap.data();
+            data.id = docSnap.id;
+            students.push(data);
+        });
+        
+        students.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        const sIndex = students.findIndex(s => s.id === sid);
+        
+        if (sIndex === -1) throw new Error("Student not found");
+        const student = students[sIndex];
+        
+        const healthRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'settings', 'health_tracking');
+        const healthSnap = await getDoc(healthRef);
+        const healthData = healthSnap.exists() ? healthSnap.data() : {};
+        
+        const hVal = healthData[`h_${sIndex}`] || null;
+        const wVal = healthData[`w_${sIndex}`] || null;
+        
+        // Save fresh data to Cache
+        localStorage.setItem(cacheKey, JSON.stringify({ student, hVal, wVal }));
+        
+        // Silently update UI with fresh data
+        renderUI(student, hVal, wVal);
+        
+    } catch (error) {
+        console.error("Firebase fetch failed:", error);
+        
+        // Only show error if we have NO cached data to fall back on
+        if (!isDataCached) {
+            document.getElementById('loading-overlay').innerHTML = `
+                <div class="text-red-400 bg-red-400/10 p-4 rounded-xl text-center max-w-xs mx-4 border border-red-500/20">
+                    <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
+                    <p class="font-bold text-sm">${translations[currentLang].err_fetch}</p>
+                    <button onclick="window.history.back()" class="mt-4 px-4 py-2 bg-red-500/20 rounded-lg text-xs hover:bg-red-500/30">${translations[currentLang].btn_back}</button>
+                </div>
+            `;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+}
 
         function renderUI(student, hVal, wVal) {
             // Profile Info

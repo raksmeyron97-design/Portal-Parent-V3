@@ -439,8 +439,8 @@
         const isLightMode = document.body.classList.contains('light-mode');
 
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            
+        lucide.createIcons();
+        
             if (!tid || !sid) {
                 alert(currentLang === 'en' ? "No account info. Please login from Parent Portal again." : "មិនមានព័ត៌មានគណនី។ សូមចូលតាមរយៈ Parent Portal ម្តងទៀត។");
                 window.location.href = 'index.html';
@@ -448,14 +448,9 @@
             }
 
             window.switchType('monthly');
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    await fetchData();
-                } else {
-                    await signInAnonymously(auth);
-                }
-            });
+            
+            // Call fetchData immediately without waiting for Auth
+            fetchData(); 
         });
 
         // Safe Scanner 

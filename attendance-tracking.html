@@ -249,36 +249,10 @@
             renderList();
         });
 
-        // Check if user is legally here
-        if (!savedTid || !savedSid) {
-            alert(t.alert_login_first);
-            window.location.href = 'index.html';
-        } else {
-            // Init Auth & Fetch Data
-            const initAuth = async () => {
-                try {
-                    if (!auth.currentUser) await signInAnonymously(auth);
-                } catch (error) {
-                    console.error("Auth error:", error);
-                    alert(t.alert_connection_error);
-                }
-            };
-
-            initAuth().then(() => {
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        await fetchData();
-                    } else {
-                        alert(t.alert_relogin);
-                        window.location.href = 'index.html';
-                    }
-                });
-            });
-        }
-
+        // 1. ប្រកាសអញ្ញាតជាមុនសិន
         let isAttendanceCached = false;
         
-        // ទាញយកឈ្មោះ និងរូបថត ដែលបាន Save ទុកពីទំព័រមុខ
+        // 2. ទាញយកឈ្មោះ និងរូបថត ដែលបាន Save ទុកពីទំព័រមុខ
         const cachedStudent = localStorage.getItem('offline_student_' + savedSid);
         if (cachedStudent) {
             try {
@@ -289,7 +263,7 @@
             } catch(e) { console.warn(e); }
         }
 
-        // ទាញយកប្រវត្តិវត្តមានចាស់មកបង្ហាញភ្លាមៗ
+        // 3. ទាញយកប្រវត្តិវត្តមានចាស់មកបង្ហាញភ្លាមៗ
         const cachedAttendance = localStorage.getItem('offline_attendance_' + savedSid);
         if (cachedAttendance) {
             try {
@@ -303,6 +277,16 @@
                 loader.classList.add('hidden');
             } catch(e) { console.warn(e); }
         }
+
+        // 4. ហៅមុខងារ fetchData ដំណើរការចុងក្រោយគេបង្អស់
+        if (!savedTid || !savedSid) {
+            alert(t.alert_login_first);
+            window.location.href = 'index.html';
+        } else {
+            // ដោយសារយើងបើក Public Read រួចហើយ មិនបាច់ប្រើ Anonymous Auth ទៀតទេ
+            fetchData();
+        }
+
         async function fetchData() {
             try {
                 // បង្ហាញរង្វង់វិលៗ តែក្នុងករណីដែលអត់មាន Cache សោះប៉ុណ្ណោះ
