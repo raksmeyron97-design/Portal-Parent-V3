@@ -1497,13 +1497,13 @@
                 } else {
                     // បើមិនទាន់មាន User Session ទេ យើងបង្កើត Anonymous Auth មួយ
                     // (ចាំបាច់ត្រូវមាន ដើម្បីមានសិទ្ធិអានទិន្នន័យពី Firestore)
-                    try {
-                        await signInAnonymously(auth);
+                    //try {
+                    //    await signInAnonymously(auth);
                         // បន្ទាប់ពី Sign in ជោគជ័យ, onAuthStateChanged ខាងលើនឹងដំណើរការម្តងទៀតដោយស្វ័យប្រវត្តិ
-                    } catch (err) {
-                        console.error("Anonymous Auth Failed:", err);
-                        window.showLogin();
-                    }
+                    //} catch (err) {
+                    //    console.error("Anonymous Auth Failed:", err);
+                    //    window.showLogin();
+                    //}
                 }
             });
 
