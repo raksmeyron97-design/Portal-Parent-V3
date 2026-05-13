@@ -18,7 +18,7 @@
       "@type": "WebSite",
       "name": "KruSmart Parent Portal",
       "alternateName": ["Tamdan", "ប្រព័ន្ធអាណាព្យាបាល"],
-      "url": "https://tamdan.xyz/"
+      "url": "https://portal.krusmart.org/"
     }
     </script>
     <link rel="stylesheet" href="style.css">
@@ -1265,11 +1265,6 @@
             const errorText = document.getElementById('login-error-text');
             errorBox.classList.add('hidden');
 
-            if (!auth.currentUser) {
-                window.showToast("សូមរង់ចាំ ការភ្ជាប់ប្រព័ន្ធមិនទាន់រួចរាល់ទេ", "error");
-                return;
-            }
-
             // ==========================================
             // [ថ្មី] ១. ទាញទិន្នន័យពី LocalStorage មកបង្ហាញភ្លាមៗ (Instant Load)
             // ==========================================
@@ -1405,7 +1400,6 @@
         };
 
         window.listenToNotifications = function(tid, sid) {
-            if (!auth.currentUser) return;
             if (window.unsubNotifications) window.unsubNotifications();
 
             // Clear old notifications before setting new listeners
@@ -1478,43 +1472,30 @@
         };
 
         const initAuth = async () => {
-        try {
-            // យើងត្រូវរង់ចាំការបញ្ជាក់ពី Firebase Auth ជាមុនសិន
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // ពេល Firebase ភ្ជាប់រួចរាល់ ទើបយើងឆែកមើល LocalStorage ឬ URL
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const urlTeacherId = urlParams.get('tid');
-                    const urlStudentId = urlParams.get('sid');
-                    
-                    if (urlTeacherId && urlStudentId) {
-                        window.attemptLogin(urlTeacherId, urlStudentId);
-                    } else if (localStorage.getItem('savedTid') && localStorage.getItem('savedSid')) {
-                        window.attemptLogin(localStorage.getItem('savedTid'), localStorage.getItem('savedSid'));
-                    } else {
-                        window.showLogin();
-                    }
+            try {
+                // យើងលែងចាំបាច់រង់ចាំ onAuthStateChanged ឬមាន User ទៀតហើយ 
+                // ព្រោះឥឡូវនេះប្រព័ន្ធប្រើប្រាស់ Public Read Rules
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlTeacherId = urlParams.get('tid');
+                const urlStudentId = urlParams.get('sid');
+                
+                if (urlTeacherId && urlStudentId) {
+                    window.attemptLogin(urlTeacherId, urlStudentId);
+                } else if (localStorage.getItem('savedTid') && localStorage.getItem('savedSid')) {
+                    window.attemptLogin(localStorage.getItem('savedTid'), localStorage.getItem('savedSid'));
                 } else {
-                    // បើមិនទាន់មាន User Session ទេ យើងបង្កើត Anonymous Auth មួយ
-                    // (ចាំបាច់ត្រូវមាន ដើម្បីមានសិទ្ធិអានទិន្នន័យពី Firestore)
-                    //try {
-                    //    await signInAnonymously(auth);
-                        // បន្ទាប់ពី Sign in ជោគជ័យ, onAuthStateChanged ខាងលើនឹងដំណើរការម្តងទៀតដោយស្វ័យប្រវត្តិ
-                    //} catch (err) {
-                    //    console.error("Anonymous Auth Failed:", err);
-                    //    window.showLogin();
-                    //}
+                    window.showLogin();
                 }
-            });
 
-        } catch (error) {
-            console.error("Auth initialization error:", error);
-            window.showLogin();
-        }
-    };
+            } catch (error) {
+                console.error("Initialization error:", error);
+                window.showLogin();
+            }
+        };
 
-    initAuth();
-</script>
+        initAuth();
+    </script>
     
     <!-- PWA Install Script -->
     <script src="pwa-install.js"></script>
