@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>តាមដានសុខភាព - Parent Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title data-i18n="title_health">តាមដានសុខភាព - Parent Portal</title>
+    
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    
     <style>
         body { 
             font-family: 'Kantumruy Pro', sans-serif; 
@@ -55,7 +57,7 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="spinner w-12 h-12 mb-4 border-t-emerald-500"></div>
-        <p class="text-white text-sm animate-pulse">កំពុងទាញយកទិន្នន័យ...</p>
+        <p class="text-white text-sm animate-pulse" data-i18n="loading_data">កំពុងទាញយកទិន្នន័យ...</p>
     </div>
 
     <!-- Header Section -->
@@ -64,7 +66,7 @@
             <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-sm">
                 <i data-lucide="arrow-left" class="w-6 h-6 text-white"></i>
             </button>
-            <h1 class="text-white font-bold text-xl kh-moul">តាមដានសុខភាព</h1>
+            <h1 class="text-white font-bold text-xl kh-moul" data-i18n="header_health">តាមដានសុខភាព</h1>
             <div class="w-10"></div> <!-- Spacer -->
         </div>
 
@@ -91,18 +93,18 @@
         <div class="grid grid-cols-3 gap-3 mb-6">
             <div class="bg-card-dark rounded-2xl p-4 border border-gray-800/50 flex flex-col items-center justify-center text-center shadow-sm">
                 <i data-lucide="ruler" class="w-6 h-6 text-blue-400 mb-2"></i>
-                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1">កម្ពស់</p>
+                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1" data-i18n="height_label">កម្ពស់</p>
                 <p id="val-height" class="text-dynamic text-white font-bold text-lg">...</p>
             </div>
             <div class="bg-card-dark rounded-2xl p-4 border border-gray-800/50 flex flex-col items-center justify-center text-center shadow-sm">
                 <i data-lucide="weight" class="w-6 h-6 text-orange-400 mb-2"></i>
-                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1">ទម្ងន់</p>
+                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1" data-i18n="weight_label">ទម្ងន់</p>
                 <p id="val-weight" class="text-dynamic text-white font-bold text-lg">...</p>
             </div>
             <div class="bg-card-dark rounded-2xl p-4 border border-gray-800/50 flex flex-col items-center justify-center text-center shadow-sm relative overflow-hidden">
                 <div id="bmi-bg-glow" class="absolute inset-0 opacity-10"></div>
                 <i data-lucide="activity" class="w-6 h-6 text-emerald-400 mb-2 relative z-10"></i>
-                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1 relative z-10">BMI</p>
+                <p class="text-dynamic-sub text-gray-400 text-[11px] font-semibold mb-1 relative z-10" data-i18n="bmi_label">BMI</p>
                 <p id="val-bmi" class="text-dynamic text-white font-bold text-lg relative z-10">...</p>
             </div>
         </div>
@@ -113,7 +115,7 @@
                 <i data-lucide="heart-pulse" class="w-6 h-6"></i>
             </div>
             <div>
-                <p class="text-[11px] font-semibold mb-0.5 opacity-80">ស្ថានភាពសុខភាព (BMI)</p>
+                <p class="text-[11px] font-semibold mb-0.5 opacity-80" data-i18n="health_status_label">ស្ថានភាពសុខភាព (BMI)</p>
                 <h3 id="status-text" class="font-bold text-[17px] kh-moul leading-tight">...</h3>
             </div>
         </div>
@@ -122,7 +124,7 @@
         <div class="bg-card-dark rounded-2xl p-4 lg:p-5 border border-gray-800/50 mb-6 shadow-sm">
             <h3 class="text-dynamic text-gray-200 font-bold text-sm mb-4 flex items-center gap-2">
                 <i data-lucide="line-chart" class="w-5 h-5 text-indigo-400"></i>
-                ក្រាបចំណាត់ថ្នាក់ BMI (WHO)
+                <span data-i18n="chart_title">ក្រាបចំណាត់ថ្នាក់ BMI (WHO)</span>
             </h3>
             <div class="relative w-full h-[280px]">
                 <canvas id="bmiChart"></canvas>
@@ -132,7 +134,7 @@
         <!-- Info Note -->
         <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 flex gap-3 shadow-sm mb-4">
             <i data-lucide="info" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
-            <p class="text-dynamic-sub text-gray-300 text-[12px] leading-relaxed">
+            <p class="text-dynamic-sub text-gray-300 text-[12px] leading-relaxed" data-i18n="info_note">
                 ទិន្នន័យនេះត្រូវបានវាស់វែងដោយគ្រូបន្ទុកថ្នាក់។ ក្រាបចំណាត់ថ្នាក់គឺផ្អែកលើស្តង់ដារអង្គការសុខភាពពិភពលោក (WHO) សម្រាប់កុមារ និងយុវវ័យអាយុ ៥ ដល់ ១៥ឆ្នាំ។ ចំណុចនៅលើក្រាបតំណាងឲ្យស្ថានភាពកូនរបស់អ្នកបច្ចុប្បន្ន។
             </p>
         </div>
@@ -140,25 +142,14 @@
 
     <!-- Firebase SDKs & Script -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // ទាញយកការកំណត់ (Import) ពីឯកសារ firebase-config.js របស់អ្នក
+        import { auth, db, PTEC_APP_ID, onAuthStateChanged, doc, getDoc, collection, signInAnonymously } from './firebase-config.js';
+        
+        // ទាញយកមុខងារបន្ថែមដែលមិនមាននៅក្នុង export នៃ firebase-config.js
+        import { getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81",
-            measurementId: "G-PX867PB723"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
-
+        let currentLang = localStorage.getItem('app_lang') || 'km';
         let isDarkMode = localStorage.getItem('theme') !== 'light';
         if (!isDarkMode) document.body.classList.add('light-mode');
 
@@ -168,6 +159,85 @@
         if (!tid || !sid) {
             window.location.href = 'index.html';
         }
+
+        // Translations Definition
+        const translations = {
+            km: {
+                title_health: "តាមដានសុខភាព - Parent Portal",
+                loading_data: "កំពុងទាញយកទិន្នន័យ...",
+                header_health: "តាមដានសុខភាព",
+                age_label: "អាយុ: ",
+                gender_label: "ភេទ: ",
+                height_label: "កម្ពស់",
+                weight_label: "ទម្ងន់",
+                bmi_label: "BMI",
+                health_status_label: "ស្ថានភាពសុខភាព (BMI)",
+                chart_title: "ក្រាបចំណាត់ថ្នាក់ BMI (WHO)",
+                info_note: "ទិន្នន័យនេះត្រូវបានវាស់វែងដោយគ្រូបន្ទុកថ្នាក់។ ក្រាបចំណាត់ថ្នាក់គឺផ្អែកលើស្តង់ដារអង្គការសុខភាពពិភពលោក (WHO) សម្រាប់កុមារ និងយុវវ័យអាយុ ៥ ដល់ ១៥ឆ្នាំ។ ចំណុចនៅលើក្រាបតំណាងឲ្យស្ថានភាពកូនរបស់អ្នកបច្ចុប្បន្ន។",
+                unknown_name: "មិនស្គាល់ឈ្មោះ",
+                status_not_measured: "មិនទាន់វាស់វែង",
+                status_underweight: "ស្គម",
+                status_normal: "ធម្មតា",
+                status_overweight: "លើសទម្ងន់",
+                status_obese: "ធាត់ខ្លាំង",
+                chart_your_child: "កូនរបស់អ្នក",
+                chart_max: "Max",
+                chart_obese: "ធាត់ខ្លាំង (Obese ≥)",
+                chart_overweight: "លើសទម្ងន់ (Overweight ≥)",
+                chart_normal: "ធម្មតា (Normal ≥)",
+                chart_y_axis: "BMI (សន្ទស្សន៍ម៉ាសរាងកាយ)",
+                chart_x_axis: "អាយុ (ឆ្នាំ)",
+                chart_tooltip_current: "បច្ចុប្បន្ន",
+                err_fetch: "មិនអាចទាញយកទិន្នន័យបានទេ។",
+                btn_back: "ត្រឡប់ក្រោយ",
+                year_unit: "ឆ្នាំ"
+            },
+            en: {
+                title_health: "Health Tracking - Parent Portal",
+                loading_data: "Downloading data...",
+                header_health: "Health Tracking",
+                age_label: "Age: ",
+                gender_label: "Gender: ",
+                height_label: "Height",
+                weight_label: "Weight",
+                bmi_label: "BMI",
+                health_status_label: "Health Status (BMI)",
+                chart_title: "BMI Classification Chart (WHO)",
+                info_note: "This data is measured by the homeroom teacher. The classification chart is based on the World Health Organization (WHO) standards for children and adolescents aged 5 to 15. The dot on the chart represents your child's current status.",
+                unknown_name: "Unknown Name",
+                status_not_measured: "Not Measured",
+                status_underweight: "Underweight",
+                status_normal: "Normal",
+                status_overweight: "Overweight",
+                status_obese: "Obese",
+                chart_your_child: "Your Child",
+                chart_max: "Max",
+                chart_obese: "Obese (≥)",
+                chart_overweight: "Overweight (≥)",
+                chart_normal: "Normal (≥)",
+                chart_y_axis: "BMI (Body Mass Index)",
+                chart_x_axis: "Age (Years)",
+                chart_tooltip_current: "Current",
+                err_fetch: "Failed to fetch data.",
+                btn_back: "Go Back",
+                year_unit: "years"
+            }
+        };
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    if (el.tagName === 'TITLE') {
+                        document.title = translations[currentLang][key];
+                    } else {
+                        el.textContent = translations[currentLang][key];
+                    }
+                }
+            });
+        }
+        // អនុវត្តភាសាភ្លាមៗពេលឯកសារចាប់ផ្ដើមលោត
+        applyTranslations();
 
         // Data arrays from Data Analysis app
         const labels = ['៥', '៦', '៧', '៨', '៩', '១០', '១១', '១២', '១៣', '១៤', '១៥'];
@@ -209,9 +279,9 @@
                 const studentsRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students');
                 const studentSnap = await getDocs(studentsRef);
                 let students = [];
-                studentSnap.forEach(doc => {
-                    let data = doc.data();
-                    data.id = doc.id;
+                studentSnap.forEach(docSnap => {
+                    let data = docSnap.data();
+                    data.id = docSnap.id;
                     students.push(data);
                 });
                 
@@ -235,19 +305,19 @@
                 document.getElementById('loading-overlay').innerHTML = `
                     <div class="text-red-400 bg-red-400/10 p-4 rounded-xl text-center max-w-xs mx-4 border border-red-500/20">
                         <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2"></i>
-                        <p class="font-bold text-sm">មិនអាចទាញយកទិន្នន័យបានទេ។</p>
-                        <button onclick="window.history.back()" class="mt-4 px-4 py-2 bg-red-500/20 rounded-lg text-xs hover:bg-red-500/30">ត្រឡប់ក្រោយ</button>
+                        <p class="font-bold text-sm">${translations[currentLang].err_fetch}</p>
+                        <button onclick="window.history.back()" class="mt-4 px-4 py-2 bg-red-500/20 rounded-lg text-xs hover:bg-red-500/30">${translations[currentLang].btn_back}</button>
                     </div>
                 `;
-                lucide.createIcons();
+                if(typeof lucide !== 'undefined') lucide.createIcons();
             }
         }
 
         function renderUI(student, hVal, wVal) {
             // Profile Info
-            document.getElementById('student-name').textContent = student.name || 'មិនស្គាល់ឈ្មោះ';
+            document.getElementById('student-name').textContent = student.name || translations[currentLang].unknown_name;
             document.getElementById('student-photo').src = student.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${student.id}`;
-            document.getElementById('student-gender').textContent = `ភេទ: ${student.gender || '-'}`;
+            document.getElementById('student-gender').textContent = `${translations[currentLang].gender_label}${student.gender || '-'}`;
             
             let age = 9; 
             if (student.dob) {
@@ -258,7 +328,7 @@
                     if(calcAge >= 5 && calcAge <= 18) age = calcAge;
                 }
             }
-            document.getElementById('student-age').textContent = `អាយុ: ${age} ឆ្នាំ`;
+            document.getElementById('student-age').textContent = `${translations[currentLang].age_label}${age} ${translations[currentLang].year_unit}`;
             
             // Metrics
             document.getElementById('val-height').textContent = hVal ? `${hVal} cm` : '-';
@@ -278,20 +348,20 @@
             
             if (!bmiData.raw) {
                 banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-gray-500/10 border-gray-500/20 text-gray-500';
-                statusText.textContent = 'មិនទាន់វាស់វែង';
+                statusText.textContent = translations[currentLang].status_not_measured;
                 statusIcon.className = 'p-3 rounded-full bg-gray-500/20';
                 glow.className = 'absolute inset-0 opacity-10 bg-gray-500';
             } else {
                 statusText.textContent = bmiData.text;
-                if (bmiData.text === 'ស្គម') {
+                if (bmiData.key === 'status_underweight') {
                     banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-500';
                     statusIcon.className = 'p-3 rounded-full bg-yellow-500/20';
                     glow.className = 'absolute inset-0 opacity-20 bg-yellow-500';
-                } else if (bmiData.text === 'ធម្មតា') {
+                } else if (bmiData.key === 'status_normal') {
                     banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-500';
                     statusIcon.className = 'p-3 rounded-full bg-emerald-500/20';
                     glow.className = 'absolute inset-0 opacity-20 bg-emerald-500';
-                } else if (bmiData.text === 'លើសទម្ងន់') {
+                } else if (bmiData.key === 'status_overweight') {
                     banner.className = 'rounded-2xl p-4 mb-6 flex items-center gap-4 border shadow-sm bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-500';
                     statusIcon.className = 'p-3 rounded-full bg-orange-500/20';
                     glow.className = 'absolute inset-0 opacity-20 bg-orange-500';
@@ -309,11 +379,11 @@
             setTimeout(() => {
                 loader.classList.add('hidden');
                 main.classList.remove('hidden');
-                lucide.createIcons();
+                if(typeof lucide !== 'undefined') lucide.createIcons();
                 setTimeout(() => main.classList.remove('opacity-0'), 50);
                 
                 // Render Chart after unhiding to ensure correct dimensions
-                renderChart(age, bmiData.raw, dataCutoffs);
+                if(typeof Chart !== 'undefined') renderChart(age, bmiData.raw, dataCutoffs);
             }, 300);
         }
 
@@ -322,7 +392,7 @@
             const w = parseFloat(w_kg);
             
             if (!h || !w || isNaN(h) || isNaN(w) || h < 50 || w < 5) {
-                return { val: '-', text: '-', raw: null };
+                return { val: '-', text: '-', raw: null, key: '' };
             }
             
             const h_m = h / 100;
@@ -334,18 +404,18 @@
             if (lookupAge > 15) lookupAge = 15;
             const ageIdx = lookupAge - 5;
 
-            let text = '';
+            let textKey = '';
             if (bmiRaw < cutoffs.underweight[ageIdx]) { 
-                text = 'ស្គម'; 
+                textKey = 'status_underweight'; 
             } else if (bmiRaw >= cutoffs.underweight[ageIdx] && bmiRaw < cutoffs.overweight[ageIdx]) { 
-                text = 'ធម្មតា'; 
+                textKey = 'status_normal'; 
             } else if (bmiRaw >= cutoffs.overweight[ageIdx] && bmiRaw < cutoffs.obese[ageIdx]) { 
-                text = 'លើសទម្ងន់'; 
+                textKey = 'status_overweight'; 
             } else { 
-                text = 'ធាត់ខ្លាំង'; 
+                textKey = 'status_obese'; 
             }
             
-            return { val: bmi, text: text, raw: bmiRaw };
+            return { val: bmi, text: translations[currentLang][textKey], raw: bmiRaw, key: textKey };
         }
 
         function renderChart(age, bmiRaw, cutoffs) {
@@ -367,7 +437,7 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: 'កូនរបស់អ្នក',
+                            label: translations[currentLang].chart_your_child,
                             data: studentPointData,
                             backgroundColor: '#3b82f6',
                             borderColor: '#ffffff',
@@ -378,7 +448,7 @@
                             order: 0
                         },
                         {
-                            label: 'Max',
+                            label: translations[currentLang].chart_max,
                             data: Array(11).fill(32),
                             borderColor: 'transparent',
                             backgroundColor: `rgba(239, 68, 68, ${alpha})`,
@@ -387,7 +457,7 @@
                             tooltip: false
                         },
                         {
-                            label: 'ធាត់ខ្លាំង (Obese ≥)',
+                            label: translations[currentLang].chart_obese,
                             data: cutoffs.obese,
                             borderColor: '#ef4444',
                             borderWidth: 2,
@@ -397,7 +467,7 @@
                             pointRadius: 0
                         },
                         {
-                            label: 'លើសទម្ងន់ (Overweight ≥)',
+                            label: translations[currentLang].chart_overweight,
                             data: cutoffs.overweight,
                             borderColor: '#f97316',
                             borderWidth: 2,
@@ -407,7 +477,7 @@
                             pointRadius: 0
                         },
                         {
-                            label: 'ធម្មតា (Normal ≥)',
+                            label: translations[currentLang].chart_normal,
                             data: cutoffs.underweight,
                             borderColor: '#22c55e',
                             borderWidth: 2,
@@ -438,7 +508,7 @@
                             callbacks: {
                                 label: function(context) {
                                     if (context.datasetIndex === 0) {
-                                        return ` បច្ចុប្បន្ន: ${context.parsed.y.toFixed(1)} BMI`;
+                                        return ` ${translations[currentLang].chart_tooltip_current}: ${context.parsed.y.toFixed(1)} BMI`;
                                     }
                                     return ' ' + context.dataset.label.replace(' ≥', '') + ': ' + context.parsed.y;
                                 }
@@ -449,11 +519,11 @@
                         y: {
                             min: 10, max: 32,
                             ticks: { stepSize: 4 },
-                            title: { display: true, text: 'BMI (សន្ទស្សន៍ម៉ាសរាងកាយ)', font: { size: 11, family: "'Kantumruy Pro', sans-serif" } },
+                            title: { display: true, text: translations[currentLang].chart_y_axis, font: { size: 11, family: "'Kantumruy Pro', sans-serif" } },
                             grid: { color: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }
                         },
                         x: {
-                            title: { display: true, text: 'អាយុ (ឆ្នាំ)', font: { size: 11, family: "'Kantumruy Pro', sans-serif" } },
+                            title: { display: true, text: translations[currentLang].chart_x_axis, font: { size: 11, family: "'Kantumruy Pro', sans-serif" } },
                             grid: { display: false }
                         }
                     }

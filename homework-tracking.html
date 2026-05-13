@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>តាមដានកិច្ចការផ្ទះ - Parent Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title data-i18n="page_title">តាមដានកិច្ចការផ្ទះ - Parent Portal</title>
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- បន្ថែម defer -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
     <style>
         body { 
             font-family: 'Kantumruy Pro', sans-serif; 
@@ -81,8 +82,10 @@
             <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-sm">
                 <i data-lucide="arrow-left" class="w-6 h-6 text-white"></i>
             </button>
-            <h1 class="text-white font-bold text-lg kh-moul">កិច្ចការផ្ទះ</h1>
-            <div class="w-10"></div>
+            <h1 class="text-white font-bold text-lg kh-moul" data-i18n="header_title">កិច្ចការផ្ទះ</h1>
+            <button onclick="toggleLanguage()" class="w-10 h-10 p-2 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-sm flex items-center justify-center outline-none">
+                <span id="lang-indicator" class="text-white font-bold text-xs">EN</span>
+            </button>
         </div>
 
         <div class="flex items-center gap-4 bg-white/10 p-4 rounded-2xl border border-white/20 backdrop-blur-sm">
@@ -90,8 +93,8 @@
                 <i data-lucide="book-open-check" class="w-8 h-8 text-indigo-100"></i>
             </div>
             <div>
-                <p class="text-indigo-200 text-xs font-semibold mb-1">តាមដានកិច្ចការ និងពិន្ទុ</p>
-                <h2 class="text-white font-bold text-sm" id="student-name-display">កំពុងទាញយក...</h2>
+                <p class="text-indigo-200 text-xs font-semibold mb-1" data-i18n="header_subtitle">តាមដានកិច្ចការ និងពិន្ទុ</p>
+                <h2 class="text-white font-bold text-sm" id="student-name-display" data-i18n="loading">កំពុងទាញយក...</h2>
             </div>
         </div>
     </div>
@@ -102,10 +105,10 @@
         <!-- Custom Tabs -->
         <div class="flex p-1 bg-card-dark rounded-xl border border-gray-700 shadow-sm">
             <button id="tab-tasks" onclick="switchTab('tasks')" class="flex-1 py-2.5 text-sm font-bold bg-indigo-500 text-white rounded-lg transition shadow-sm flex items-center justify-center gap-2">
-                <i data-lucide="inbox" class="w-4 h-4"></i> កិច្ចការពីគ្រូ
+                <i data-lucide="inbox" class="w-4 h-4"></i> <span data-i18n="tab_tasks">កិច្ចការពីគ្រូ</span>
             </button>
             <button id="tab-scores" onclick="switchTab('scores')" class="flex-1 py-2.5 text-sm font-bold text-gray-400 hover:text-white-light-mode transition flex items-center justify-center gap-2">
-                <i data-lucide="bar-chart-2" class="w-4 h-4"></i> ពិន្ទុប្រចាំខែ
+                <i data-lucide="bar-chart-2" class="w-4 h-4"></i> <span data-i18n="tab_scores">ពិន្ទុប្រចាំខែ</span>
             </button>
         </div>
 
@@ -114,15 +117,15 @@
             
             <div id="tasks-loading" class="py-10 flex flex-col items-center justify-center gap-3">
                 <div class="spinner"></div>
-                <p class="text-gray-400 text-xs font-bold">កំពុងទាញយកកិច្ចការថ្មីៗ...</p>
+                <p class="text-gray-400 text-xs font-bold" data-i18n="loading_tasks">កំពុងទាញយកកិច្ចការថ្មីៗ...</p>
             </div>
 
             <div id="tasks-empty" class="hidden py-10 bg-card-dark border border-gray-700 rounded-2xl flex flex-col items-center justify-center text-center px-4">
                 <div class="bg-gray-800 p-4 rounded-full mb-3">
                     <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
                 </div>
-                <p class="text-white-light-mode font-bold text-sm mb-1">មិនមានកិច្ចការថ្មីទេ</p>
-                <p class="text-gray-400 text-xs">សិស្សមិនមានកិច្ចការផ្ទះដែលត្រូវធ្វើពេលនេះទេ។</p>
+                <p class="text-white-light-mode font-bold text-sm mb-1" data-i18n="no_tasks">មិនមានកិច្ចការថ្មីទេ</p>
+                <p class="text-gray-400 text-xs" data-i18n="no_tasks_desc">សិស្សមិនមានកិច្ចការផ្ទះដែលត្រូវធ្វើពេលនេះទេ។</p>
             </div>
 
             <div id="tasks-list" class="flex flex-col gap-4 hidden">
@@ -137,9 +140,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div class="relative">
                     <select id="yearSelect" class="w-full bg-card-dark border border-gray-700 text-white-light-mode text-sm rounded-xl px-4 py-3 outline-none focus:border-indigo-500 font-semibold" onchange="loadHomeworkData()">
-                        <option value="2024-2025">២០២៤-២០២៥</option>
-                        <option value="2025-2026" selected>២០២៥-២០២៦</option>
-                        <option value="2026-2027">២០២៦-២០២7</option>
+                        <!-- Options generated by JS -->
                     </select>
                 </div>
                 <div class="relative">
@@ -154,18 +155,18 @@
                 <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                     <i data-lucide="award" class="w-24 h-24 text-indigo-500"></i>
                 </div>
-                <h3 class="text-gray-400 text-xs font-bold mb-4 uppercase tracking-wider">សរុបលទ្ធផលប្រចាំខែ</h3>
+                <h3 class="text-gray-400 text-xs font-bold mb-4 uppercase tracking-wider" data-i18n="summary_title">សរុបលទ្ធផលប្រចាំខែ</h3>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <p class="text-gray-400 text-[11px] mb-1">ពិន្ទុសរុប</p>
+                        <p class="text-gray-400 text-[11px] mb-1" data-i18n="total_score">ពិន្ទុសរុប</p>
                         <div class="flex items-end gap-1">
                             <span id="total-score" class="text-3xl font-bold text-indigo-500 leading-none">0</span>
-                            <span class="text-gray-500 text-xs mb-1 font-bold">ពិន្ទុ</span>
+                            <span class="text-gray-500 text-xs mb-1 font-bold" data-i18n="points">ពិន្ទុ</span>
                         </div>
                     </div>
                     <div>
-                        <p class="text-gray-400 text-[11px] mb-1">មធ្យមភាគ</p>
+                        <p class="text-gray-400 text-[11px] mb-1" data-i18n="average">មធ្យមភាគ</p>
                         <div class="flex items-end gap-1">
                             <span id="average-score" class="text-3xl font-bold text-emerald-500 leading-none">0.00</span>
                         </div>
@@ -173,7 +174,7 @@
                 </div>
                 
                 <div class="mt-4 pt-4 border-t border-gray-800 flex justify-between items-center">
-                    <span class="text-gray-400 text-xs">ចំនួនដងដែលបានធ្វើ៖</span>
+                    <span class="text-gray-400 text-xs" data-i18n="submit_count_label">ចំនួនដងដែលបានធ្វើ៖</span>
                     <span id="submit-count" class="text-white-light-mode font-bold text-sm bg-gray-800 px-3 py-1 rounded-lg">0 ដង</span>
                 </div>
             </div>
@@ -181,26 +182,26 @@
             <!-- Info Banner -->
             <div class="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-3 flex gap-3 items-start">
                 <i data-lucide="info" class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5"></i>
-                <p class="text-xs text-indigo-200/80 leading-relaxed light:text-indigo-800">
+                <p class="text-xs text-indigo-200/80 leading-relaxed light:text-indigo-800" data-i18n="info_banner">
                     ទិន្នន័យប្រចាំខែគិតចាប់ពី <span class="font-bold text-indigo-400">ថ្ងៃទី២៦ ខែមុន</span> ដល់ <span class="font-bold text-indigo-400">ថ្ងៃទី២៥ ខែនេះ</span>។
                 </p>
             </div>
 
             <!-- Timeline / Detailed List -->
             <div>
-                <h3 class="text-gray-400 text-sm font-bold mb-4 ml-1">កាលបរិច្ឆេទលម្អិត</h3>
+                <h3 class="text-gray-400 text-sm font-bold mb-4 ml-1" data-i18n="detail_title">កាលបរិច្ឆេទលម្អិត</h3>
                 
                 <div id="scores-loading" class="py-10 flex flex-col items-center justify-center gap-3">
                     <div class="spinner"></div>
-                    <p class="text-gray-400 text-xs">កំពុងទាញយកទិន្នន័យ...</p>
+                    <p class="text-gray-400 text-xs" data-i18n="loading_data">កំពុងទាញយកទិន្នន័យ...</p>
                 </div>
 
                 <div id="scores-empty" class="hidden py-8 bg-card-dark border border-gray-700 rounded-2xl flex flex-col items-center justify-center text-center px-4">
                     <div class="bg-gray-800 p-4 rounded-full mb-3">
                         <i data-lucide="calendar-x" class="w-8 h-8 text-gray-500"></i>
                     </div>
-                    <p class="text-white-light-mode font-bold text-sm mb-1">មិនមានទិន្នន័យទេ</p>
-                    <p class="text-gray-400 text-xs">សិស្សមិនមានពិន្ទុកិច្ចការផ្ទះក្នុងខែនេះឡើយ។</p>
+                    <p class="text-white-light-mode font-bold text-sm mb-1" data-i18n="no_data">មិនមានទិន្នន័យទេ</p>
+                    <p class="text-gray-400 text-xs" data-i18n="no_data_desc">សិស្សមិនមានពិន្ទុកិច្ចការផ្ទះក្នុងខែនេះឡើយ។</p>
                 </div>
 
                 <div id="score-list" class="hidden relative pb-6">
@@ -223,66 +224,173 @@
         <img id="modalImg" src="" onerror="this.onerror=null; this.src='https://placehold.co/600x400/1c1c1e/ffffff?text=រូបភាពមិនដំណើរការ';" class="w-full h-auto max-h-[70vh] object-contain rounded-xl shadow-2xl mb-6" onclick="event.stopPropagation()">
         
         <div class="flex gap-4 w-full max-w-sm px-4" onclick="event.stopPropagation()">
-            <button onclick="closePhotoModal()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-3.5 rounded-xl transition-colors border border-gray-700">បិទ</button>
+            <button onclick="closePhotoModal()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-bold py-3.5 rounded-xl transition-colors border border-gray-700" data-i18n="btn_close">បិទ</button>
             <button onclick="downloadHomeworkImage()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition-colors flex justify-center items-center gap-2 shadow-lg shadow-indigo-900/50">
-                <i data-lucide="download" class="w-5 h-5"></i> ទាញយក
+                <i data-lucide="download" class="w-5 h-5"></i> <span id="btn-download-text" data-i18n="btn_download">ទាញយក</span>
             </button>
         </div>
     </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // នាំចូល (Import) មុខងារ និងការកំណត់ (Config & Caching) ពីឯកសារ firebase-config.js
+        import { 
+            auth, 
+            db, 
+            PTEC_APP_ID, 
+            signInAnonymously, 
+            onAuthStateChanged, 
+            doc, 
+            getDoc, 
+            collection, 
+            onSnapshot 
+        } from "./firebase-config.js";
+        
+        // នាំចូល query និង orderBy ដោយផ្ទាល់ពី CDN ព្រោះមិនទាន់មានក្នុង export របស់ config
+        import { query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
+        // ================= LANGUAGE & TRANSLATION SYSTEM =================
+        let currentLang = localStorage.getItem('app_lang') || 'km';
+
+        const translations = {
+            km: {
+                page_title: "តាមដានកិច្ចការផ្ទះ - Parent Portal",
+                header_title: "កិច្ចការផ្ទះ",
+                header_subtitle: "តាមដានកិច្ចការ និងពិន្ទុ",
+                loading: "កំពុងទាញយក...",
+                tab_tasks: "កិច្ចការពីគ្រូ",
+                tab_scores: "ពិន្ទុប្រចាំខែ",
+                loading_tasks: "កំពុងទាញយកកិច្ចការថ្មីៗ...",
+                no_tasks: "មិនមានកិច្ចការថ្មីទេ",
+                no_tasks_desc: "សិស្សមិនមានកិច្ចការផ្ទះដែលត្រូវធ្វើពេលនេះទេ។",
+                summary_title: "សរុបលទ្ធផលប្រចាំខែ",
+                total_score: "ពិន្ទុសរុប",
+                average: "មធ្យមភាគ",
+                points: "ពិន្ទុ",
+                submit_count_label: "ចំនួនដងដែលបានធ្វើ៖",
+                times: "ដង",
+                info_banner: "ទិន្នន័យប្រចាំខែគិតចាប់ពី <span class=\"font-bold text-indigo-400\">ថ្ងៃទី២៦ ខែមុន</span> ដល់ <span class=\"font-bold text-indigo-400\">ថ្ងៃទី២៥ ខែនេះ</span>។",
+                detail_title: "កាលបរិច្ឆេទលម្អិត",
+                loading_data: "កំពុងទាញយកទិន្នន័យ...",
+                no_data: "មិនមានទិន្នន័យទេ",
+                no_data_desc: "សិស្សមិនមានពិន្ទុកិច្ចការផ្ទះក្នុងខែនេះឡើយ។",
+                homework: "កិច្ចការផ្ទះ",
+                btn_close: "បិទ",
+                btn_download: "ទាញយក",
+                btn_downloading: "ទាញយក...",
+                btn_done: "រួចរាល់",
+                btn_open_tab: "បានបើកក្នុង Tab ថ្មី",
+                error_fetch: "មានបញ្ហាទាញយកទិន្នន័យ",
+                due_date: "ផុតកំណត់៖"
+            },
+            en: {
+                page_title: "Homework Tracking - Parent Portal",
+                header_title: "Homework",
+                header_subtitle: "Track Assignments & Scores",
+                loading: "Loading...",
+                tab_tasks: "Assignments",
+                tab_scores: "Monthly Scores",
+                loading_tasks: "Loading recent assignments...",
+                no_tasks: "No New Assignments",
+                no_tasks_desc: "The student has no pending homework at the moment.",
+                summary_title: "Monthly Summary",
+                total_score: "Total Score",
+                average: "Average",
+                points: "pts",
+                submit_count_label: "Submitted count:",
+                times: "times",
+                info_banner: "Monthly data is calculated from the <span class=\"font-bold text-indigo-400\">26th of last month</span> to the <span class=\"font-bold text-indigo-400\">25th of this month</span>.",
+                detail_title: "Detailed Dates",
+                loading_data: "Fetching data...",
+                no_data: "No Data Available",
+                no_data_desc: "The student has no homework scores for this month.",
+                homework: "Homework",
+                btn_close: "Close",
+                btn_download: "Download",
+                btn_downloading: "Downloading...",
+                btn_done: "Done",
+                btn_open_tab: "Opened in New Tab",
+                error_fetch: "Error fetching data",
+                due_date: "Due:"
+            }
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        window.applyTranslations = function() {
+            currentLang = localStorage.getItem('app_lang') || 'km';
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    el.innerHTML = translations[currentLang][key]; 
+                }
+            });
+
+            const langIndicator = document.getElementById('lang-indicator');
+            if (langIndicator) {
+                langIndicator.textContent = currentLang === 'km' ? 'EN' : 'KH';
+            }
+
+            // Re-render dropdown and contents if needed
+            setupYearOptions();
+            setupMonthOptions();
+            
+            if (window.lastScoreData) {
+                renderScores(window.lastScoreData.data, window.lastScoreData.month, window.lastScoreData.year);
+            }
+            if (window.lastAssignmentsData) {
+                renderAssignments(window.lastAssignmentsData);
+            }
+        };
+
+        window.toggleLanguage = function() {
+            currentLang = currentLang === 'km' ? 'en' : 'km';
+            localStorage.setItem('app_lang', currentLang);
+            window.applyTranslations();
+        };
+
+        // ================= GLOBAL VARIABLES =================
 
         let tid = localStorage.getItem('savedTid');
         let sid = localStorage.getItem('savedSid');
         let studentDataCache = null;
         let unsubscribeTasks = null;
+        let unsubscribeScores = null;
+        
+        window.lastScoreData = null; 
+        window.lastAssignmentsData = null;
 
         const allMonthsMap = [
-            { id: 'nov', label: 'វិច្ឆិកា', isNextYear: false, khIndex: 11 },
-            { id: 'dec', label: 'ធ្នូ', isNextYear: false, khIndex: 12 },
-            { id: 'jan', label: 'មករា', isNextYear: true, khIndex: 1 },
-            { id: 'feb', label: 'កុម្ភៈ', isNextYear: true, khIndex: 2 },
-            { id: 'mar', label: 'មីនា', isNextYear: true, khIndex: 3 },
-            { id: 'apr', label: 'មេសា', isNextYear: true, khIndex: 4 },
-            { id: 'may', label: 'ឧសភា', isNextYear: true, khIndex: 5 },
-            { id: 'jun', label: 'មិថុនា', isNextYear: true, khIndex: 6 },
-            { id: 'jul', label: 'កក្កដា', isNextYear: true, khIndex: 7 },
-            { id: 'aug', label: 'សីហា', isNextYear: true, khIndex: 8 },
-            { id: 'sep', label: 'កញ្ញា', isNextYear: true, khIndex: 9 },
-            { id: 'oct', label: 'តុលា', isNextYear: true, khIndex: 10 }
+            { id: 'nov', label: 'វិច្ឆិកា', enLabel: 'November', isNextYear: false, khIndex: 11 },
+            { id: 'dec', label: 'ធ្នូ', enLabel: 'December', isNextYear: false, khIndex: 12 },
+            { id: 'jan', label: 'មករា', enLabel: 'January', isNextYear: true, khIndex: 1 },
+            { id: 'feb', label: 'កុម្ភៈ', enLabel: 'February', isNextYear: true, khIndex: 2 },
+            { id: 'mar', label: 'មីនា', enLabel: 'March', isNextYear: true, khIndex: 3 },
+            { id: 'apr', label: 'មេសា', enLabel: 'April', isNextYear: true, khIndex: 4 },
+            { id: 'may', label: 'ឧសភា', enLabel: 'May', isNextYear: true, khIndex: 5 },
+            { id: 'jun', label: 'មិថុនា', enLabel: 'June', isNextYear: true, khIndex: 6 },
+            { id: 'jul', label: 'កក្កដា', enLabel: 'July', isNextYear: true, khIndex: 7 },
+            { id: 'aug', label: 'សីហា', enLabel: 'August', isNextYear: true, khIndex: 8 },
+            { id: 'sep', label: 'កញ្ញា', enLabel: 'September', isNextYear: true, khIndex: 9 },
+            { id: 'oct', label: 'តុលា', enLabel: 'October', isNextYear: true, khIndex: 10 }
         ];
 
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
         }
 
-        lucide.createIcons();
+        if (window.lucide) {
+            lucide.createIcons();
+        }
 
         // 1. Initialize
         document.addEventListener('DOMContentLoaded', () => {
             if (!tid || !sid) {
-                alert("មិនមានព័ត៌មានគណនីទេ។ សូមចូលប្រព័ន្ធ (Login) ឡើងវិញ។");
+                alert(currentLang === 'en' ? "No account info. Please login again." : "មិនមានព័ត៌មានគណនីទេ។ សូមចូលប្រព័ន្ធ (Login) ឡើងវិញ។");
                 window.location.href = 'index.html';
                 return;
             }
             
-            setupMonthOptions();
+            window.applyTranslations(); // Apply lang on load
             authenticateAndLoad();
         });
 
@@ -330,11 +438,21 @@
 
         async function fetchStudentInfo() {
             try {
+                // ១. យកឈ្មោះពី Cache មកដាក់បង្ហាញមុន
+                const cachedStudent = localStorage.getItem('offline_student_' + sid);
+                if (cachedStudent) {
+                    studentDataCache = JSON.parse(cachedStudent);
+                    let name = studentDataCache.name || studentDataCache['ឈ្មោះ'] || studentDataCache['គោត្តនាម និងនាម'] || translations[currentLang].loading;
+                    document.getElementById('student-name-display').textContent = name;
+                }
+
+                // ២. ទាញទិន្នន័យថ្មីពី Firebase
                 const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
                 const snap = await getDoc(studentRef);
                 if (snap.exists()) {
                     studentDataCache = snap.data();
-                    let name = studentDataCache.name || studentDataCache['ឈ្មោះ'] || studentDataCache['គោត្តនាម និងនាម'] || "មិនស្គាល់ឈ្មោះ";
+                    localStorage.setItem('offline_student_' + sid, JSON.stringify(studentDataCache)); // Update Cache
+                    let name = studentDataCache.name || studentDataCache['ឈ្មោះ'] || studentDataCache['គោត្តនាម និងនាម'] || translations[currentLang].loading;
                     document.getElementById('student-name-display').textContent = name;
                 }
             } catch(e) {
@@ -354,78 +472,107 @@
             empty.classList.add('hidden');
             list.classList.add('hidden');
 
+            // ១. អានកិច្ចការពី LocalStorage បង្ហាញសិន
+            const cachedTasks = localStorage.getItem('offline_tasks_' + tid);
+            if (cachedTasks) {
+                try {
+                    const taskArray = JSON.parse(cachedTasks);
+                    window.lastAssignmentsData = taskArray;
+                    loading.classList.add('hidden');
+                    
+                    if (taskArray.length > 0) {
+                        list.classList.remove('hidden');
+                        renderAssignments(taskArray);
+                    } else {
+                        empty.classList.remove('hidden');
+                    }
+                } catch(e) { console.warn(e); }
+            }
+
             const hwRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'homework_assignments');
             const q = query(hwRef, orderBy('createdAt', 'desc'));
 
             if(unsubscribeTasks) unsubscribeTasks();
 
+            // ២. ស្តាប់ទិន្នន័យថ្មីៗពី Firebase រួច Update Cache និង UI
             unsubscribeTasks = onSnapshot(q, (snapshot) => {
                 loading.classList.add('hidden');
+                const taskArray = [];
+                snapshot.forEach((docSnap) => taskArray.push(docSnap.data()));
+                
+                // រក្សាទុកកិច្ចការថ្មីៗចូល Cache
+                localStorage.setItem('offline_tasks_' + tid, JSON.stringify(taskArray));
+                window.lastAssignmentsData = taskArray;
 
                 if (snapshot.empty) {
                     empty.classList.remove('hidden');
                     list.innerHTML = '';
-                    return;
+                    list.classList.add('hidden');
+                } else {
+                    empty.classList.add('hidden');
+                    list.classList.remove('hidden');
+                    renderAssignments(taskArray);
                 }
-
-                empty.classList.add('hidden');
-                list.classList.remove('hidden');
-                
-                let html = '';
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    
-                    // Format Date
-                    let displayDate = '-';
-                    if (data.dueDate) {
-                        const d = new Date(data.dueDate);
-                        displayDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-                    }
-
-                    // Assign subject colors
-                    let subjectBg = 'bg-indigo-500/20';
-                    let subjectText = 'text-indigo-400';
-                    let isLight = document.body.classList.contains('light-mode');
-
-                    if (data.subject && data.subject.includes('គណិត')) { subjectBg = 'bg-rose-500/20'; subjectText = isLight ? 'text-rose-600' : 'text-rose-400'; }
-                    else if (data.subject && data.subject.includes('ខ្មែរ')) { subjectBg = 'bg-amber-500/20'; subjectText = isLight ? 'text-amber-600' : 'text-amber-400'; }
-                    else if (data.subject && data.subject.includes('វិទ្យាសាស្ត្រ')) { subjectBg = 'bg-emerald-500/20'; subjectText = isLight ? 'text-emerald-600' : 'text-emerald-400'; }
-                    else if (isLight) { subjectText = 'text-indigo-600'; }
-
-                    const imageHtml = data.imageUrl 
-                        ? `<div class="mt-3 relative w-full h-40 rounded-xl overflow-hidden border border-gray-700 cursor-pointer" onclick="openPhotoModal('${data.imageUrl}')">
-                               <img src="${data.imageUrl}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/1c1c1e/ffffff?text=មិនមានរូបភាព';" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition">
-                               <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity">
-                                    <i data-lucide="zoom-in" class="text-white w-8 h-8 drop-shadow-lg"></i>
-                               </div>
-                           </div>` 
-                        : '';
-
-                    html += `
-                        <div class="bg-card-dark border border-gray-700 rounded-2xl p-4 md:p-5 shadow-sm">
-                            <div class="flex justify-between items-start mb-3 gap-2">
-                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-md ${subjectBg} ${subjectText} whitespace-nowrap">
-                                    ${data.subject || 'កិច្ចការ'}
-                                </span>
-                                <span class="text-[11px] font-bold text-red-500 flex items-center gap-1.5 bg-red-500/10 px-2.5 py-1 rounded-md">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> ផុតកំណត់៖ ${displayDate}
-                                </span>
-                            </div>
-                            <h3 class="font-bold text-white-light-mode text-base leading-snug mb-2">${data.title}</h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">${data.description || '<span class="italic opacity-50">មិនមានការណែនាំបន្ថែម...</span>'}</p>
-                            ${imageHtml}
-                        </div>
-                    `;
-                });
-                
-                list.innerHTML = html;
-                lucide.createIcons();
             }, (error) => {
                 console.error("Error fetching assignments:", error);
-                loading.classList.add('hidden');
-                empty.classList.remove('hidden');
-                empty.innerHTML = `<p class="text-red-400 text-sm font-bold">មានបញ្ហាទាញយកទិន្នន័យ</p>`;
+                if (!cachedTasks) {
+                    loading.classList.add('hidden');
+                    empty.classList.remove('hidden');
+                    empty.innerHTML = `<p class="text-red-400 text-sm font-bold">${translations[currentLang].error_fetch}</p>`;
+                }
             });
+        }
+        
+        function renderAssignments(taskArray) {
+            const list = document.getElementById('tasks-list');
+            if(!taskArray || taskArray.length === 0) return;
+            
+            let html = '';
+            taskArray.forEach(data => {
+                // Format Date
+                let displayDate = '-';
+                if (data.dueDate) {
+                    const d = new Date(data.dueDate);
+                    displayDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                }
+
+                // Assign subject colors
+                let subjectBg = 'bg-indigo-500/20';
+                let subjectText = 'text-indigo-400';
+                let isLight = document.body.classList.contains('light-mode');
+
+                if (data.subject && data.subject.includes('គណិត')) { subjectBg = 'bg-rose-500/20'; subjectText = isLight ? 'text-rose-600' : 'text-rose-400'; }
+                else if (data.subject && data.subject.includes('ខ្មែរ')) { subjectBg = 'bg-amber-500/20'; subjectText = isLight ? 'text-amber-600' : 'text-amber-400'; }
+                else if (data.subject && data.subject.includes('វិទ្យាសាស្ត្រ')) { subjectBg = 'bg-emerald-500/20'; subjectText = isLight ? 'text-emerald-600' : 'text-emerald-400'; }
+                else if (isLight) { subjectText = 'text-indigo-600'; }
+
+                const imageHtml = data.imageUrl 
+                    ? `<div class="mt-3 relative w-full h-40 rounded-xl overflow-hidden border border-gray-700 cursor-pointer" onclick="openPhotoModal('${data.imageUrl}')">
+                           <img src="${data.imageUrl}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/1c1c1e/ffffff?text=មិនមានរូបភាព';" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition">
+                           <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity">
+                                <i data-lucide="zoom-in" class="text-white w-8 h-8 drop-shadow-lg"></i>
+                           </div>
+                       </div>` 
+                    : '';
+
+                html += `
+                    <div class="bg-card-dark border border-gray-700 rounded-2xl p-4 md:p-5 shadow-sm">
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-md ${subjectBg} ${subjectText} whitespace-nowrap">
+                                ${data.subject || translations[currentLang].homework}
+                            </span>
+                            <span class="text-[11px] font-bold text-red-500 flex items-center gap-1.5 bg-red-500/10 px-2.5 py-1 rounded-md">
+                                <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${translations[currentLang].due_date} ${displayDate}
+                            </span>
+                        </div>
+                        <h3 class="font-bold text-white-light-mode text-base leading-snug mb-2">${data.title}</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">${data.description || '<span class="italic opacity-50">...</span>'}</p>
+                        ${imageHtml}
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+            if (window.lucide) { lucide.createIcons(); }
         }
 
         // Image Modal Functions
@@ -445,13 +592,16 @@
             const imgSrc = document.getElementById('modalImg').src;
             if (!imgSrc || imgSrc.includes('placehold.co')) return;
             
-            const btn = document.querySelector('button[onclick="downloadHomeworkImage()"]');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> ទាញយក...';
+            const btnText = document.getElementById('btn-download-text');
+            const originalHtml = btnText.innerHTML;
+            btnText.innerHTML = translations[currentLang].btn_downloading;
+            
+            const btnIcon = document.querySelector('button[onclick="downloadHomeworkImage()"] i');
+            btnIcon.setAttribute('data-lucide', 'loader-2');
+            btnIcon.classList.add('animate-spin');
             if (window.lucide) window.lucide.createIcons();
             
             try {
-                // Try fetching as Blob to force direct download (Depends on Firebase CORS config)
                 const response = await fetch(imgSrc, { mode: 'cors' });
                 if (!response.ok) throw new Error('Network response was not ok');
                 
@@ -468,17 +618,20 @@
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
                 
-                btn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> រួចរាល់';
+                btnText.innerHTML = translations[currentLang].btn_done;
+                btnIcon.setAttribute('data-lucide', 'check');
+                btnIcon.classList.remove('animate-spin');
                 if (window.lucide) window.lucide.createIcons();
+                
                 setTimeout(() => {
-                    btn.innerHTML = originalHtml;
+                    btnText.innerHTML = originalHtml;
+                    btnIcon.setAttribute('data-lucide', 'download');
                     if (window.lucide) window.lucide.createIcons();
                 }, 2000);
                 
             } catch (error) {
                 console.error('CORS error or Fetch failed. Falling back to open in new tab:', error);
                 
-                // Fallback for strict CORS: Open image in new tab so parent can long-press to save
                 const a = document.createElement('a');
                 a.href = imgSrc;
                 a.download = `PTEC_Homework_${Date.now()}.jpg`;
@@ -487,19 +640,44 @@
                 a.click();
                 document.body.removeChild(a);
                 
-                btn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> បានបើកក្នុង Tab ថ្មី';
+                btnText.innerHTML = translations[currentLang].btn_open_tab;
+                btnIcon.setAttribute('data-lucide', 'check');
+                btnIcon.classList.remove('animate-spin');
                 if (window.lucide) window.lucide.createIcons();
+                
                 setTimeout(() => {
-                    btn.innerHTML = originalHtml;
+                    btnText.innerHTML = originalHtml;
+                    btnIcon.setAttribute('data-lucide', 'download');
                     if (window.lucide) window.lucide.createIcons();
                 }, 2500);
             }
         };
 
         // ==========================================
-        // FEATURE: LOAD SCORES (EXISTING LOGIC)
+        // FEATURE: LOAD SCORES (UPDATED TO REALTIME)
         // ==========================================
+        function setupYearOptions() {
+            const yearSelect = document.getElementById('yearSelect');
+            if (!yearSelect) return;
+            
+            const years = ['2024-2025', '2025-2026', '2026-2027'];
+            let optionsHTML = '';
+            let localeLang = localStorage.getItem('app_lang') || 'km';
+            
+            const currentSelected = yearSelect.value || '2025-2026';
+            
+            years.forEach(y => {
+                const selected = y === currentSelected ? 'selected' : '';
+                const displayLabel = localeLang === 'en' ? y : y.replace(/[0-9]/g, d => '០១២៣៤៥៦៧៨៩'[d]);
+                optionsHTML += `<option value="${y}" ${selected}>${displayLabel}</option>`;
+            });
+            yearSelect.innerHTML = optionsHTML;
+        }
+
         function setupMonthOptions() {
+            const monthSelect = document.getElementById('monthSelect');
+            const currentSelected = monthSelect.value;
+            
             const d = new Date();
             let dMonth = d.getMonth(); 
             let dDay = d.getDate();
@@ -511,13 +689,17 @@
             }
 
             const monthIds = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-            const currentMonthId = monthIds[targetMonth];
+            const autoCurrentMonthId = monthIds[targetMonth];
+            
+            const monthToSelect = currentSelected || autoCurrentMonthId;
 
-            const monthSelect = document.getElementById('monthSelect');
             let optionsHTML = '';
+            let localeLang = localStorage.getItem('app_lang') || 'km';
+            
             allMonthsMap.forEach(m => {
-                const selected = m.id === currentMonthId ? 'selected' : '';
-                optionsHTML += `<option value="${m.id}" ${selected}>ខែ${m.label}</option>`;
+                const selected = m.id === monthToSelect ? 'selected' : '';
+                const displayLabel = localeLang === 'en' ? m.enLabel : `ខែ${m.label}`;
+                optionsHTML += `<option value="${m.id}" ${selected}>${displayLabel}</option>`;
             });
             monthSelect.innerHTML = optionsHTML;
         }
@@ -549,14 +731,18 @@
             return dates;
         }
 
-        function formatKhmerDate(date) {
+        function formatAppDate(date) {
             const khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
             const khmerDays = ['អាទិត្យ', 'ច័ន្ទ', 'អង្គារ', 'ពុធ', 'ព្រហស្បតិ៍', 'សុក្រ', 'សៅរ៍'];
+            const englishMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const englishDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            let localeLang = localStorage.getItem('app_lang') || 'km';
             
             return {
-                dayName: khmerDays[date.getDay()],
+                dayName: localeLang === 'en' ? englishDays[date.getDay()] : khmerDays[date.getDay()],
                 dayNum: date.getDate(),
-                monthName: khmerMonths[date.getMonth()],
+                monthName: localeLang === 'en' ? englishMonths[date.getMonth()] : khmerMonths[date.getMonth()],
                 year: date.getFullYear()
             };
         }
@@ -571,30 +757,53 @@
             document.getElementById('score-list').classList.add('hidden');
             document.getElementById('timeline-line').classList.add('hidden');
 
+            // ១. អានពិន្ទុកិច្ចការពី LocalStorage បង្ហាញសិន
+            const cacheKey = `offline_hw_scores_${sid}_${year}_${month}`;
+            const cachedHwScores = localStorage.getItem(cacheKey);
+            if (cachedHwScores) {
+                try {
+                    const myScoreData = JSON.parse(cachedHwScores);
+                    renderScores(myScoreData, month, year);
+                } catch(e) { console.warn(e); }
+            }
+
             try {
                 const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'homework_scores', storageKey);
-                const docSnap = await getDoc(docRef);
-
-                let myScoreData = { days: {}, total: 0 };
                 
-                if (docSnap.exists() && docSnap.data().scores) {
-                    const allScores = docSnap.data().scores;
-                    if (allScores[sid]) {
-                        myScoreData = allScores[sid];
+                if(unsubscribeScores) unsubscribeScores();
+                
+                // ២. ស្តាប់ទិន្នន័យថ្មីៗពី Firebase
+                unsubscribeScores = onSnapshot(docRef, (docSnap) => {
+                    let myScoreData = { days: {}, total: 0 };
+                    
+                    if (docSnap.exists() && docSnap.data().scores) {
+                        const allScores = docSnap.data().scores;
+                        if (allScores[sid]) {
+                            myScoreData = allScores[sid];
+                        }
                     }
-                }
 
-                renderScores(myScoreData, month, year);
+                    // រក្សាទុកពិន្ទុថ្មីចូល Cache
+                    localStorage.setItem(cacheKey, JSON.stringify(myScoreData));
+                    renderScores(myScoreData, month, year);
+                    
+                }, (error) => {
+                    console.error("Error fetching scores realtime:", error);
+                    if (!cachedHwScores) {
+                        document.getElementById('scores-loading').classList.add('hidden');
+                        document.getElementById('scores-empty').classList.remove('hidden');
+                        document.getElementById('scores-empty').innerHTML = `<p class="text-red-400 text-sm font-bold">${translations[currentLang].error_fetch}</p>`;
+                    }
+                });
 
             } catch (error) {
-                console.error("Error fetching scores:", error);
-                document.getElementById('scores-loading').classList.add('hidden');
-                document.getElementById('scores-empty').classList.remove('hidden');
-                document.getElementById('scores-empty').innerHTML = `<p class="text-red-400 text-sm font-bold">មានបញ្ហាទាញយកពិន្ទុ</p>`;
+                console.error("Error setting up score listener:", error);
             }
         }
 
         function renderScores(scoreData, mId, yearStr) {
+            window.lastScoreData = { data: scoreData, month: mId, year: yearStr };
+            
             document.getElementById('scores-loading').classList.add('hidden');
             
             const daysData = scoreData.days || {};
@@ -610,10 +819,11 @@
             }
 
             document.getElementById('total-score').textContent = totalScore;
-            document.getElementById('submit-count').textContent = `${count} ដង`;
+            document.getElementById('submit-count').textContent = `${count} ${translations[currentLang].times}`;
             document.getElementById('average-score').textContent = count > 0 ? (totalScore / count).toFixed(2) : '0.00';
 
             if (count === 0) {
+                document.getElementById('score-list').classList.add('hidden');
                 document.getElementById('scores-empty').classList.remove('hidden');
                 return;
             }
@@ -629,7 +839,7 @@
                 if (daysData[dayNum] !== undefined) {
                     hasItemsRendered = true;
                     const val = daysData[dayNum];
-                    const khDate = formatKhmerDate(dateObj);
+                    const appDate = formatAppDate(dateObj);
                     
                     let scoreColor = 'text-emerald-500';
                     let bgIconColor = 'bg-emerald-500/20';
@@ -648,11 +858,13 @@
                         iconName = 'check-circle';
                     }
 
+                    const monthStr = currentLang === 'en' ? appDate.monthName : `ខែ${appDate.monthName}`;
+
                     const itemHtml = `
                         <div class="flex items-center gap-4 relative">
                             <div class="w-12 flex flex-col items-center justify-center shrink-0">
-                                <span class="text-xs text-gray-500 font-bold">${khDate.dayName}</span>
-                                <span class="text-xl font-bold text-white-light-mode leading-none">${khDate.dayNum}</span>
+                                <span class="text-xs text-gray-500 font-bold uppercase">${appDate.dayName}</span>
+                                <span class="text-xl font-bold text-white-light-mode leading-none">${appDate.dayNum}</span>
                             </div>
                             
                             <div class="w-10 h-10 rounded-full ${bgIconColor} flex items-center justify-center shrink-0 relative z-10 border border-gray-700">
@@ -661,12 +873,12 @@
                             
                             <div class="flex-1 bg-card-dark border border-gray-700 rounded-xl p-3 flex justify-between items-center shadow-sm">
                                 <div>
-                                    <p class="text-sm font-bold text-white-light-mode">កិច្ចការផ្ទះ</p>
-                                    <p class="text-[11px] text-gray-400">ខែ${khDate.monthName} ${khDate.year}</p>
+                                    <p class="text-sm font-bold text-white-light-mode">${translations[currentLang].homework}</p>
+                                    <p class="text-[11px] text-gray-400">${monthStr} ${appDate.year}</p>
                                 </div>
                                 <div class="text-right">
                                     <span class="text-lg font-bold ${scoreColor}">${val}</span>
-                                    <span class="text-xs text-gray-500 font-bold ml-0.5">ពិន្ទុ</span>
+                                    <span class="text-xs text-gray-500 font-bold ml-0.5">${translations[currentLang].points}</span>
                                 </div>
                             </div>
                         </div>
@@ -676,15 +888,19 @@
             });
 
             if (hasItemsRendered) {
+                document.getElementById('scores-empty').classList.add('hidden');
                 document.getElementById('score-list').classList.remove('hidden');
                 if (count > 1) {
                     document.getElementById('timeline-line').classList.remove('hidden');
+                } else {
+                    document.getElementById('timeline-line').classList.add('hidden');
                 }
             } else {
+                document.getElementById('score-list').classList.add('hidden');
                 document.getElementById('scores-empty').classList.remove('hidden');
             }
 
-            lucide.createIcons();
+            if (window.lucide) { lucide.createIcons(); }
         }
 
     </script>

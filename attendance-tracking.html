@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>តាមដានវត្តមាន - Parent Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -18,6 +18,8 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         .kh-moul { font-family: 'Moul', cursive; }
+        /* When language is English, remove Moul font to make it readable */
+        html[lang="en"] .kh-moul { font-family: 'Kantumruy Pro', sans-serif; font-weight: 700; }
         
         .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
         .bg-card-dark { background-color: #242426; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
@@ -59,16 +61,16 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="spinner w-10 h-10 mb-4 border-t-emerald-500"></div>
-        <p class="text-white text-sm animate-pulse">កំពុងទាញយកទិន្នន័យវត្តមាន...</p>
+        <p class="text-white text-sm animate-pulse" data-i18n="loading_data">កំពុងទាញយកទិន្នន័យវត្តមាន...</p>
     </div>
 
     <!-- Header -->
     <div class="bg-header-green pt-12 pb-6 px-6 rounded-b-[2rem] shadow-md relative z-20 shrink-0">
         <div class="flex justify-between items-center mb-6">
-            <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition flex items-center justify-center">
+            <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition flex items-center justify-center outline-none">
                 <i data-lucide="arrow-left" class="w-5 h-5 text-white"></i>
             </button>
-            <h1 class="text-white font-bold text-lg kh-moul">តាមដានវត្តមាន</h1>
+            <h1 class="text-white font-bold text-lg kh-moul" data-i18n="page_title">តាមដានវត្តមាន</h1>
             <div class="w-9 h-9"></div> <!-- Spacer for centering -->
         </div>
 
@@ -77,7 +79,7 @@
                 <img id="student-photo" src="https://api.dicebear.com/7.x/notionists/svg?seed=loading" class="w-full h-full object-cover">
             </div>
             <div>
-                <h3 id="student-name" class="text-white font-bold text-base kh-moul">កំពុងទាញយក...</h3>
+                <h3 id="student-name" class="text-white font-bold text-base kh-moul" data-i18n="fetching_name">កំពុងទាញយក...</h3>
                 <p class="text-emerald-100/80 text-xs font-mono mt-0.5">ID: <span id="student-id">***</span></p>
             </div>
         </div>
@@ -88,20 +90,20 @@
         
         <!-- Today's Status Banner -->
         <div id="today-status-container" class="mb-6">
-            <h3 class="text-gray-400 text-sm font-semibold mb-3 px-1">ស្ថានភាពថ្ងៃនេះ (<span id="today-date-text">...</span>)</h3>
+            <h3 class="text-gray-400 text-sm font-semibold mb-3 px-1"><span data-i18n="today_status_label">ស្ថានភាពថ្ងៃនេះ</span> (<span id="today-date-text">...</span>)</h3>
             <div id="today-status-card" class="bg-card-dark rounded-2xl p-4 border border-gray-700 shadow-sm flex items-center gap-4">
                 <div class="spinner w-6 h-6 border-t-emerald-500 mx-auto"></div> <!-- Initial Loading -->
             </div>
         </div>
 
         <!-- Summary Cards -->
-        <h3 class="text-gray-400 text-sm font-semibold mb-3 px-1">សង្ខេបប្រចាំខែ</h3>
+        <h3 class="text-gray-400 text-sm font-semibold mb-3 px-1" data-i18n="monthly_summary_label">សង្ខេបប្រចាំខែ</h3>
         <div class="grid grid-cols-3 gap-3 mb-6">
             <div class="bg-card-dark p-3 rounded-2xl border border-gray-700/50 shadow-sm flex flex-col items-center justify-center text-center">
                 <div class="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center mb-1 border border-emerald-500/20">
                     <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
                 </div>
-                <p class="text-[10px] text-gray-400 mb-0.5 font-bold">មក</p>
+                <p class="text-[10px] text-gray-400 mb-0.5 font-bold" data-i18n="status_present">មក</p>
                 <p id="total-p" class="text-lg font-bold text-emerald-500 kh-moul">០</p>
             </div>
             
@@ -109,7 +111,7 @@
                 <div class="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center mb-1 border border-yellow-500/20">
                     <i data-lucide="file-text" class="w-4 h-4 text-yellow-500"></i>
                 </div>
-                <p class="text-[10px] text-gray-400 mb-0.5 font-bold">ច្បាប់</p>
+                <p class="text-[10px] text-gray-400 mb-0.5 font-bold" data-i18n="status_leave">ច្បាប់</p>
                 <p id="total-l" class="text-lg font-bold text-yellow-500 kh-moul">០</p>
             </div>
 
@@ -117,14 +119,14 @@
                 <div class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center mb-1 border border-red-500/20">
                     <i data-lucide="x" class="w-4 h-4 text-red-500"></i>
                 </div>
-                <p class="text-[10px] text-gray-400 mb-0.5 font-bold">អវត្តមាន</p>
+                <p class="text-[10px] text-gray-400 mb-0.5 font-bold" data-i18n="status_absent">អវត្តមាន</p>
                 <p id="total-a" class="text-lg font-bold text-red-500 kh-moul">០</p>
             </div>
         </div>
 
         <!-- Filter & List Header -->
         <div class="flex justify-between items-center mb-4 px-1">
-            <h3 class="text-gray-400 text-sm font-semibold">កំណត់ត្រាប្រចាំថ្ងៃ</h3>
+            <h3 class="text-gray-400 text-sm font-semibold" data-i18n="daily_records_label">កំណត់ត្រាប្រចាំថ្ងៃ</h3>
             <div class="relative">
                 <input type="month" id="month-filter" class="bg-card-dark border border-gray-700/50 text-white text-xs rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500 transition shadow-sm appearance-none font-sans">
             </div>
@@ -137,35 +139,89 @@
 
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase Scripts (ភ្ជាប់ជាមួយឯកសាររួម firebase-config.js) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { auth, db, PTEC_APP_ID, onAuthStateChanged, doc, getDoc, signInAnonymously } from './firebase-config.js';
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
+        // Translations
+        const currentLang = localStorage.getItem('app_lang') || 'km';
+        document.documentElement.lang = currentLang;
+
+        const translations = {
+            km: {
+                page_title: "តាមដានវត្តមាន",
+                loading_data: "កំពុងទាញយកទិន្នន័យវត្តមាន...",
+                fetching_name: "កំពុងទាញយក...",
+                today_status_label: "ស្ថានភាពថ្ងៃនេះ",
+                monthly_summary_label: "សង្ខេបប្រចាំខែ",
+                status_present: "មក",
+                status_leave: "ច្បាប់",
+                status_absent: "អវត្តមាន",
+                daily_records_label: "កំណត់ត្រាប្រចាំថ្ងៃ",
+                no_name: "គ្មានឈ្មោះ",
+                alert_login_first: "សូមធ្វើការឡុកចូលជាមុនសិន!",
+                alert_connection_error: "មិនអាចភ្ជាប់ទៅកាន់ប្រព័ន្ធបានទេ។",
+                alert_relogin: "សូមចូលគណនីម្តងទៀត។",
+                error_fetching: "មានបញ្ហាក្នុងការទាញយកទិន្នន័យ។ សូមសាកល្បងម្ដងទៀត។",
+                recorded: "បានកត់ត្រារួចរាល់",
+                no_data_today: "មិនទាន់មានទិន្នន័យ",
+                teacher_not_recorded: "លោកគ្រូ/អ្នកគ្រូមិនទាន់កត់ត្រាវត្តមានថ្ងៃនេះនៅឡើយទេ",
+                no_records_month: "មិនមានកំណត់ត្រាវត្តមានទេ",
+                for_selected_month: "សម្រាប់ខែដែលអ្នកបានជ្រើសរើស",
+                table_date: "ថ្ងៃខែ",
+                table_status: "ស្ថានភាព & ចំណាំ",
+                unknown_status: "មិនស្គាល់"
+            },
+            en: {
+                page_title: "Attendance",
+                loading_data: "Fetching attendance data...",
+                fetching_name: "Loading...",
+                today_status_label: "Today's Status",
+                monthly_summary_label: "Monthly Summary",
+                status_present: "Present",
+                status_leave: "Leave",
+                status_absent: "Absent",
+                daily_records_label: "Daily Records",
+                no_name: "Unknown Name",
+                alert_login_first: "Please login first!",
+                alert_connection_error: "Cannot connect to the system.",
+                alert_relogin: "Please login again.",
+                error_fetching: "Error fetching data. Please try again.",
+                recorded: "Recorded",
+                no_data_today: "No data today",
+                teacher_not_recorded: "Teacher has not recorded attendance for today yet",
+                no_records_month: "No attendance records",
+                for_selected_month: "for the selected month",
+                table_date: "Date",
+                table_status: "Status & Note",
+                unknown_status: "Unknown"
+            }
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        const t = translations[currentLang];
+
+        // Apply translations to static elements
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (t[key]) el.textContent = t[key];
+        });
+        document.title = t.page_title + " - Parent Portal";
+
 
         // State Variables
-        let savedTid = localStorage.getItem('savedTid');
-        let savedSid = localStorage.getItem('savedSid');
+        const urlParams = new URLSearchParams(window.location.search);
+        let savedTid = urlParams.get('tid') || localStorage.getItem('savedTid');
+        let savedSid = urlParams.get('sid') || localStorage.getItem('savedSid');
         let allRecords = []; // Stores formatted array of records {date, status, note}
+        
         const khMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
+        const enMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const displayMonths = currentLang === 'km' ? khMonths : enMonths;
+
         const khDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
         
-        function toKhmerNum(num) { 
+        function formatNumber(num) {
+            if (currentLang === 'en') return num.toString();
             return num.toString().split('').map(d => khDigits[d] || d).join(''); 
         }
 
@@ -176,21 +232,6 @@
 
         lucide.createIcons();
 
-        // Check if user is legally here
-        if (!savedTid || !savedSid) {
-            alert("សូមធ្វើការឡុកចូលជាមុនសិន!");
-            window.location.href = 'index.html';
-        }
-
-        // Init Auth & Fetch Data
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await fetchData();
-            } else {
-                signInAnonymously(auth).catch(err => console.error(err));
-            }
-        });
-
         // Setup Dates
         const todayObj = new Date();
         const yyyy = todayObj.getFullYear();
@@ -198,7 +239,7 @@
         const dd = String(todayObj.getDate()).padStart(2, '0');
         const todayStr = `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD format
         
-        document.getElementById('today-date-text').textContent = `${toKhmerNum(todayObj.getDate())} ${khMonths[todayObj.getMonth()]}`;
+        document.getElementById('today-date-text').textContent = `${formatNumber(todayObj.getDate())} ${displayMonths[todayObj.getMonth()]}`;
 
         const currentMonthString = `${yyyy}-${mm}`;
         document.getElementById('month-filter').value = currentMonthString;
@@ -208,62 +249,125 @@
             renderList();
         });
 
+        // Check if user is legally here
+        if (!savedTid || !savedSid) {
+            alert(t.alert_login_first);
+            window.location.href = 'index.html';
+        } else {
+            // Init Auth & Fetch Data
+            const initAuth = async () => {
+                try {
+                    if (!auth.currentUser) await signInAnonymously(auth);
+                } catch (error) {
+                    console.error("Auth error:", error);
+                    alert(t.alert_connection_error);
+                }
+            };
+
+            initAuth().then(() => {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        await fetchData();
+                    } else {
+                        alert(t.alert_relogin);
+                        window.location.href = 'index.html';
+                    }
+                });
+            });
+        }
+
+        let isAttendanceCached = false;
+        
+        // ទាញយកឈ្មោះ និងរូបថត ដែលបាន Save ទុកពីទំព័រមុខ
+        const cachedStudent = localStorage.getItem('offline_student_' + savedSid);
+        if (cachedStudent) {
+            try {
+                const sData = JSON.parse(cachedStudent);
+                document.getElementById('student-name').textContent = sData.name || t.no_name;
+                document.getElementById('student-id').textContent = savedSid;
+                if (sData.photo) document.getElementById('student-photo').src = sData.photo;
+            } catch(e) { console.warn(e); }
+        }
+
+        // ទាញយកប្រវត្តិវត្តមានចាស់មកបង្ហាញភ្លាមៗ
+        const cachedAttendance = localStorage.getItem('offline_attendance_' + savedSid);
+        if (cachedAttendance) {
+            try {
+                allRecords = JSON.parse(cachedAttendance);
+                renderTodayStatus();
+                renderList();
+                isAttendanceCached = true;
+                
+                // លាក់រង្វង់វិលៗភ្លាមៗ ព្រោះយើងមានទិន្នន័យបង្ហាញហើយ
+                const loader = document.getElementById('loading-overlay');
+                loader.classList.add('hidden');
+            } catch(e) { console.warn(e); }
+        }
         async function fetchData() {
             try {
-                // 1. Fetch Student Info (to show name & photo)
+                // បង្ហាញរង្វង់វិលៗ តែក្នុងករណីដែលអត់មាន Cache សោះប៉ុណ្ណោះ
+                if (!isAttendanceCached) {
+                    document.getElementById('loading-overlay').classList.remove('hidden');
+                }
+
+                // 1. Fetch Student Info (បញ្ជាក់ទិន្នន័យថ្មី)
                 const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', savedTid, 'students', savedSid);
                 const studentSnap = await getDoc(studentRef);
                 
                 if (studentSnap.exists()) {
                     const sData = studentSnap.data();
-                    document.getElementById('student-name').textContent = sData.name || 'គ្មានឈ្មោះ';
-                    document.getElementById('student-id').textContent = savedSid;
-                    if (sData.photo) {
-                        document.getElementById('student-photo').src = sData.photo;
-                    }
+                    // Update Cache សិស្សឡើងវិញ
+                    localStorage.setItem('offline_student_' + savedSid, JSON.stringify(sData)); 
+                    document.getElementById('student-name').textContent = sData.name || t.no_name;
+                    if (sData.photo) document.getElementById('student-photo').src = sData.photo;
                 }
 
                 // 2. Fetch Attendance History from Teacher's class data
-                const classDocRef = doc(db, "users", savedTid, "data", "class_default");
+                const classDocRef = doc(db, "artifacts", PTEC_APP_ID, "users", savedTid, "attendance_data", "class_default");
                 const classDocSnap = await getDoc(classDocRef);
                 
-                allRecords = []; // Reset
+                let newRecords = []; // ប្រើ Array ថ្មីដើម្បីកុំឱ្យជាន់ទិន្នន័យ Cache
 
                 if (classDocSnap.exists()) {
                     const data = classDocSnap.data();
                     const history = data.attendanceHistory || {};
                     
-                    // Convert nested object to flat array for this specific student
                     for (const date in history) {
                         if (history[date][savedSid]) {
-                            allRecords.push({
+                            newRecords.push({
                                 date: date,
                                 status: history[date][savedSid].status,
                                 note: history[date][savedSid].note || ''
                             });
                         }
                     }
-
-                    // Sort descending (newest first)
-                    allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    newRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
                 }
 
-                // Render Today's Status
+                // ផ្ទេរទិន្នន័យថ្មីចូលអញ្ញាតគោល
+                allRecords = newRecords;
+                
+                // [ថ្មី] រក្សាទុកប្រវត្តិវត្តមានថ្មីចូល Cache សម្រាប់ប្រើលើកក្រោយ
+                localStorage.setItem('offline_attendance_' + savedSid, JSON.stringify(allRecords));
+
+                // ធ្វើបច្ចុប្បន្នភាព UI ម្តងទៀតដោយស្ងាត់ៗ
                 renderTodayStatus();
-                // Render List
                 renderList();
 
             } catch (error) {
                 console.error("Error fetching attendance:", error);
-                document.getElementById('history-list').innerHTML = `
-                    <div class="text-center p-6 bg-red-500/10 border border-red-500/30 rounded-2xl">
-                        <i data-lucide="alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2"></i>
-                        <p class="text-red-400 text-sm">មានបញ្ហាក្នុងការទាញយកទិន្នន័យ។ សូមសាកល្បងម្ដងទៀត។</p>
-                    </div>
-                `;
-                lucide.createIcons();
+                // បង្ហាញ Error តែក្នុងករណីដែលយើងគ្មានទិន្នន័យ Cache មកបង្ហាញទាល់តែសោះ
+                if (!isAttendanceCached) {
+                    document.getElementById('history-list').innerHTML = `
+                        <div class="text-center p-6 bg-red-500/10 border border-red-500/30 rounded-2xl">
+                            <i data-lucide="alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2"></i>
+                            <p class="text-red-400 text-sm">${t.error_fetching}</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }
             } finally {
-                // Hide loader
+                // លាក់រង្វង់វិលៗ
                 const loader = document.getElementById('loading-overlay');
                 loader.classList.add('opacity-0');
                 setTimeout(() => loader.classList.add('hidden'), 300);
@@ -271,10 +375,10 @@
         }
 
         function getStatusConfig(status) {
-            if (status === 'P') return { icon: 'check', colorClass: 'text-emerald-500', borderColor: 'border-emerald-500/30 bg-emerald-500/10', label: 'មានវត្តមាន' };
-            if (status === 'L') return { icon: 'file-text', colorClass: 'text-yellow-500', borderColor: 'border-yellow-500/30 bg-yellow-500/10', label: 'សុំច្បាប់' };
-            if (status === 'A') return { icon: 'x', colorClass: 'text-red-500', borderColor: 'border-red-500/30 bg-red-500/10', label: 'អវត្តមាន' };
-            return { icon: 'help-circle', colorClass: 'text-gray-500', borderColor: 'border-gray-500/30 bg-gray-500/10', label: 'មិនស្គាល់' };
+            if (status === 'P' || status === 'p') return { icon: 'check', colorClass: 'text-emerald-500', borderColor: 'border-emerald-500/30 bg-emerald-500/10', label: t.status_present };
+            if (status === 'L' || status === 'l') return { icon: 'file-text', colorClass: 'text-yellow-500', borderColor: 'border-yellow-500/30 bg-yellow-500/10', label: t.status_leave };
+            if (status === 'A' || status === 'a') return { icon: 'x', colorClass: 'text-red-500', borderColor: 'border-red-500/30 bg-red-500/10', label: t.status_absent };
+            return { icon: 'help-circle', colorClass: 'text-gray-500', borderColor: 'border-gray-500/30 bg-gray-500/10', label: t.unknown_status };
         }
 
         function renderTodayStatus() {
@@ -292,7 +396,7 @@
                         </div>
                         <div>
                             <p class="font-bold text-base text-gray-200">${config.label}</p>
-                            ${todayRecord.note ? `<p class="text-[11px] text-gray-500 mt-0.5 italic flex items-start gap-1"><i data-lucide="message-square" class="w-3 h-3 shrink-0"></i> ${todayRecord.note}</p>` : '<p class="text-[11px] text-gray-500 mt-0.5">បានកត់ត្រារួចរាល់</p>'}
+                            ${todayRecord.note ? `<p class="text-[11px] text-gray-500 mt-0.5 italic flex items-start gap-1"><i data-lucide="message-square" class="w-3 h-3 shrink-0"></i> ${todayRecord.note}</p>` : `<p class="text-[11px] text-gray-500 mt-0.5">${t.recorded}</p>`}
                         </div>
                     </div>
                 `;
@@ -303,8 +407,8 @@
                             <i data-lucide="clock" class="w-5 h-5 text-gray-400"></i>
                         </div>
                         <div>
-                            <p class="font-bold text-sm text-gray-300">មិនទាន់មានទិន្នន័យ</p>
-                            <p class="text-[11px] text-gray-500 mt-0.5">លោកគ្រូ/អ្នកគ្រូមិនទាន់កត់ត្រាវត្តមានថ្ងៃនេះនៅឡើយទេ</p>
+                            <p class="font-bold text-sm text-gray-300">${t.no_data_today}</p>
+                            <p class="text-[11px] text-gray-500 mt-0.5">${t.teacher_not_recorded}</p>
                         </div>
                     </div>
                 `;
@@ -328,8 +432,8 @@
                         <div class="bg-gray-800/50 p-3 rounded-full mb-3">
                             <i data-lucide="calendar-x" class="w-6 h-6 text-gray-500"></i>
                         </div>
-                        <p class="text-gray-400 text-sm font-bold">មិនមានកំណត់ត្រាវត្តមានទេ</p>
-                        <p class="text-gray-500 text-xs mt-1">សម្រាប់ខែដែលអ្នកបានជ្រើសរើស</p>
+                        <p class="text-gray-400 text-sm font-bold">${t.no_records_month}</p>
+                        <p class="text-gray-500 text-xs mt-1">${t.for_selected_month}</p>
                     </div>
                 `;
             } else {
@@ -337,14 +441,15 @@
 
                 filteredRecords.forEach(record => {
                     // Update Counters
-                    if (record.status === 'P') countP++;
-                    else if (record.status === 'L') countL++;
-                    else if (record.status === 'A') countA++;
+                    const stat = record.status.toUpperCase();
+                    if (stat === 'P') countP++;
+                    else if (stat === 'L') countL++;
+                    else if (stat === 'A') countA++;
 
                     // Formatting Date (e.g., 24 មីនា)
                     const d = new Date(record.date);
-                    const dayKh = toKhmerNum(d.getDate());
-                    const monthKh = khMonths[d.getMonth()];
+                    const dayFormatted = formatNumber(d.getDate());
+                    const monthFormatted = displayMonths[d.getMonth()];
                     
                     const config = getStatusConfig(record.status);
 
@@ -353,8 +458,8 @@
                         <tr class="active:bg-black/10 transition-colors">
                             <td class="py-3 px-4 whitespace-nowrap align-top w-[90px]">
                                 <div class="flex flex-col">
-                                    <span class="text-[15px] font-bold text-gray-200 kh-moul leading-tight">${dayKh}</span>
-                                    <span class="text-[10px] text-gray-500 font-semibold mt-0.5">${monthKh}</span>
+                                    <span class="text-[15px] font-bold text-gray-200 kh-moul leading-tight">${dayFormatted}</span>
+                                    <span class="text-[10px] text-gray-500 font-semibold mt-0.5">${monthFormatted}</span>
                                 </div>
                             </td>
                             <td class="py-3 px-4 align-top">
@@ -375,8 +480,8 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-date-box border-b border-gray-700/60">
-                                    <th class="py-2.5 px-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">ថ្ងៃខែ</th>
-                                    <th class="py-2.5 px-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">ស្ថានភាព & ចំណាំ</th>
+                                    <th class="py-2.5 px-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">${t.table_date}</th>
+                                    <th class="py-2.5 px-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">${t.table_status}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-700/50">
@@ -390,10 +495,10 @@
             // Update DOM
             listContainer.innerHTML = html;
             
-            // Update Summary Stats with Khmer Numerals
-            document.getElementById('total-p').textContent = toKhmerNum(countP);
-            document.getElementById('total-l').textContent = toKhmerNum(countL);
-            document.getElementById('total-a').textContent = toKhmerNum(countA);
+            // Update Summary Stats with Numbers
+            document.getElementById('total-p').textContent = formatNumber(countP);
+            document.getElementById('total-l').textContent = formatNumber(countL);
+            document.getElementById('total-a').textContent = formatNumber(countA);
 
             lucide.createIcons();
         }

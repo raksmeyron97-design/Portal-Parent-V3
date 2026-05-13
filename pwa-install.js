@@ -1,12 +1,12 @@
 // ឯកសារ: pwa-install.js
 
 (function() {
-    // ១. ចុះឈ្មោះ Service Worker ដោយស្វ័យប្រវត្តិ
+    // ១. ចុះឈ្មោះ Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('✅ Service Worker Registered!'))
-                .catch(err => console.error('❌ Service Worker Failed', err));
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('✅ Service Worker បានចុះឈ្មោះជោគជ័យ!', reg.scope))
+                .catch(err => console.error('❌ Service Worker បរាជ័យ:', err));
         });
     }
 
@@ -34,13 +34,13 @@
     `;
     document.head.appendChild(style);
 
-    // ៣. បង្កើត HTML Banner ចូលទៅក្នុង Body
+    // ៣. បង្កើត HTML Banner
     const banner = document.createElement('div');
     banner.id = 'ptec-pwa-banner';
     banner.innerHTML = `
         <div class="ptec-pwa-text">
             <p class="ptec-pwa-title">📥 ដំឡើងកម្មវិធី (Install App)</p>
-            <p class="ptec-pwa-desc">ដំឡើងចូលទូរស័ព្ទ ឬកុំព្យូទ័រ ដើម្បីប្រើប្រាស់ងាយស្រួល និងលឿនជាងមុន</p>
+            <p class="ptec-pwa-desc">ដំឡើងចូលទូរស័ព្ទ ដើម្បីប្រើប្រាស់ងាយស្រួល និងលឿនជាងមុន</p>
         </div>
         <button id="ptec-pwa-install-btn" class="ptec-pwa-btn">ដំឡើងឥឡូវនេះ</button>
         <button id="ptec-pwa-close-btn" class="ptec-pwa-close">&times;</button>
@@ -49,36 +49,38 @@
 
     // ៤. មុខងារបញ្ជា PWA
     let deferredPrompt;
-    const installBtn = document.getElementById('ptec-pwa-install-btn');
-    const closeBtn = document.getElementById('ptec-pwa-close-btn');
-
-    // លោតពេល Browser ពិនិត្យឃើញថា App អាច Install បាន
+    
     window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); // ការពារកុំឱ្យលោតផ្ទាំង default របស់ Chrome
+        e.preventDefault(); 
         deferredPrompt = e;
-        banner.classList.add('show'); // បង្ហាញ Banner របស់យើង
+        // បង្ហាញ Banner ក្រោយពេល Load ចប់ 2 វិនាទី
+        setTimeout(() => {
+            document.getElementById('ptec-pwa-banner').classList.add('show');
+        }, 2000);
     });
 
-    // ពេលចុចប៊ូតុងដំឡើង
-    installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                banner.classList.remove('show');
+    // Event សម្រាប់ប៊ូតុង Install
+    document.body.addEventListener('click', async (e) => {
+        if (e.target && e.target.id === 'ptec-pwa-install-btn') {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('ptec-pwa-banner').classList.remove('show');
+                }
+                deferredPrompt = null;
             }
-            deferredPrompt = null;
+        }
+        
+        // Event សម្រាប់ប៊ូតុងបិទ
+        if (e.target && e.target.id === 'ptec-pwa-close-btn') {
+            document.getElementById('ptec-pwa-banner').classList.remove('show');
         }
     });
 
-    // ពេលចុចបិទ x
-    closeBtn.addEventListener('click', () => {
-        banner.classList.remove('show');
-    });
-
-    // លាក់ Banner ពេលដំឡើងជោគជ័យ
     window.addEventListener('appinstalled', () => {
         deferredPrompt = null;
-        banner.classList.remove('show');
+        document.getElementById('ptec-pwa-banner').classList.remove('show');
+        console.log('PWA ត្រូវបាន Install ជោគជ័យ!');
     });
 })();

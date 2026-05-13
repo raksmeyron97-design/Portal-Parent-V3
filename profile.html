@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ប្រវត្តិរូបសិស្ស - Parent Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- បន្ថែម defer លើ External Scripts -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    
     <style>
         body { 
             font-family: 'Kantumruy Pro', sans-serif; 
@@ -49,6 +53,62 @@
         body.light-mode .spinner { border-color: rgba(0, 0, 0, 0.1); border-top-color: #10b981; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
+
+    <!-- Language Translation Script -->
+    <script>
+        const translations = {
+            km: {
+                page_title: "ប្រវត្តិរូបសិស្ស",
+                loading: "កំពុងទាញយកទិន្នន័យ...",
+                general_info: "ព័ត៌មានទូទៅ",
+                dob: "ថ្ងៃខែឆ្នាំកំណើត",
+                age: "អាយុ",
+                ethnicity: "សញ្ជាតិ/ជនជាតិ",
+                birth_place: "ទីកន្លែងកំណើត",
+                current_address: "អាសយដ្ឋានបច្ចុប្បន្ន",
+                years_old: "ឆ្នាំ",
+                khmer_eth: "ខ្មែរ",
+                err_not_found: "រកមិនឃើញទិន្នន័យសិស្សទេ!",
+                err_fetch: "មានបញ្ហាក្នុងការទាញយកទិន្នន័យ។",
+                village_prefix: "ភូមិ",
+                commune_prefix: "ឃុំ/សង្កាត់",
+                district_prefix: "ស្រុក/ខណ្ឌ",
+                province_prefix: "ខេត្ត/ក្រុង"
+            },
+            en: {
+                page_title: "Student Profile",
+                loading: "Loading data...",
+                general_info: "General Information",
+                dob: "Date of Birth",
+                age: "Age",
+                ethnicity: "Nationality/Ethnicity",
+                birth_place: "Place of Birth",
+                current_address: "Current Address",
+                years_old: "Years",
+                khmer_eth: "Cambodian",
+                err_not_found: "Student data not found!",
+                err_fetch: "Error fetching data.",
+                village_prefix: "Village ",
+                commune_prefix: "Commune ",
+                district_prefix: "District ",
+                province_prefix: "Province "
+            }
+        };
+
+        let currentLang = localStorage.getItem('app_lang') || 'km';
+
+        function applyTranslations() {
+            document.documentElement.lang = currentLang;
+            document.title = translations[currentLang].page_title + " - Parent Portal";
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+        }
+    </script>
 </head>
 <body class="bg-app-dark min-h-screen flex flex-col">
 
@@ -57,13 +117,13 @@
         <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition text-white">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </button>
-        <h1 class="text-white font-bold text-lg kh-moul flex-1">ប្រវត្តិរូបសិស្ស</h1>
+        <h1 class="text-white font-bold text-lg kh-moul flex-1" data-i18n="page_title">ប្រវត្តិរូបសិស្ស</h1>
     </div>
 
     <!-- Loading State -->
     <div id="loading-state" class="flex-1 flex flex-col items-center justify-center py-20">
         <div class="spinner mb-4"></div>
-        <p class="text-gray-400 text-sm animate-pulse">កំពុងទាញយកទិន្នន័យ...</p>
+        <p class="text-gray-400 text-sm animate-pulse" data-i18n="loading">កំពុងទាញយកទិន្នន័យ...</p>
     </div>
 
     <!-- Content -->
@@ -84,20 +144,20 @@
         <!-- General Info -->
         <div class="bg-card-dark rounded-2xl p-5 border border-gray-800 shadow-sm">
             <h3 class="flex items-center gap-2 text-sm font-bold text-gray-300 mb-4 border-b border-gray-800 pb-3">
-                <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i> ព័ត៌មានទូទៅ
+                <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i> <span data-i18n="general_info">ព័ត៌មានទូទៅ</span>
             </h3>
             
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-400">ថ្ងៃខែឆ្នាំកំណើត</span>
+                    <span class="text-sm text-gray-400" data-i18n="dob">ថ្ងៃខែឆ្នាំកំណើត</span>
                     <span id="p-dob" class="text-sm font-semibold text-gray-200">-</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-400">អាយុ</span>
+                    <span class="text-sm text-gray-400" data-i18n="age">អាយុ</span>
                     <span id="p-age" class="text-sm font-semibold text-gray-200">-</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-400">សញ្ជាតិ/ជនជាតិ</span>
+                    <span class="text-sm text-gray-400" data-i18n="ethnicity">សញ្ជាតិ/ជនជាតិ</span>
                     <span id="p-ethnicity" class="text-sm font-semibold text-gray-200">-</span>
                 </div>
             </div>
@@ -106,7 +166,7 @@
         <!-- Birth Place -->
         <div class="bg-card-dark rounded-2xl p-5 border border-gray-800 shadow-sm">
             <h3 class="flex items-center gap-2 text-sm font-bold text-gray-300 mb-4 border-b border-gray-800 pb-3">
-                <i data-lucide="map-pin" class="w-4 h-4 text-orange-400"></i> ទីកន្លែងកំណើត
+                <i data-lucide="map-pin" class="w-4 h-4 text-orange-400"></i> <span data-i18n="birth_place">ទីកន្លែងកំណើត</span>
             </h3>
             <p id="p-birthplace" class="text-sm text-gray-200 leading-relaxed">-</p>
         </div>
@@ -114,39 +174,38 @@
         <!-- Current Address -->
         <div class="bg-card-dark rounded-2xl p-5 border border-gray-800 shadow-sm mb-6">
             <h3 class="flex items-center gap-2 text-sm font-bold text-gray-300 mb-4 border-b border-gray-800 pb-3">
-                <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i> អាសយដ្ឋានបច្ចុប្បន្ន
+                <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i> <span data-i18n="current_address">អាសយដ្ឋានបច្ចុប្បន្ន</span>
             </h3>
             <p id="p-address" class="text-sm text-gray-200 leading-relaxed">-</p>
         </div>
 
     </div>
 
-    <!-- Firebase -->
+    <!-- Firebase Configuration & Script -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        // ទាញយកមុខងារចាំបាច់ពីឯកសាររួម (មានរួមបញ្ចូលនូវមុខងារ Offline Caching រួចជាស្រេច)
+        import { 
+            auth, 
+            db, 
+            PTEC_APP_ID, 
+            signInAnonymously, 
+            onAuthStateChanged, 
+            doc, 
+            getDoc 
+        } from './firebase-config.js';
 
         // Check Theme
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
         }
 
-        lucide.createIcons();
+        // Apply Language Texts
+        applyTranslations();
+
+        // ត្រូវប្រាកដថា lucide ដំណើរការដោយសារយើងដាក់ defer
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
 
         const tid = localStorage.getItem('savedTid');
         const sid = localStorage.getItem('savedSid');
@@ -156,7 +215,13 @@
         }
 
         const initAuth = async () => {
-            if (!auth.currentUser) await signInAnonymously(auth);
+            if (!auth.currentUser) {
+                try {
+                    await signInAnonymously(auth);
+                } catch(e) {
+                    console.error("Auth Error", e);
+                }
+            }
         };
 
         initAuth().then(() => {
@@ -177,7 +242,7 @@
             if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
                 age--;
             }
-            return age + ' ឆ្នាំ';
+            return age + ' ' + translations[currentLang].years_old;
         }
 
         function formatLocation(v, c, d, p) {
@@ -189,10 +254,12 @@
             let district = clean(d, /^(ស្រុក\/ខណ្ឌ|ក្រុង\/ស្រុក\/ខណ្ឌ|ខណ្ឌ|ស្រុក|ក្រុង)\s*/);
             let province = clean(p, /^(ខេត្ត\/ក្រុង|រាជធានី\/ខេត្ត|រាជធានី|ខេត្ត)\s*/);
 
-            if(village) parts.push('ភូមិ' + village);
-            if(commune) parts.push('ឃុំ/សង្កាត់' + commune);
-            if(district) parts.push('ស្រុក/ខណ្ឌ' + district);
-            if(province) parts.push('ខេត្ត/ក្រុង' + province);
+            const t = translations[currentLang];
+
+            if(village) parts.push(t.village_prefix + village);
+            if(commune) parts.push(t.commune_prefix + commune);
+            if(district) parts.push(t.district_prefix + district);
+            if(province) parts.push(t.province_prefix + province);
             
             return parts.length > 0 ? parts.join(', ') : '-';
         }
@@ -204,38 +271,71 @@
             return dobStr;
         }
 
-        async function fetchStudentData() {
+        async function fetchProfileData() {
+            let isProfileCached = false;
+            
+            // មុខងារសម្រាប់ Update UI
+            const updateUI = (s) => {
+                const noDataTxt = translations[currentLang].no_data;
+                document.getElementById('p-name').textContent = s.name || noDataTxt;
+                document.getElementById('p-name-en').textContent = s.nameEn || noDataTxt;
+                
+                if (s.photo) {
+                    document.getElementById('p-photo').src = s.photo;
+                } else {
+                    document.getElementById('p-photo').src = `https://api.dicebear.com/7.x/notionists/svg?seed=${sid}`;
+                }
+                
+                let genderTxt = s.gender === 'ប្រុស' ? translations[currentLang].male : (s.gender === 'ស្រី' ? translations[currentLang].female : (s.gender || '-'));
+                document.getElementById('p-gender').textContent = genderTxt;
+                document.getElementById('p-id').textContent = `ID: ${sid}`;
+                
+                document.getElementById('p-dob').textContent = formatDate(s.dob);
+                document.getElementById('p-age').textContent = calculateAge(s.dob);
+                
+                let ethnicity = s.ethnicity || translations[currentLang].khmer_eth;
+                document.getElementById('p-ethnicity').textContent = ethnicity;
+                
+                const birthPlace = formatLocation(s.village, s.commune, s.district, s.province);
+                document.getElementById('p-birthplace').textContent = birthPlace;
+                
+                const currPlace = formatLocation(s.currVillage, s.currCommune, s.currDistrict, s.currProvince);
+                document.getElementById('p-address').textContent = currPlace !== '-' ? currPlace : (s.currentAddress || '-');
+            };
+
+            // ១. អានពី LocalStorage បង្ហាញភ្លាមៗ
+            const cachedStudent = localStorage.getItem('offline_student_' + sid);
+            if (cachedStudent) {
+                try {
+                    const s = JSON.parse(cachedStudent);
+                    updateUI(s);
+                    document.getElementById('loading-state').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                    isProfileCached = true;
+                } catch(e) { console.warn(e); }
+            }
+
+            // ២. លួចទាញពី Firebase
             try {
                 const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
                 const snap = await getDoc(docRef);
                 
                 if (snap.exists()) {
                     const s = snap.data();
-                    
-                    document.getElementById('p-photo').src = s.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${sid}`;
-                    document.getElementById('p-name').textContent = s.name || '-';
-                    document.getElementById('p-gender').textContent = s.gender || '-';
-                    document.getElementById('p-id').textContent = `ID: ${sid}`;
-                    
-                    document.getElementById('p-dob').textContent = formatDate(s.dob);
-                    document.getElementById('p-age').textContent = calculateAge(s.dob);
-                    document.getElementById('p-ethnicity').textContent = s.ethnicity || 'ខ្មែរ';
-                    
-                    const birthPlace = formatLocation(s.village, s.commune, s.district, s.province);
-                    document.getElementById('p-birthplace').textContent = birthPlace;
-                    
-                    const currPlace = formatLocation(s.currVillage, s.currCommune, s.currDistrict, s.currProvince);
-                    document.getElementById('p-address').textContent = currPlace !== '-' ? currPlace : (s.currentAddress || '-');
+                    localStorage.setItem('offline_student_' + sid, JSON.stringify(s)); // Update Cache
+                    updateUI(s);
 
-                    document.getElementById('loading-state').classList.add('hidden');
-                    document.getElementById('main-content').classList.remove('hidden');
-                } else {
-                    alert('រកមិនឃើញទិន្នន័យសិស្សទេ!');
+                    if (!isProfileCached) {
+                        document.getElementById('loading-state').classList.add('hidden');
+                        document.getElementById('main-content').classList.remove('hidden');
+                    }
+                } else if (!isProfileCached) {
+                    alert(translations[currentLang].err_not_found);
                     window.location.href = 'index.html';
                 }
             } catch (e) {
                 console.error(e);
-                alert('មានបញ្ហាក្នុងការទាញយកទិន្នន័យ។');
+                if (!isProfileCached) alert(translations[currentLang].err_fetch);
             }
         }
     </script>

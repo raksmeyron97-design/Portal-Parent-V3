@@ -4,16 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ប្រព័ន្ធអាណាព្យាបាល - Parent Portal</title>
+    
+    <!-- PWA Requirements -->
     <link rel="manifest" href="manifest.json">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" href="/icon-192.png" type="image/png">
+    <meta property="og:site_name" content="KruSmart Parent Portal">
+    <meta property="og:title" content="ប្រព័ន្ធអាណាព្យាបាល - Parent Portal">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "KruSmart Parent Portal",
+      "alternateName": ["Tamdan", "ប្រព័ន្ធអាណាព្យាបាល"],
+      "url": "https://tamdan.xyz/"
+    }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Moul&display=swap" rel="stylesheet">
+    
+    <!-- បន្ថែម defer ដើម្បីកុំឱ្យទប់ស្កាត់ការបង្ហាញ UI (Render Blocking) -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript" defer></script>
+    
     <style>
+        :root {
+            /* Color Tokens - Dark Mode (Default) */
+            --bg-app: #1c1c1e;
+            --bg-card: #2c2c2e;
+            --text: #ffffff;
+            --text-muted: #9ca3af; /* Gray 400 */
+            --card-border: rgba(255, 255, 255, 0.1);
+            
+            /* Global Accent & Feedback Colors */
+            --accent: #10b981; /* Emerald 500 */
+            --danger: #ef4444; /* Red 500 */
+            --success: #10b981;
+            
+            --toast-bg: #1f2937;
+            --header-gradient: linear-gradient(135deg, #0d9488 0%, #047857 100%); /* Cooler teal/blue variant */
+            --overlay-bg: rgba(0, 0, 0, 0.55);
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --input-border: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="light"] {
+            /* Color Tokens - Light Mode */
+            --bg-app: #f9fafb;
+            --bg-card: #ffffff;
+            --text: #111827;
+            --text-muted: #4b5563; /* Improved AA contrast */
+            --card-border: #e5e7eb;
+            
+            --accent: #059669; /* Darker emerald for contrast */
+            --danger: #dc2626;
+            --success: #059669;
+            
+            --toast-bg: #ffffff;
+            --header-gradient: linear-gradient(135deg, #0f766e 0%, #059669 100%);
+            --overlay-bg: rgba(0, 0, 0, 0.4);
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
+        }
+
         body { 
-            font-family: 'Kantumruy Pro', sans-serif; 
-            background-color: #121212; 
-            color: #ffffff;
+            font-family: 'Khmer OS Content', sans-serif; 
+            background-color: var(--bg-app); 
+            color: var(--text);
             margin: 0; 
             padding: 0; 
             overflow-x: hidden; 
@@ -21,52 +79,137 @@
             -webkit-tap-highlight-color: transparent;
         }
         .kh-moul { font-family: 'Moul', cursive; }
-        
+
         /* Mobile Safe Areas */
         .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
         .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
-        
-        /* Custom Colors */
-        .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
-        .bg-card-dark { background-color: #2c2c2e; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
-        .bg-header-green { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); }
-        
-        /* Light Mode Adjustments */
-        body.light-mode { background-color: #f9fafb; color: #1f2937; }
-        body.light-mode .bg-app-dark { background-color: #f9fafb; }
-        body.light-mode .bg-card-dark { background-color: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        body.light-mode .bg-gray-700\/50 { background-color: #f3f4f6; }
-        body.light-mode .border-gray-800\/50, body.light-mode .border-gray-700 { border-color: #e5e7eb; }
-        body.light-mode .bg-\[\#1c1c1e\]\/95 { background-color: rgba(255,255,255,0.95); border-top-color: #e5e7eb; }
-        
-        body.light-mode .feature-card h3, body.light-mode #settings-view h3, 
-        body.light-mode #settings-view p.text-gray-200, body.light-mode #notification-modal h3, 
-        body.light-mode #notification-modal h4, body.light-mode #qr-scanner-modal h3 { color: #111827; }
-        body.light-mode #settings-view p.text-gray-400, body.light-mode #notification-modal p.text-gray-400, 
-        body.light-mode #qr-scanner-modal p.text-gray-400 { color: #6b7280; }
-        body.light-mode #settings-view i.text-gray-300, body.light-mode #settings-view i.text-gray-400 { color: #6b7280; }
-        body.light-mode #settings-view .bg-gray-800 { background-color: #e5e7eb; }
 
-        /* Notification Modal Light Mode */
-        body.light-mode #notification-modal .bg-gray-800\/30 { background-color: #f3f4f6; border-color: #e5e7eb; }
-        body.light-mode #notification-modal .bg-gray-800\/40 { background-color: #ffffff; border-color: #e5e7eb; }
-        body.light-mode #notification-modal .hover\:bg-gray-800\/60:hover { background-color: #f9fafb; }
+        /* Custom Structural Colors Applied via Tokens */
+        .bg-app-dark { background-color: var(--bg-app) !important; }
+        .bg-card-dark { 
+            background-color: var(--bg-card) !important; 
+            border-color: var(--card-border) !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .bg-header-green { background: var(--header-gradient) !important; }
+        .login-overlay { background: var(--overlay-bg) !important; backdrop-filter: blur(8px); }
+
+        /* Protect Header from Light Theme Overrides */
+        .bg-header-green,
+        .bg-header-green h1,
+        .bg-header-green h2,
+        .bg-header-green h3,
+        .bg-header-green .text-white {
+            color: #ffffff !important;
+        }
+        .bg-header-green .text-emerald-100 { color: #d1fae5 !important; }
+        .bg-header-green .text-emerald-200 { color: #a7f3d0 !important; }
+
+        .bg-header-green .bg-white\/10 {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        .bg-header-green .bg-black\/20 {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+        }
+
+        /* Light Theme Global Text/Color Overrides */
+        [data-theme="light"] #main-content section .text-white,
+        [data-theme="light"] #main-content section .text-gray-200,
+        [data-theme="light"] #main-content section h1,
+        [data-theme="light"] #main-content section h2,
+        [data-theme="light"] #main-content section h3,
+        [data-theme="light"] #main-content section h4,
+        [data-theme="light"] #notification-modal .text-white,
+        [data-theme="light"] #notification-modal h3,
+        [data-theme="light"] #notification-modal h4,
+        [data-theme="light"] #qr-scanner-modal h3,
+        [data-theme="light"] #qr-scanner-modal .text-white { 
+            color: var(--text) !important; 
+        }
+
+        [data-theme="light"] #main-content section .text-gray-300,
+        [data-theme="light"] #main-content section .text-gray-400,
+        [data-theme="light"] #main-content section .text-gray-500,
+        [data-theme="light"] nav .text-gray-500,
+        [data-theme="light"] #notification-modal .text-gray-400,
+        [data-theme="light"] #notification-modal .text-gray-500,
+        [data-theme="light"] #qr-scanner-modal .text-gray-400 { 
+            color: var(--text-muted) !important; 
+        }
+
+        [data-theme="light"] #main-content section .bg-gray-800,
+        [data-theme="light"] #main-content section .bg-gray-700\/50,
+        [data-theme="light"] #main-content section .bg-white\/10 {
+            background-color: #f3f4f6 !important;
+            border-color: var(--card-border) !important;
+        }
+
+        [data-theme="light"] #notification-modal .bg-gray-800\/40,
+        [data-theme="light"] #notification-modal .bg-gray-800\/30 {
+            background-color: #ffffff !important;
+            border-color: var(--card-border) !important;
+        }
+        [data-theme="light"] #notification-modal .hover\:bg-gray-800\/60:hover { background-color: #f9fafb !important; }
+
+        [data-theme="light"] .bg-\[\#1c1c1e\]\/95 {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-top-color: var(--card-border) !important;
+        }
+
+        [data-theme="light"] .bg-black\/80 { background-color: rgba(0, 0, 0, 0.6) !important; }
+
+        /* Force Consistant Accent Color Everywhere */
+        .text-emerald-500, .text-emerald-400, .text-emerald-600, .text-emerald-700 { color: var(--accent) !important; }
+        .bg-emerald-500, .bg-emerald-600 { background-color: var(--accent) !important; }
+        .border-emerald-500, .border-emerald-800 { border-color: var(--accent) !important; }
+        .border-t-emerald-500 { border-top-color: var(--accent) !important; }
+
+        /* Inputs & Form Elements */
+        input {
+            background-color: var(--input-bg) !important;
+            border-color: var(--input-border) !important;
+            color: var(--text) !important;
+        }
+        [data-theme="light"] input::placeholder { color: #9ca3af !important; }
+        [data-theme="dark"] input::placeholder, :root:not([data-theme="light"]) input::placeholder { color: #6b7280 !important; }
+
+        /* Disabled Inputs - Visual Clarity */
+        input:disabled, button:disabled { opacity: 0.6; }
+
+        [data-theme="light"] input:disabled {
+            border: 1px dashed rgba(0,0,0,0.15) !important;
+            background-color: #f3f4f6 !important;
+        }
+        [data-theme="dark"] input:disabled, :root:not([data-theme="light"]) input:disabled {
+            border: 1px dashed rgba(255,255,255,0.15) !important;
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+
+        /* Accessible Interactive Elements Focus States */
+        *:focus-visible {
+            outline: 2px solid var(--accent) !important;
+            outline-offset: 2px !important;
+        }
 
         /* Auth styling */
-        .login-bg { background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop'); background-size: cover; background-position: center; }
-        .login-overlay { background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); }
+        .login-bg { background-image: url('https://www.ptec.edu.kh/wp-content/uploads/2024/02/PTEC-BANNER-2048x682.jpg'); background-size: cover; background-position: center; }
         .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 1.5rem; }
+        [data-theme="light"] .glass-card { background: rgba(255, 255, 255, 0.85); border: 1px solid var(--card-border); }
 
-        /* Feature Card */
+        /* Feature Card Interactions */
         .feature-card { transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease; touch-action: manipulation; }
-        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .feature-card:active { transform: scale(0.95); background-color: #3a3a3c; }
-        .feature-card:focus-visible { outline: 2px solid #10b981; outline-offset: 2px; }
+        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
+        .feature-card:active { transform: scale(0.95); background-color: rgba(0,0,0,0.05) !important; }
 
+        /* Scrollbar Utility */
         ::-webkit-scrollbar { display: none; }
-        
+
         /* Animations & Loaders */
-        .spinner { border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 3px solid #10b981; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        .spinner { border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 3px solid var(--accent); width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        [data-theme="light"] .spinner { border-color: rgba(0, 0, 0, 0.1); border-top-color: var(--accent); }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .notif-card-enter { animation: slideIn 0.4s ease-out forwards; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -82,13 +225,22 @@
             *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
         }
     </style>
+
+    <!-- Initialize Theme Attribute immediately to prevent flash -->
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
 </head>
 <body class="bg-app-dark min-h-screen flex flex-col">
 
     <!-- Loading Overlay -->
     <div id="loading-overlay" role="alert" aria-busy="true" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="spinner w-12 h-12 mb-4 border-t-emerald-500"></div>
-        <p class="text-white text-sm animate-pulse" id="loading-text" data-i18n="loading_data">កំពុងរៀបចំទិន្នន័យ...</p>
+        <p class="text-white text-sm animate-pulse font-medium" id="loading-text" data-i18n="loading_data">កំពុងរៀបចំទិន្នន័យ...</p>
     </div>
 
     <!-- ================= AUTH SECTION (LOGIN) ================= -->
@@ -103,7 +255,7 @@
             </div>
             
             <h1 class="text-3xl font-bold text-white mb-2">Parent Portal</h1>
-            <p class="text-gray-300 text-sm mb-8" data-i18n="auth_subtitle">សម្រាប់អាណាព្យាបាលសិស្ស</p>
+            <p class="text-gray-300 text-sm mb-8 font-medium" data-i18n="auth_subtitle">សម្រាប់អាណាព្យាបាលសិស្ស</p>
 
             <!-- Login Form -->
             <div class="glass-card w-full p-6 shadow-2xl">
@@ -115,11 +267,11 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i data-lucide="key" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
                             </div>
-                            <input value="KS9lutduPQZambSiLyZzFgh0xDh1" type="text" id="teacher-code" required placeholder="ឧទាហរណ៍៖ KS9lut..." aria-describedby="teacher-helper teacher-error" data-i18n-placeholder="placeholder_teacher"
-                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition">
+                            <input value="" type="text" id="teacher-code" required placeholder="ឧទាហរណ៍៖ KS9lut..." aria-describedby="teacher-helper teacher-error" data-i18n-placeholder="placeholder_teacher"
+                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none transition">
                         </div>
-                        <p id="teacher-helper" class="text-[11px] text-gray-300 ml-1" data-i18n="class_code_helper">សួរគ្រូរបស់អ្នកសម្រាប់លេខកូដនេះ</p>
-                        <p id="teacher-error" class="text-[11px] text-red-400 ml-1 hidden" role="alert"></p>
+                        <p id="teacher-helper" class="text-xs font-medium text-gray-300 ml-1 mt-1" data-i18n="class_code_helper">សួរគ្រូរបស់អ្នកសម្រាប់លេខកូដនេះ</p>
+                        <p id="teacher-error" class="text-xs font-medium text-red-400 ml-1 mt-1 hidden" role="alert"></p>
                     </div>
                     
                     <div class="space-y-1">
@@ -129,24 +281,24 @@
                                 <i data-lucide="user" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
                             </div>
                             <input type="text" id="student-code" required placeholder="ឧទាហរណ៍៖ STU001" aria-describedby="student-helper student-error" data-i18n-placeholder="placeholder_student"
-                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition">
+                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none transition">
                         </div>
-                        <p id="student-helper" class="text-[11px] text-gray-300 ml-1" data-i18n="student_id_helper">អត្តលេខសម្គាល់កូនរបស់អ្នក</p>
-                        <p id="student-error" class="text-[11px] text-red-400 ml-1 hidden" role="alert"></p>
+                        <p id="student-helper" class="text-xs font-medium text-gray-300 ml-1 mt-1" data-i18n="student_id_helper">អត្តលេខសម្គាល់កូនរបស់អ្នក</p>
+                        <p id="student-error" class="text-xs font-medium text-red-400 ml-1 mt-1 hidden" role="alert"></p>
                     </div>
                     
-                    <div id="login-error" class="hidden bg-red-500/20 text-red-100 border border-red-500/50 p-3 rounded-lg text-xs text-center flex items-center gap-2" role="alert">
+                    <div id="login-error" class="hidden bg-red-500/20 text-red-100 border border-red-500/50 p-3 rounded-lg text-xs font-medium text-center flex items-center gap-2" role="alert">
                         <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
                         <span id="login-error-text" data-i18n="login_error_default">ព័ត៌មានមិនត្រឹមត្រូវ។</span>
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                        <button type="button" onclick="scanQR()" aria-label="ស្កេន QR Code" class="flex-1 sm:flex-[0.4] flex items-center justify-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-500/50 text-white py-3 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none">
+                        <button type="button" onclick="scanQR()" aria-label="ស្កេន QR Code" class="flex-1 sm:flex-[0.4] flex items-center justify-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-500/50 text-white py-3 rounded-xl transition cursor-pointer outline-none">
                             <i data-lucide="qr-code" class="w-5 h-5"></i>
                             <span class="text-sm font-bold sm:hidden" data-i18n="scan_qr_btn">ស្កេន QR</span>
                         </button>
                         
-                        <button type="submit" id="btn-login" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-white outline-none disabled:opacity-70 disabled:cursor-not-allowed">
+                        <button type="submit" id="btn-login" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 outline-none">
                             <span id="btn-login-text" data-i18n="login_btn">ចូលប្រើប្រាស់</span>
                             <i data-lucide="log-in" id="btn-login-icon" class="w-5 h-5"></i>
                         </button>
@@ -154,13 +306,12 @@
                 </form>
             </div>
             
-            <p class="mt-8 text-xs text-gray-300 text-center flex items-center gap-1 justify-center">
+            <p class="mt-8 text-xs font-medium text-gray-300 text-center flex items-center gap-1 justify-center">
                 <i data-lucide="info" class="w-3.5 h-3.5"></i>
                 <span data-i18n="login_footer">ស្កេន QR Code ពីសាលាដើម្បីចូលដោយស្វ័យប្រវត្តិ។</span>
             </p>
         </div>
     </main>
-
 
     <!-- ================= MAIN CONTENT SECTION ================= -->
     <div id="main-content" class="hidden opacity-0 transition-opacity duration-500 flex-1 flex flex-col h-full w-full" aria-hidden="true">
@@ -172,11 +323,11 @@
                 <div class="flex justify-between items-start mb-6">
                     <div>
                         <h2 id="header-school-name" class="text-white font-bold text-lg">សាលាបឋមសិក្សា</h2>
-                        <p id="header-academic-year" class="text-emerald-100/80 text-xs">ឆ្នាំសិក្សា ២០២៥-២០២៦</p>
+                        <p id="header-academic-year" class="text-emerald-100/90 font-medium text-xs">ឆ្នាំសិក្សា ២០២៥-២០២៦</p>
                     </div>
                     
                     <!-- Notification Bell -->
-                    <button onclick="toggleNotifications()" aria-label="បើកការជូនដំណឹង" aria-haspopup="dialog" class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                    <button onclick="toggleNotifications()" aria-label="បើកការជូនដំណឹង" aria-haspopup="dialog" class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition outline-none">
                         <i data-lucide="bell" class="w-6 h-6 text-white" aria-hidden="true"></i>
                         <span id="notif-badge" class="absolute top-1 right-1 flex h-2.5 w-2.5 hidden">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -193,14 +344,14 @@
                         </div>
                     </div>
                     <div class="flex-1">
-                        <p class="text-emerald-100 text-[11px] font-semibold mb-0.5" data-i18n="student_info_label">ព័ត៌មានកូនរបស់អ្នក៖</p>
+                        <p class="text-emerald-100 text-[12px] font-semibold mb-0.5" data-i18n="student_info_label">ព័ត៌មានកូនរបស់អ្នក៖</p>
                         <h3 id="display-name" class="text-white font-bold text-base kh-moul">កំពុងទាញយក...</h3>
                         <div class="flex items-center gap-2 mt-1">
-                            <span id="display-gender" class="bg-black/20 px-2 py-0.5 rounded text-xs text-white border border-white/10">-</span>
-                            <span class="bg-black/20 px-2 py-0.5 rounded text-xs text-white border border-white/10 font-mono flex items-center gap-1">
+                            <span id="display-gender" class="bg-black/20 px-2 py-0.5 rounded text-[11px] font-medium text-white border border-white/10">-</span>
+                            <span class="bg-black/20 px-2 py-0.5 rounded text-[11px] font-medium text-white border border-white/10 font-mono flex items-center gap-1">
                                 ID: <span id="display-id" aria-live="polite">***</span>
                             </span>
-                            <button onclick="toggleID()" aria-label="បង្ហាញអត្តលេខ" class="text-emerald-200 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-white outline-none">
+                            <button onclick="toggleID()" aria-label="បង្ហាញអត្តលេខ" class="text-emerald-200 hover:text-white p-1 rounded outline-none">
                                 <i data-lucide="eye" id="eye-icon" class="w-3.5 h-3.5" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -239,26 +390,26 @@
                     <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
                     
                     <!-- Dark Mode Toggle Button -->
-                    <button type="button" role="switch" aria-checked="true" id="btn-dark-mode" onclick="toggleDarkMode()" class="w-full flex justify-between items-center mb-5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-1 transition-colors hover:bg-gray-700/30">
+                    <button type="button" role="switch" aria-checked="true" id="btn-dark-mode" onclick="toggleDarkMode()" class="w-full flex justify-between items-center mb-5 group outline-none rounded-lg p-1 transition-colors hover:bg-gray-700/30">
                         <div class="flex gap-4 items-center">
                             <i data-lucide="moon" id="dark-mode-icon" class="w-5 h-5 text-gray-400 transition-colors group-hover:text-emerald-400" aria-hidden="true"></i>
                             <div class="text-left">
                                 <p class="font-bold text-[13px] text-gray-200" data-i18n="theme">រូបរាង (Theme)</p>
-                                <p class="text-[11px] text-gray-400 mt-0.5" id="dark-mode-text" data-i18n="dark_mode_active">កំពុងប្រើ Dark Mode</p>
+                                <p class="text-[12px] font-medium text-gray-400 mt-0.5" id="dark-mode-text" data-i18n="dark_mode_active">កំពុងប្រើ Dark Mode</p>
                             </div>
                         </div>
-                        <div id="dark-mode-toggle" class="w-10 h-6 bg-emerald-500 rounded-full relative mr-1 transition-colors duration-300">
-                            <div id="dark-mode-circle" class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform duration-300"></div>
+                        <div id="dark-mode-toggle" class="w-10 h-6 rounded-full relative mr-1 transition-colors duration-300" style="background-color: var(--accent);">
+                            <div id="dark-mode-circle" class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform duration-300" style="transform: translateX(0);"></div>
                         </div>
                     </button>
                     
                     <!-- Language Toggle Button -->
-                    <button type="button" onclick="toggleLanguage()" class="w-full flex justify-between items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-1 transition-colors hover:bg-gray-700/30">
+                    <button type="button" onclick="toggleLanguage()" class="w-full flex justify-between items-center group outline-none rounded-lg p-1 transition-colors hover:bg-gray-700/30">
                         <div class="flex gap-4 items-center">
                             <i data-lucide="languages" class="w-5 h-5 text-gray-400 transition-colors group-hover:text-emerald-400" aria-hidden="true"></i>
                             <div class="text-left">
                                 <p class="font-bold text-[13px] text-gray-200" data-i18n="language_label">ភាសា</p>
-                                <p class="text-[11px] text-gray-400 mt-0.5" id="lang-text" data-i18n="lang_name">ខ្មែរ</p>
+                                <p class="text-[12px] font-medium text-gray-400 mt-0.5" id="lang-text" data-i18n="lang_name">ខ្មែរ</p>
                             </div>
                         </div>
                         <div class="mr-1 text-lg" id="lang-flag" aria-hidden="true">🇰🇭</div>
@@ -277,7 +428,7 @@
                             <i data-lucide="key" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
                             <div>
                                 <p class="font-bold text-[13px] text-gray-200" data-i18n="class_code_label">លេខកូដថ្នាក់រៀន</p>
-                                <p class="text-[11px] text-gray-400 mt-0.5 font-mono" id="setting-tid">***</p>
+                                <p class="text-[12px] font-medium text-gray-400 mt-0.5 font-mono" id="setting-tid">***</p>
                             </div>
                         </div>
                     </div>
@@ -286,20 +437,20 @@
                             <i data-lucide="user" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
                             <div>
                                 <p class="font-bold text-[13px] text-gray-200" data-i18n="student_id_label">អត្តលេខសិស្ស</p>
-                                <p class="text-[11px] text-gray-400 mt-0.5 font-mono" id="setting-sid">***</p>
+                                <p class="text-[12px] font-medium text-gray-400 mt-0.5 font-mono" id="setting-sid">***</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Account Management -->
-                <button type="button" onclick="logout()" class="w-full bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50 hover:bg-red-500/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 text-left group">
+                <button type="button" onclick="logout()" class="w-full bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50 hover:bg-red-500/10 transition-colors outline-none focus-visible:ring-red-500 text-left group">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="bg-red-500/10 p-2 rounded-lg transition-colors group-hover:bg-red-500/20" aria-hidden="true"><i data-lucide="log-out" class="w-5 h-5 text-red-500"></i></div>
                         <h3 class="font-bold text-red-400 text-sm" data-i18n="logout_btn">ចាកចេញ</h3>
                     </div>
                     <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
-                    <p class="text-[13px] text-gray-400 px-1" data-i18n="logout_desc">ចាកចេញពីគណនីដោយសុវត្ថិភាព។ អ្នកនឹងត្រូវបញ្ចូលលេខកូដម្តងទៀតនៅពេលក្រោយ។</p>
+                    <p class="text-[13px] font-medium text-gray-400 px-1" data-i18n="logout_desc">ចាកចេញពីគណនីដោយសុវត្ថិភាព។ អ្នកនឹងត្រូវបញ្ចូលលេខកូដម្តងទៀតនៅពេលក្រោយ។</p>
                 </button>
             </section>
         </main>
@@ -307,13 +458,13 @@
         <!-- Bottom Navigation Bar -->
         <nav class="fixed bottom-0 left-0 w-full bg-[#1c1c1e]/95 backdrop-blur-lg border-t border-gray-800 pb-safe pt-2 px-6 z-40" aria-label="ម៉ឺនុយខាងក្រោម">
             <div class="flex justify-around items-center max-w-sm mx-auto pb-2" role="tablist">
-                <button role="tab" aria-selected="true" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="flex flex-col items-center gap-1 text-emerald-500 w-16 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1">
+                <button role="tab" aria-selected="true" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="flex flex-col items-center gap-1 text-emerald-500 w-16 transition-colors outline-none rounded-lg py-1">
                     <i data-lucide="layout-dashboard" class="w-6 h-6" aria-hidden="true"></i>
-                    <span class="text-[10px] font-bold" data-i18n="nav_home">ទំព័រដើម</span>
+                    <span class="text-[11px] font-bold" data-i18n="nav_home">ទំព័រដើម</span>
                 </button>
-                <button role="tab" aria-selected="false" onclick="switchTab('settings')" id="tab-btn-settings" class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-300 w-16 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1">
+                <button role="tab" aria-selected="false" onclick="switchTab('settings')" id="tab-btn-settings" class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-300 w-16 transition-colors outline-none rounded-lg py-1">
                     <i data-lucide="settings" class="w-6 h-6" aria-hidden="true"></i>
-                    <span class="text-[10px] font-bold" data-i18n="nav_settings">ការកំណត់</span>
+                    <span class="text-[11px] font-bold" data-i18n="nav_settings">ការកំណត់</span>
                 </button>
             </div>
         </nav>
@@ -330,12 +481,12 @@
                     </div>
                     <div>
                         <h3 id="notif-title" class="text-white font-bold text-lg kh-moul leading-tight" data-i18n="notif_title">ការជូនដំណឹង</h3>
-                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="notif_subtitle">សារពីសាលារៀន</p>
+                        <p class="text-[13px] font-medium text-gray-400 mt-0.5" data-i18n="notif_subtitle">សារពីសាលារៀន</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="btn-dismiss-all" onclick="dismissAllNotifications()" class="hidden text-xs text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-lg transition font-medium focus-visible:ring-2 focus-visible:ring-red-400 outline-none" data-i18n="notif_dismiss_all">លុបទាំងអស់</button>
-                    <button onclick="toggleNotifications()" aria-label="បិទការជូនដំណឹង" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                    <button id="btn-dismiss-all" onclick="dismissAllNotifications()" class="hidden text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-lg transition outline-none" data-i18n="notif_dismiss_all">លុបទាំងអស់</button>
+                    <button onclick="toggleNotifications()" aria-label="បិទការជូនដំណឹង" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition outline-none">
                         <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -343,8 +494,8 @@
             <div id="notification-list" class="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar" aria-live="polite">
                 <!-- Fetching state -->
                 <div class="text-center py-10">
-                    <div class="spinner w-8 h-8 mx-auto border-t-emerald-500 mb-4"></div>
-                    <p class="text-gray-400 text-sm" data-i18n="loading">កំពុងទាញយក...</p>
+                    <div class="spinner w-8 h-8 mx-auto mb-4"></div>
+                    <p class="text-gray-400 text-sm font-medium" data-i18n="loading">កំពុងទាញយក...</p>
                 </div>
             </div>
         </div>
@@ -356,22 +507,22 @@
         <div class="bg-card-dark w-full max-w-sm rounded-[2rem] border border-gray-700 relative z-10 shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300" id="qr-scanner-content">
             <header class="flex justify-between items-center mb-4">
                 <h3 id="qr-title" class="text-white font-bold text-xl" data-i18n="qr_title">ស្កេន QR Code</h3>
-                <button onclick="closeQRScanner()" aria-label="បិទកាមេរ៉ា" class="text-gray-400 hover:text-white bg-gray-800 p-1.5 rounded-full transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                <button onclick="closeQRScanner()" aria-label="បិទកាមេរ៉ា" class="text-gray-400 hover:text-white bg-gray-800 p-1.5 rounded-full transition outline-none">
                     <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
                 </button>
             </header>
-            <p class="text-gray-400 text-[13px] mb-4 text-center" data-i18n="qr_desc">សូមដាក់កាមេរ៉ារបស់អ្នកឱ្យចំ QR Code របស់គ្រូ។</p>
+            <p class="text-gray-400 text-[13px] font-medium mb-4 text-center" data-i18n="qr_desc">សូមដាក់កាមេរ៉ារបស់អ្នកឱ្យចំ QR Code របស់គ្រូ។</p>
             
             <!-- Camera Preview Container -->
             <div class="w-full bg-black rounded-2xl overflow-hidden border-2 border-emerald-500/50 relative flex items-center justify-center min-h-[250px]">
                 <div id="qr-reader" class="w-full"></div>
             </div>
             
-            <p id="qr-status" aria-live="polite" class="text-emerald-500 text-xs text-center mt-4 animate-pulse" data-i18n="qr_opening">កំពុងបើកកាមេរ៉ា...</p>
+            <p id="qr-status" aria-live="polite" class="text-emerald-500 text-xs font-semibold text-center mt-4 animate-pulse" data-i18n="qr_opening">កំពុងបើកកាមេរ៉ា...</p>
         </div>
     </div>
 
-    <!-- UI Logic, Translations & Global State (Decoupled from Firebase) -->
+    <!-- Application Script (app.js) -->
     <script>
         // Global State variables that are accessed across modules
         window.loggedInStudent = null;
@@ -385,6 +536,13 @@
         let activeFocusTrap = null;
         let html5QrCode;
         let qrPreviousFocus;
+        let isIdVisible = false;
+
+        if (isDarkMode) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
 
         const translations = {
             km: {
@@ -539,7 +697,7 @@
                 features.forEach(feature => {
                     const card = document.createElement('button');
                     card.type = 'button';
-                    card.className = 'feature-card bg-card-dark p-4 rounded-2xl flex flex-col items-center justify-center text-center border border-gray-700/50 shadow-sm gap-3 w-full';
+                    card.className = 'feature-card bg-card-dark p-4 rounded-2xl flex flex-col items-center justify-center text-center border border-gray-700/50 shadow-sm gap-3 w-full outline-none focus-visible:ring-2 focus-visible:ring-emerald-500';
                     
                     const featureName = translations[currentLang][feature.id];
                     
@@ -551,7 +709,7 @@
                         }
                     };
                     
-                    card.innerHTML = `<div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center pointer-events-none" aria-hidden="true"><i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i></div><h3 class="text-gray-200 text-xs font-semibold leading-tight pointer-events-none">${featureName}</h3>`;
+                    card.innerHTML = `<div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center pointer-events-none" aria-hidden="true"><i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i></div><h3 class="text-gray-200 text-[13px] font-semibold leading-tight pointer-events-none">${featureName}</h3>`;
                     container.appendChild(card);
                 });
             };
@@ -573,9 +731,10 @@
             
             toast.className = toast.className.replace(/bg-\w+-600/g, '').replace('bg-gray-800', '').replace('text-white', '');
             
-            if (type === 'error') toast.className += ' bg-red-600 text-white';
-            else if (type === 'success') toast.className += ' bg-emerald-600 text-white';
-            else toast.className += ' bg-gray-800 text-white border border-gray-700';
+            const toastBg = type === 'error' ? 'var(--danger)' : type === 'success' ? 'var(--accent)' : 'var(--toast-bg)';
+            toast.style.background = toastBg;
+            toast.style.color = type === 'info' ? 'var(--text)' : '#ffffff';
+            toast.style.border = type === 'info' ? '1px solid var(--card-border)' : 'none';
             
             toast.innerHTML = `<i data-lucide="${type === 'error' ? 'alert-circle' : type === 'success' ? 'check-circle' : 'info'}" class="w-5 h-5 shrink-0"></i><span class="leading-snug">${message}</span>`;
             if (window.lucide) lucide.createIcons();
@@ -623,34 +782,26 @@
             if (toggleBtn) toggleBtn.setAttribute('aria-checked', isDarkMode.toString());
 
             if (isDarkMode) {
-                toggleUI.classList.remove('bg-gray-400');
-                toggleUI.classList.add('bg-emerald-500');
-                circle.classList.remove('-translate-x-4');
-                if(text) text.textContent = translations[currentLang].dark_mode_active;
-                if(icon) icon.setAttribute('data-lucide', 'moon');
+                document.documentElement.setAttribute('data-theme', 'dark');
+                if (toggleUI) toggleUI.style.backgroundColor = 'var(--accent)';
+                if (circle) circle.style.transform = 'translateX(0)';
+                if (text) text.textContent = translations[currentLang].dark_mode_active;
+                if (icon) icon.setAttribute('data-lucide', 'moon');
             } else {
-                toggleUI.classList.remove('bg-emerald-500');
-                toggleUI.classList.add('bg-gray-400');
-                circle.classList.add('-translate-x-4');
-                if(text) text.textContent = translations[currentLang].light_mode_active;
-                if(icon) icon.setAttribute('data-lucide', 'sun');
+                document.documentElement.setAttribute('data-theme', 'light');
+                if (toggleUI) toggleUI.style.backgroundColor = '#9ca3af'; // muted tracking
+                if (circle) circle.style.transform = 'translateX(-16px)';
+                if (text) text.textContent = translations[currentLang].light_mode_active;
+                if (icon) icon.setAttribute('data-lucide', 'sun');
             }
             if (window.lucide) lucide.createIcons();
         }
 
         window.toggleDarkMode = function() {
             isDarkMode = !isDarkMode;
-            if (isDarkMode) {
-                document.body.classList.remove('light-mode');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.add('light-mode');
-                localStorage.setItem('theme', 'light');
-            }
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
             updateDarkModeUI();
         };
-
-        if (!isDarkMode) document.body.classList.add('light-mode');
 
         window.applyTranslations = function() {
             document.documentElement.lang = currentLang;
@@ -702,12 +853,10 @@
                 btnLogin.disabled = true;
                 btnLogin.innerHTML = `<span class="spinner w-5 h-5 border-t-white inline-block"></span><span class="font-bold">${translations[currentLang].btn_logging_in}</span>`;
                 tCode.disabled = true; sCode.disabled = true;
-                tCode.classList.add('opacity-50'); sCode.classList.add('opacity-50');
             } else {
                 btnLogin.disabled = false;
                 btnLogin.innerHTML = `<span data-i18n="login_btn">${translations[currentLang].login_btn}</span><i data-lucide="log-in" class="w-5 h-5"></i>`;
                 tCode.disabled = false; sCode.disabled = false;
-                tCode.classList.remove('opacity-50'); sCode.classList.remove('opacity-50');
                 if (window.lucide) lucide.createIcons();
             }
         };
@@ -793,6 +942,12 @@
 
         window.logout = function() {
             if(confirm(translations[currentLang].confirm_logout)) {
+                // [ថ្មី] លុបទិន្នន័យ Offline Caching ចេញពីម៉ាស៊ីន
+                const savedTid = localStorage.getItem('savedTid');
+                const savedSid = localStorage.getItem('savedSid');
+                if (savedSid) localStorage.removeItem('offline_student_' + savedSid);
+                if (savedTid) localStorage.removeItem('offline_profile_' + savedTid);
+
                 localStorage.removeItem('savedTid');
                 localStorage.removeItem('savedSid');
                 
@@ -849,7 +1004,7 @@
             let visibleNotifs = window.currentNotifs.filter(n => !dismissedNotifs.includes(n.id));
 
             if (visibleNotifs.length === 0) {
-                listEl.innerHTML = `<div class="text-center py-12 text-gray-500"><i data-lucide="bell-off" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">${translations[currentLang].notif_empty}</p></div>`;
+                listEl.innerHTML = `<div class="text-center py-12 text-gray-500"><i data-lucide="bell-off" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-[13px] font-medium">${translations[currentLang].notif_empty}</p></div>`;
                 if (badge) badge.classList.add('hidden');
                 if (dismissAllBtn) dismissAllBtn.classList.add('hidden');
                 if (window.lucide) lucide.createIcons();
@@ -868,7 +1023,11 @@
                 if (n.type === 'success') { icon = 'check-circle'; colorClass = 'text-green-400 bg-green-500/10 border-green-500/20'; }
                 if (n.type === 'congrats') { icon = 'award'; colorClass = 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20'; cardBorder = 'border-yellow-900/30'; }
 
-                const d = new Date(n.createdAt);
+                // Safe parsing for Firestore Timestamps
+                const d = (n.createdAt && typeof n.createdAt.toDate === 'function') 
+                    ? n.createdAt.toDate() 
+                    : new Date(n.createdAt || new Date());
+                    
                 const dateStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
                 const delay = index * 0.05;
 
@@ -884,7 +1043,7 @@
                             <div class="flex-1">
                                 <h4 class="font-bold text-gray-200 text-sm mb-1">${n.title}</h4>
                                 <p class="text-[13px] text-gray-400 leading-relaxed mb-2">${n.message}</p>
-                                <time class="text-[10px] text-gray-500 font-mono flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>${dateStr}</time>
+                                <time class="text-[11px] font-medium text-gray-500 font-mono flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>${dateStr}</time>
                             </div>
                         </div>
                     </article>
@@ -957,7 +1116,7 @@
             modal.removeAttribute('aria-hidden');
             
             statusText.textContent = translations[currentLang].qr_opening;
-            statusText.className = "text-emerald-500 text-xs text-center mt-4 animate-pulse";
+            statusText.className = "text-emerald-500 text-xs font-semibold text-center mt-4 animate-pulse";
             
             setTimeout(() => {
                 content.classList.remove('scale-95', 'opacity-0');
@@ -972,7 +1131,7 @@
                 .then(() => { statusText.textContent = translations[currentLang].qr_scanning; })
                 .catch((err) => {
                     statusText.textContent = translations[currentLang].qr_error_camera;
-                    statusText.className = "text-red-500 text-xs text-center mt-4";
+                    statusText.className = "text-red-500 text-xs font-semibold text-center mt-4";
                 });
         };
 
@@ -1002,7 +1161,7 @@
             } catch (e) {
                 const statusText = document.getElementById('qr-status');
                 statusText.textContent = translations[currentLang].qr_error_invalid;
-                statusText.className = "text-red-500 text-xs text-center mt-4 animate-bounce";
+                statusText.className = "text-red-500 text-xs font-semibold text-center mt-4 animate-bounce";
             }
         }
 
@@ -1038,152 +1197,292 @@
 
         // Form Submission Logic
         const loginForm = document.getElementById('login-form');
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const tInput = document.getElementById('teacher-code');
-            const sInput = document.getElementById('student-code');
-            const tErr = document.getElementById('teacher-error');
-            const sErr = document.getElementById('student-error');
-            const errBox = document.getElementById('login-error');
-            
-            tErr.classList.add('hidden');
-            sErr.classList.add('hidden');
-            errBox.classList.add('hidden');
-            
-            tInput.classList.remove('border-red-500', 'ring-red-500');
-            sInput.classList.remove('border-red-500', 'ring-red-500');
+        if(loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const tInput = document.getElementById('teacher-code');
+                const sInput = document.getElementById('student-code');
+                const tErr = document.getElementById('teacher-error');
+                const sErr = document.getElementById('student-error');
+                const errBox = document.getElementById('login-error');
+                
+                tErr.classList.add('hidden');
+                sErr.classList.add('hidden');
+                errBox.classList.add('hidden');
+                
+                tInput.classList.remove('border-red-500');
+                sInput.classList.remove('border-red-500');
 
-            const tCode = tInput.value.trim();
-            const sCode = sInput.value.trim();
-            let isValid = true;
+                const tCode = tInput.value.trim();
+                const sCode = sInput.value.trim();
+                let isValid = true;
 
-            if(!tCode) {
-                tErr.textContent = translations[currentLang].err_enter_class; 
-                tErr.classList.remove('hidden'); 
-                tInput.classList.add('border-red-500');
-                isValid = false; 
-            }
-            if(!sCode) {
-                sErr.textContent = translations[currentLang].err_enter_student; 
-                sErr.classList.remove('hidden'); 
-                sInput.classList.add('border-red-500');
-                isValid = false; 
-            }
-
-            if(isValid) {
-                if (window.attemptLogin) {
-                    window.attemptLogin(tCode, sCode);
-                } else {
-                    window.showToast(translations[currentLang].err_connection, 'error');
+                if(!tCode) {
+                    tErr.textContent = translations[currentLang].err_enter_class; 
+                    tErr.classList.remove('hidden'); 
+                    tInput.classList.add('border-red-500');
+                    isValid = false; 
                 }
-            }
-            else if(!tCode) tInput.focus();
-            else sInput.focus();
-        });
+                if(!sCode) {
+                    sErr.textContent = translations[currentLang].err_enter_student; 
+                    sErr.classList.remove('hidden'); 
+                    sInput.classList.add('border-red-500');
+                    isValid = false; 
+                }
+
+                if(isValid) {
+                    if (window.attemptLogin) {
+                        window.attemptLogin(tCode, sCode);
+                    } else {
+                        window.showToast(translations[currentLang].err_connection, 'error');
+                    }
+                }
+                else if(!tCode) tInput.focus();
+                else sInput.focus();
+            });
+        }
 
         // Initialize immediately
         window.applyTranslations();
-
     </script>
 
-    <!-- Firebase Specific Logic (Module isolated to prevent local file blockages) -->
+    <!-- Firebase Configuration & Setup (ប្រើប្រាស់ឯកសាររួម) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        import { 
+            auth, 
+            db, 
+            PTEC_APP_ID, 
+            signInAnonymously, 
+            onAuthStateChanged, 
+            doc, 
+            getDoc, 
+            collection, 
+            onSnapshot 
+        } from './firebase-config.js';
 
         window.attemptLogin = async function(tid, sid) {
             const errorBox = document.getElementById('login-error');
             const errorText = document.getElementById('login-error-text');
             errorBox.classList.add('hidden');
-            
-            window.setLoginLoading(true);
 
-            try {
-                const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
-                const studentSnap = await getDoc(studentRef);
+            if (!auth.currentUser) {
+                window.showToast("សូមរង់ចាំ ការភ្ជាប់ប្រព័ន្ធមិនទាន់រួចរាល់ទេ", "error");
+                return;
+            }
 
-                if (studentSnap.exists()) {
-                    window.loggedInStudent = studentSnap.data();
-                    window.loggedInStudent.id = studentSnap.id;
-                    window.realId = window.loggedInStudent.id;
+            // ==========================================
+            // [ថ្មី] ១. ទាញទិន្នន័យពី LocalStorage មកបង្ហាញភ្លាមៗ (Instant Load)
+            // ==========================================
+            let isLoadedFromCache = false;
+            const cachedStudent = localStorage.getItem('offline_student_' + sid);
+            const cachedProfile = localStorage.getItem('offline_profile_' + tid);
+
+            if (cachedStudent) {
+                try {
+                    window.loggedInStudent = JSON.parse(cachedStudent);
+                    window.loggedInStudent.id = sid;
+                    window.realId = sid;
                     
-                    localStorage.setItem('savedTid', tid);
-                    localStorage.setItem('savedSid', sid);
+                    if (cachedProfile) {
+                        const pData = JSON.parse(cachedProfile);
+                        if (pData.school_name_admin) document.getElementById('header-school-name').textContent = pData.school_name_admin;
+                        if (pData.academic_year) document.getElementById('header-academic-year').textContent = (localStorage.getItem('app_lang') === 'en' ? "Academic Year " : "ឆ្នាំសិក្សា ") + pData.academic_year;
+                    }
 
-                    try {
-                        const profileRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'profile', 'data');
-                        const profileSnap = await getDoc(profileRef);
-                        if (profileSnap.exists()) {
-                            const pData = profileSnap.data();
-                            if (pData.school_name_admin) document.getElementById('header-school-name').textContent = pData.school_name_admin;
-                            if (pData.academic_year) document.getElementById('header-academic-year').textContent = (localStorage.getItem('app_lang') === 'en' ? "Academic Year " : "ឆ្នាំសិក្សា ") + pData.academic_year;
-                        }
-                    } catch (e) { console.warn("Could not fetch school profile"); }
-
+                    // បង្ហាញ UI ភ្លាមៗដោយមិនចាំបាច់រង់ចាំ Firebase
                     window.updateDashboardUI(window.loggedInStudent, tid, sid);
                     window.listenToNotifications(tid, sid);
                     window.hideLoginShowDashboard();
-                } else {
+                    isLoadedFromCache = true; 
+                } catch (e) {
+                    console.warn("Local storage parse error:", e);
+                }
+            }
+
+            // បើគ្មានទិន្នន័យក្នុងម៉ាស៊ីនទេ ទើបយើងបង្ហាញសញ្ញា Loading វិលៗ
+            if (!isLoadedFromCache) {
+                window.setLoginLoading(true);
+            }
+
+            // ==========================================
+            // ២. លួចទាញទិន្នន័យពី Firebase (Background Sync)
+            // ==========================================
+            try {
+                let studentData = null;
+
+                try {
+                    const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
+                    const studentSnap = await getDoc(studentRef);
+                    if (studentSnap.exists()) studentData = studentSnap.data();
+                } catch (e) { console.log("Subcollection check failed"); }
+
+                if (!studentData) {
+                    try {
+                        const teacherRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid);
+                        const teacherSnap = await getDoc(teacherRef);
+                        if (teacherSnap.exists()) {
+                            const tData = teacherSnap.data();
+                            if (tData.students && !Array.isArray(tData.students) && tData.students[sid]) {
+                                studentData = tData.students[sid];
+                            } else if (tData.students && Array.isArray(tData.students)) {
+                                const foundStudent = tData.students.find(s => s.id === sid || s.studentId === sid);
+                                if (foundStudent) studentData = foundStudent;
+                            }
+                        }
+                    } catch (e) { console.log("Teacher doc check failed"); }
+                }
+
+                if (!studentData) {
+                    try {
+                        const studentUserRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', sid);
+                        const studentUserSnap = await getDoc(studentUserRef);
+                        if (studentUserSnap.exists() && studentUserSnap.data().role !== 'admin') {
+                            studentData = studentUserSnap.data();
+                        }
+                    } catch (e) { console.log("Root user check failed"); }
+                }
+
+                if (studentData) {
+                    window.loggedInStudent = studentData;
+                    window.loggedInStudent.id = sid;
+                    window.realId = sid;
+                    
+                    localStorage.setItem('savedTid', tid);
+                    localStorage.setItem('savedSid', sid);
+                    
+                    // [ថ្មី] រក្សាទុកទិន្នន័យសិស្សថ្មីចូល LocalStorage សម្រាប់ប្រើលើកក្រោយ
+                    localStorage.setItem('offline_student_' + sid, JSON.stringify(studentData));
+
+                    let pDataToSave = null;
+                    try {
+                        const profileRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'profile', 'data');
+                        const profileSnap = await getDoc(profileRef);
+                        
+                        if (profileSnap.exists()) {
+                            pDataToSave = profileSnap.data();
+                        } else {
+                            const teacherRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid);
+                            const teacherSnap = await getDoc(teacherRef);
+                            if (teacherSnap.exists()) pDataToSave = teacherSnap.data();
+                        }
+                        
+                        if (pDataToSave) {
+                            // [ថ្មី] រក្សាទុកទិន្នន័យសាលាថ្មីចូល LocalStorage
+                            localStorage.setItem('offline_profile_' + tid, JSON.stringify(pDataToSave));
+                            
+                            if (pDataToSave.school_name_admin) document.getElementById('header-school-name').textContent = pDataToSave.school_name_admin;
+                            if (pDataToSave.academic_year) document.getElementById('header-academic-year').textContent = (localStorage.getItem('app_lang') === 'en' ? "Academic Year " : "ឆ្នាំសិក្សា ") + pDataToSave.academic_year;
+                        }
+                    } catch (e) { console.warn("Could not fetch school profile"); }
+
+                    // ធ្វើបច្ចុប្បន្នភាព UI ម្តងទៀតដោយស្ងាត់ៗ បើសិនជាទិន្នន័យមានការផ្លាស់ប្តូរ
+                    window.updateDashboardUI(window.loggedInStudent, tid, sid);
+                    if (!isLoadedFromCache) {
+                        window.listenToNotifications(tid, sid);
+                        window.hideLoginShowDashboard();
+                    }
+                } else if (!isLoadedFromCache) {
                     errorText.textContent = "រកមិនឃើញសិស្សនេះទេ។ លេខកូដថ្នាក់ ឬអត្តលេខអាចខុស។";
                     errorBox.classList.remove('hidden');
                     window.showLogin();
                 }
             } catch (error) {
                 console.error("Login fetch error:", error);
-                errorText.textContent = "មានបញ្ហាភ្ជាប់ទៅកាន់ប្រព័ន្ធ។ សូមពិនិត្យអ៊ីនធឺណិតរបស់អ្នក។";
-                errorBox.classList.remove('hidden');
-                window.showLogin();
+                if (!isLoadedFromCache) {
+                    if (error.code === 'permission-denied') {
+                        errorText.textContent = "បដិសេធសិទ្ធិ (Permission Denied)។ សូម Admin អនុញ្ញាត Rule សម្រាប់ Students Subcollection។";
+                    } else {
+                        errorText.textContent = "មានបញ្ហាភ្ជាប់ទៅកាន់ប្រព័ន្ធ។ សូមពិនិត្យអ៊ីនធឺណិតរបស់អ្នក។";
+                    }
+                    errorBox.classList.remove('hidden');
+                    window.showLogin();
+                }
             } finally {
-                window.setLoginLoading(false);
+                if (!isLoadedFromCache) {
+                    window.setLoginLoading(false);
+                }
             }
         };
 
         window.listenToNotifications = function(tid, sid) {
-            const notifRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'notifications');
+            if (!auth.currentUser) return;
             if (window.unsubNotifications) window.unsubNotifications();
 
-            window.unsubNotifications = onSnapshot(notifRef, (snap) => {
-                window.currentNotifs = [];
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    if (data.target === 'all' || data.target === sid) {
-                        window.currentNotifs.push({ id: doc.id, ...data });
+            // Clear old notifications before setting new listeners
+            window.currentNotifs = [];
+
+            // Helper សម្រាប់អាន Date ដែលមានសុវត្ថិភាព
+            const getSafeDate = (ts) => {
+                if (!ts) return new Date(0);
+                if (typeof ts.toDate === 'function') return ts.toDate();
+                return new Date(ts);
+            };
+
+            let docNotifs = [];
+            let colNotifs = [];
+
+            // Function to merge and render
+            const triggerRender = () => {
+                // Merge both sources and remove potential duplicates based on ID
+                const allNotifs = [...docNotifs, ...colNotifs];
+                const uniqueNotifs = Array.from(new Map(allNotifs.map(item => [item.id, item])).values());
+                
+                window.currentNotifs = uniqueNotifs;
+                // តម្រៀបតាមពេលវេលាដោយប្រើសុវត្ថិភាព Timestamp
+                window.currentNotifs.sort((a, b) => getSafeDate(b.createdAt) - getSafeDate(a.createdAt));
+                window.renderNotifications();
+            };
+
+            // 1. Listen to Teacher's Main Document (For legacy data or specific structures)
+            const teacherRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid);
+            const unsubDoc = onSnapshot(teacherRef, (docSnap) => {
+                docNotifs = [];
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.notifications && Array.isArray(data.notifications)) {
+                        data.notifications.forEach(n => {
+                            // ប្រើ !n.target ជាជំនួយក្នុងករណីភ្លេចដាក់ target ក្នុង db
+                            if (!n.target || n.target === 'all' || n.target === sid) {
+                                // ប្រើប្រាស់ Math.random ជំនួស crypto.randomUUID() ដែលអាចគាំង
+                                const safeId = n.id || ('notif_' + Math.random().toString(36).substr(2, 9));
+                                docNotifs.push({ id: safeId, ...n });
+                            }
+                        });
+                    }
+                }
+                triggerRender();
+            }, (err) => {
+                console.error("Notification Error on Teacher Doc: ", err);
+            });
+            
+            // 2. Listen directly to 'notifications' Subcollection (Primary Source)
+            const notifRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'notifications');
+            const unsubCol = onSnapshot(notifRef, (snap) => {
+                colNotifs = [];
+                snap.forEach(subDocSnap => {
+                    const data = subDocSnap.data();
+                    if (!data.target || data.target === 'all' || data.target === sid) {
+                        colNotifs.push({ id: subDocSnap.id, ...data });
                     }
                 });
-                window.currentNotifs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                window.renderNotifications();
-            }, (err) => {
-                document.getElementById('notification-list').innerHTML = `<div class="text-center py-10 text-red-400 text-sm">មានបញ្ហាក្នុងការទាញយកទិន្នន័យ</div>`;
+                triggerRender();
+            }, (subErr) => {
+                console.error("Notification Subcollection Error: ", subErr);
             });
+
+            // Combine unsubscribers so both are cleaned up when logging out
+            window.unsubNotifications = () => {
+                unsubDoc();
+                unsubCol();
+            };
         };
 
         const initAuth = async () => {
-            try {
-                if (!auth.currentUser) await signInAnonymously(auth);
-            } catch (error) {
-                console.error("Auth error:", error);
-                window.showLogin();
-            }
-        };
-
-        initAuth().then(() => {
+        try {
+            // យើងត្រូវរង់ចាំការបញ្ជាក់ពី Firebase Auth ជាមុនសិន
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
+                    // ពេល Firebase ភ្ជាប់រួចរាល់ ទើបយើងឆែកមើល LocalStorage ឬ URL
                     const urlParams = new URLSearchParams(window.location.search);
                     const urlTeacherId = urlParams.get('tid');
                     const urlStudentId = urlParams.get('sid');
@@ -1195,9 +1494,30 @@
                     } else {
                         window.showLogin();
                     }
+                } else {
+                    // បើមិនទាន់មាន User Session ទេ យើងបង្កើត Anonymous Auth មួយ
+                    // (ចាំបាច់ត្រូវមាន ដើម្បីមានសិទ្ធិអានទិន្នន័យពី Firestore)
+                    try {
+                        await signInAnonymously(auth);
+                        // បន្ទាប់ពី Sign in ជោគជ័យ, onAuthStateChanged ខាងលើនឹងដំណើរការម្តងទៀតដោយស្វ័យប្រវត្តិ
+                    } catch (err) {
+                        console.error("Anonymous Auth Failed:", err);
+                        window.showLogin();
+                    }
                 }
             });
-        });
-    </script>
+
+        } catch (error) {
+            console.error("Auth initialization error:", error);
+            window.showLogin();
+        }
+    };
+
+    initAuth();
+</script>
+    
+    <!-- PWA Install Script -->
+    <script src="pwa-install.js"></script>
+
 </body>
 </html>

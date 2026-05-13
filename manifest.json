@@ -1,20 +1,23 @@
 {
-  "name": "portal-parent-v2",
-  "short_name": "portal-parent",
+  "name": "ប្រព័ន្ធអាណាព្យាបាល - Parent Portal",
+  "short_name": "Parent Portal",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f0f4f8",
-  "theme_color": "#0054a6",
+  "background_color": "#1c1c1e",
+  "theme_color": "#0d9488",
+  "description": "កម្មវិធីតាមដានការសិក្សាសិស្សសម្រាប់អាណាព្យាបាល",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

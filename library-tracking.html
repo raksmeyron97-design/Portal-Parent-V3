@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>សៀវភៅតាមដាន - Parent Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&family=Battambang:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/gh/ThyrithSor/momentkh@3.0.3/momentkh.js"></script>
+    <!-- បន្ថែម defer ទៅកាន់ External scripts -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/ThyrithSor/momentkh@3.0.3/momentkh.js" defer></script>
     <style>
         body { 
             font-family: 'Kantumruy Pro', sans-serif; 
@@ -133,9 +134,15 @@
         <button onclick="window.location.href='index.html'" class="text-white p-2 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-sm">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </button>
-        <h1 class="text-white font-bold text-lg kh-moul">សៀវភៅតាមដាន</h1>
-        <div class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-full backdrop-blur-sm">
-            <i data-lucide="book-user" class="w-5 h-5 text-emerald-100"></i>
+        <h1 id="ui-title" class="text-white font-bold text-lg kh-moul">សៀវភៅតាមដាន</h1>
+        <div class="flex items-center gap-2">
+            <!-- Language Toggle Button -->
+            <button id="langToggleBtn" onclick="window.toggleLanguage()" class="flex items-center justify-center font-bold text-xs w-8 h-8 bg-white/20 rounded-full text-white backdrop-blur-sm transition hover:bg-white/30 border border-white/30">
+                EN
+            </button>
+            <div class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-full backdrop-blur-sm">
+                <i data-lucide="book-user" class="w-5 h-5 text-emerald-100"></i>
+            </div>
         </div>
     </div>
 
@@ -148,7 +155,7 @@
                 <img id="student-photo" src="" alt="Student" class="w-full h-full object-cover">
             </div>
             <div>
-                <p class="text-xs text-gray-400 mb-0.5">សិស្ស៖</p>
+                <p id="ui-student-lbl" class="text-xs text-gray-400 mb-0.5">សិស្ស៖</p>
                 <h2 id="student-name" class="font-bold text-base text-gray-200 kh-moul">កំពុងផ្ទុក...</h2>
                 <p id="student-id" class="text-xs text-emerald-500 font-mono mt-0.5">ID: ***</p>
             </div>
@@ -158,10 +165,11 @@
         <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800 space-y-3">
             <div class="flex items-center gap-2 mb-1">
                 <i data-lucide="calendar-search" class="w-4 h-4 text-emerald-500"></i>
-                <h3 class="font-bold text-sm text-gray-200">ជ្រើសរើសពេលវេលា</h3>
+                <h3 id="ui-select-time" class="font-bold text-sm text-gray-200">ជ្រើសរើសពេលវេលា</h3>
             </div>
             
             <select id="yearSelect" class="w-full bg-[#1c1c1e] text-white border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition shadow-sm" onchange="window.updatePeriodOptions()">
+                <!-- Options will be populated or translated by JS -->
                 <option value="2025-2026" selected>ឆ្នាំសិក្សា ២០២៥-២០២៦</option>
                 <option value="2026-2027">ឆ្នាំសិក្សា ២០២៦-២០២៧</option>
                 <option value="2027-2028">ឆ្នាំសិក្សា ២០២៧-២០២៨</option>
@@ -183,19 +191,19 @@
         <!-- Loading State -->
         <div id="loading-state" class="hidden flex-col items-center justify-center py-10">
             <div class="spinner mb-3"></div>
-            <p class="text-sm text-gray-400">កំពុងទាញយកទិន្នន័យ...</p>
+            <p id="ui-loading-lbl" class="text-sm text-gray-400">កំពុងទាញយកទិន្នន័យ...</p>
         </div>
 
         <!-- Empty State -->
         <div id="empty-state" class="hidden flex-col items-center justify-center py-10 bg-card-dark rounded-2xl border border-gray-800 border-dashed">
             <i data-lucide="folder-search" class="w-12 h-12 text-gray-600 mb-3"></i>
-            <p class="text-sm font-bold text-gray-300">មិនទាន់មានលទ្ធផលទេ</p>
-            <p class="text-xs text-gray-500 mt-1">ទិន្នន័យមិនទាន់បានបញ្ចូលនៅឡើយ។</p>
+            <p id="ui-empty-title" class="text-sm font-bold text-gray-300">មិនទាន់មានលទ្ធផលទេ</p>
+            <p id="ui-empty-desc" class="text-xs text-gray-500 mt-1">ទិន្នន័យមិនទាន់បានបញ្ចូលនៅឡើយ។</p>
         </div>
 
         <!-- Results Container (Table View) -->
         <div id="results-container" class="hidden flex-col gap-2">
-            <p class="text-[11px] text-emerald-500 text-center zoom-hint mb-1">
+            <p id="ui-zoom-hint" class="text-[11px] text-emerald-500 text-center zoom-hint mb-1">
                 <i data-lucide="move-horizontal" class="w-3 h-3 inline"></i> អាចអូសឆ្វេងស្តាំ ឬពង្រីក-បង្រួមតារាងបាន (Zoom In/Out)
             </p>
             <div class="table-scroll-wrapper" id="report-card-container">
@@ -207,112 +215,188 @@
 
     <!-- Firebase Scripts -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        // នាំចូល Instance ដែលមាន Offline Caching ស្រាប់ពីមុខងាររួម
+        import { auth, db, PTEC_APP_ID } from './firebase-config.js';
+        
+        // នាំចូល Function បន្ថែមសម្រាប់ប្រើក្នុងទំព័រនេះ
+        import { signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // State variables
         let tid = localStorage.getItem('savedTid');
         let sid = localStorage.getItem('savedSid');
+        window.currentLang = localStorage.getItem('appLang') || 'km';
         
         let allStudents = [];
         let scoresCache = {};
         let attendanceHistory = {};
         let customSubjects = [];
         let customMonthsConfig = {};
-        let classConfig = { className: "ថ្នាក់...", managerRole: "នាយកសាលា", teacher: "គ្រូប្រចាំថ្នាក់", location: "ភ្នំពេញ" };
+        let classConfig = { className: "ថ្នាក់...", managerRole: "នាយកសាលា", teacher: "គ្រូប្រចាំថ្នាក់", location: "ភ្នំពេញ", location_en: "Phnom Penh" };
         let studentProfile = {};
         window.currentViewContext = {};
+
+        // Translation Dictionary
+        const i18n = {
+            title: { km: 'សៀវភៅតាមដាន', en: 'Library Tracking' },
+            studentLbl: { km: 'សិស្ស៖', en: 'Student:' },
+            loadingStudent: { km: 'កំពុងផ្ទុក...', en: 'Loading...' },
+            selectTime: { km: 'ជ្រើសរើសពេលវេលា', en: 'Select Period' },
+            optMonthly: { km: 'ប្រចាំខែ', en: 'Monthly' },
+            optSemester: { km: 'ប្រចាំឆមាស', en: 'Semester' },
+            optYearly: { km: 'ប្រចាំឆ្នាំ', en: 'Yearly' },
+            loadingData: { km: 'កំពុងទាញយកទិន្នន័យ...', en: 'Fetching data...' },
+            emptyTitle: { km: 'មិនទាន់មានលទ្ធផលទេ', en: 'No Results Found' },
+            emptyDesc: { km: 'ទិន្នន័យមិនទាន់បានបញ្ចូលនៅឡើយ។', en: 'Data has not been entered yet.' },
+            zoomHint: { km: 'អាចអូសឆ្វេងស្តាំ ឬពង្រីក-បង្រួមតារាងបាន (Zoom In/Out)', en: 'Swipe left/right or pinch to zoom table' },
+            sem1: { km: 'ឆមាសទី១', en: 'Semester 1' },
+            sem2: { km: 'ឆមាសទី២', en: 'Semester 2' },
+            yearly: { km: 'ប្រចាំឆ្នាំសិក្សា', en: 'Academic Year' },
+            commentLbl: { km: "មតិអាណាព្យាបាល / Parent's Comment:", en: "Parent's Comment:" },
+            commentPlaceholder: { km: "សូមសរសេរមតិ ឬសំណូមពររបស់អ្នកនៅទីនេះ...", en: "Write your comment or request here..." },
+            btnSave: { km: "រក្សាទុកមតិ", en: "Save Comment" },
+            btnSaving: { km: "រក្សាទុក...", en: "Saving..." },
+            btnSaved: { km: "រួចរាល់", en: "Saved" },
+            btnFailed: { km: "បរាជ័យ", en: "Failed" }
+        };
 
         // Constants 
         const khmerNums = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
         const khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+        const englishMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
         const monthLabels = {
-            'nov': 'វិច្ឆិកា', 'dec': 'ធ្នូ', 'jan': 'មករា', 'feb': 'កុម្ភៈ',
-            'mar': 'មីនា', 'apr': 'មេសា', 'may': 'ឧសភា', 'jun': 'មិថុនា',
-            'jul': 'កក្កដា', 'aug': 'សីហា', 'sep': 'កញ្ញា', 'oct': 'តុលា',
-            'sem1': 'ឆមាសទី១', 'sem2': 'ឆមាសទី២', 'yearly': 'ប្រចាំឆ្នាំ'
+            'nov': { km: 'វិច្ឆិកា', en: 'November' }, 
+            'dec': { km: 'ធ្នូ', en: 'December' }, 
+            'jan': { km: 'មករា', en: 'January' }, 
+            'feb': { km: 'កុម្ភៈ', en: 'February' },
+            'mar': { km: 'មីនា', en: 'March' }, 
+            'apr': { km: 'មេសា', en: 'April' }, 
+            'may': { km: 'ឧសភា', en: 'May' }, 
+            'jun': { km: 'មិថុនា', en: 'June' },
+            'jul': { km: 'កក្កដា', en: 'July' }, 
+            'aug': { km: 'សីហា', en: 'August' }, 
+            'sep': { km: 'កញ្ញា', en: 'September' }, 
+            'oct': { km: 'តុលា', en: 'October' },
+            'sem1': { km: 'ឆមាសទី១', en: 'Semester 1' }, 
+            'sem2': { km: 'ឆមាសទី២', en: 'Semester 2' }, 
+            'yearly': { km: 'ប្រចាំឆ្នាំ', en: 'Yearly' }
         };
 
         const sem1Months = ['nov', 'dec', 'jan', 'feb', 'mar'];
         const sem2Months = ['apr', 'may', 'jun', 'jul', 'aug'];
 
-        // ជួសជុលការដាច់ Array នៅទីនេះ ដើម្បីឱ្យដំណើរការបានរលូន
         const baseMonthlySubjects = [
-            { key: 'kh_listen', label: 'ស្តាប់', max: 10, color: 'text-purple-700' },
-            { key: 'kh_speak', label: 'និយាយ', max: 10, color: 'text-purple-700' },
-            { key: 'kh_read', label: 'អាន', max: 10, color: 'text-purple-700' },
-            { key: 'kh_write', label: 'សរសេរ', max: 10, color: 'text-purple-700' },
-            { key: 'kh_calligraphy', label: 'អក្សរផ្ចង់', max: 10, color: 'text-purple-700' },
-            { key: 'kh_recitation', label: 'មេសូត្រ', max: 10, color: 'text-purple-700' },
-            { key: 'kh_essay', label: 'តែងសេចក្តី', max: 10, color: 'text-purple-700' },
-            { key: 'math_num', label: 'ចំនួន', max: 10, color: 'text-orange-700' },
-            { key: 'math_meas', label: 'រង្វាស់រង្វាល់', max: 10, color: 'text-orange-700' },
-            { key: 'math_geo', label: 'ធរណីមាត្រ', max: 10, color: 'text-orange-700' },
-            { key: 'math_alg', label: 'ពីជគណិត', max: 10, color: 'text-orange-700' },
-            { key: 'math_stat', label: 'ស្ថិតិ', max: 10, color: 'text-orange-700' },
-            { key: 'sci_phy', label: 'រូបវិទ្យា', max: 10, color: 'text-green-700' },
-            { key: 'sci_chem', label: 'គីមីវិទ្យា', max: 10, color: 'text-green-700' },
-            { key: 'sci_bio', label: 'ជីវវិទ្យា', max: 10, color: 'text-green-700' },
-            { key: 'sci_earth', label: 'ផែនដីវិទ្យា', max: 10, color: 'text-green-700' },
-            { key: 'sci_applied', label: 'អនុវត្តន៍', max: 10, color: 'text-green-700' },
-            { key: 'soc_ethic', label: 'សីលធម៌', max: 10, color: 'text-sky-700' },
-            { key: 'soc_geo', label: 'ភូមិវិទ្យា', max: 10, color: 'text-sky-700' },
-            { key: 'soc_hist', label: 'ប្រវត្តិវិទ្យា', max: 10, color: 'text-sky-700' },
-            { key: 'soc_home', label: 'គេហវិទ្យា', max: 10, color: 'text-amber-700' },
-            { key: 'pe_sport', label: 'អប់រំកាយ', max: 10, color: 'text-amber-700' },
-            { key: 'health_hygiene', label: 'សុខភាព', max: 10, color: 'text-amber-700' },
-            { key: 'life_skill', label: 'បំណិនជីវិត', max: 10, color: 'text-blue-700' },
-            { key: 'foreign', label: 'ភាសាបរទេស', max: 10, color: 'text-purple-700' },
-            { key: 'ex_oral', label: 'ផ្ទាល់មាត់', max: 10, color: 'text-gray-800' },
-            { key: 'ex_att', label: 'អវត្តមាន', max: 10, color: 'text-gray-800' },
-            { key: 'ex_book', label: 'សៀវភៅ', max: 10, color: 'text-gray-800' },
-            { key: 'ex_hw', label: 'កិច្ចការផ្ទះ', max: 10, color: 'text-gray-800' }
+            { key: 'kh_listen', label: 'ស្តាប់', label_en: 'Listening', max: 10, color: 'text-purple-700' },
+            { key: 'kh_speak', label: 'និយាយ', label_en: 'Speaking', max: 10, color: 'text-purple-700' },
+            { key: 'kh_read', label: 'អាន', label_en: 'Reading', max: 10, color: 'text-purple-700' },
+            { key: 'kh_write', label: 'សរសេរ', label_en: 'Writing', max: 10, color: 'text-purple-700' },
+            { key: 'kh_calligraphy', label: 'អក្សរផ្ចង់', label_en: 'Calligraphy', max: 10, color: 'text-purple-700' },
+            { key: 'kh_recitation', label: 'មេសូត្រ', label_en: 'Recitation', max: 10, color: 'text-purple-700' },
+            { key: 'kh_essay', label: 'តែងសេចក្តី', label_en: 'Essay', max: 10, color: 'text-purple-700' },
+            { key: 'math_num', label: 'ចំនួន', label_en: 'Numbers', max: 10, color: 'text-orange-700' },
+            { key: 'math_meas', label: 'រង្វាស់រង្វាល់', label_en: 'Measurement', max: 10, color: 'text-orange-700' },
+            { key: 'math_geo', label: 'ធរណីមាត្រ', label_en: 'Geometry', max: 10, color: 'text-orange-700' },
+            { key: 'math_alg', label: 'ពីជគណិត', label_en: 'Algebra', max: 10, color: 'text-orange-700' },
+            { key: 'math_stat', label: 'ស្ថិតិ', label_en: 'Statistics', max: 10, color: 'text-orange-700' },
+            { key: 'sci_phy', label: 'រូបវិទ្យា', label_en: 'Physics', max: 10, color: 'text-green-700' },
+            { key: 'sci_chem', label: 'គីមីវិទ្យា', label_en: 'Chemistry', max: 10, color: 'text-green-700' },
+            { key: 'sci_bio', label: 'ជីវវិទ្យា', label_en: 'Biology', max: 10, color: 'text-green-700' },
+            { key: 'sci_earth', label: 'ផែនដីវិទ្យា', label_en: 'Earth Sci', max: 10, color: 'text-green-700' },
+            { key: 'sci_applied', label: 'អនុវត្តន៍', label_en: 'Applied Sci', max: 10, color: 'text-green-700' },
+            { key: 'soc_ethic', label: 'សីលធម៌', label_en: 'Ethics', max: 10, color: 'text-sky-700' },
+            { key: 'soc_geo', label: 'ភូមិវិទ្យា', label_en: 'Geography', max: 10, color: 'text-sky-700' },
+            { key: 'soc_hist', label: 'ប្រវត្តិវិទ្យា', label_en: 'History', max: 10, color: 'text-sky-700' },
+            { key: 'soc_home', label: 'គេហវិទ្យា', label_en: 'Home Econ', max: 10, color: 'text-amber-700' },
+            { key: 'pe_sport', label: 'អប់រំកាយ', label_en: 'PE/Sports', max: 10, color: 'text-amber-700' },
+            { key: 'health_hygiene', label: 'សុខភាព', label_en: 'Health', max: 10, color: 'text-amber-700' },
+            { key: 'life_skill', label: 'បំណិនជីវិត', label_en: 'Life Skills', max: 10, color: 'text-blue-700' },
+            { key: 'foreign', label: 'ភាសាបរទេស', label_en: 'Foreign Lang', max: 10, color: 'text-purple-700' },
+            { key: 'ex_oral', label: 'ផ្ទាល់មាត់', label_en: 'Oral Exam', max: 10, color: 'text-gray-800' },
+            { key: 'ex_att', label: 'អវត្តមាន', label_en: 'Absence', max: 10, color: 'text-gray-800' },
+            { key: 'ex_book', label: 'សៀវភៅ', label_en: 'Books/Notes', max: 10, color: 'text-gray-800' },
+            { key: 'ex_hw', label: 'កិច្ចការផ្ទះ', label_en: 'Homework', max: 10, color: 'text-gray-800' }
         ];
 
         const baseSemesterSubjects = [
-            { key: 'sem_kh_reading', label: 'អំណាន', max: 10, color: 'text-purple-700' },
-            { key: 'sem_kh_listening_speaking', label: 'ស្តាប់-និយាយ', max: 10, color: 'text-purple-700' },
-            { key: 'sem_kh_dictation', label: 'សរសេរតាមអាន', max: 10, color: 'text-purple-700' },
-            { key: 'sem_kh_essay', label: 'តែងសេចក្តី', max: 10, color: 'text-purple-700' },
-            { key: 'sem_math', label: 'គណិតវិទ្យា', max: 10, color: 'text-orange-700' },
-            { key: 'sem_science', label: 'វិទ្យាសាស្ត្រ', max: 10, color: 'text-green-700' },
-            { key: 'sem_moral_civics', label: 'សីលធម៌', max: 10, color: 'text-sky-700' },
-            { key: 'sem_geo', label: 'ភូមិវិទ្យា', max: 10, color: 'text-sky-700' },
-            { key: 'sem_hist', label: 'ប្រវត្តិវិទ្យា', max: 10, color: 'text-sky-700' },
-            { key: 'sem_home_arts', label: 'គេហវិទ្យា', max: 10, color: 'text-amber-700' },
-            { key: 'sem_life_skills', label: 'បំណិនជីវិត', max: 10, color: 'text-blue-700' },
-            { key: 'sem_foreign', label: 'ភាសាបរទេស', max: 10, color: 'text-purple-700' },
-            { key: 'sem_sport', label: 'កីឡា', max: 10, color: 'text-amber-700' },
-            { key: 'sem_eval_knowledge', label: 'ចំណេះដឹង', isText: true, color: 'text-gray-800' },
-            { key: 'sem_eval_skill', label: 'បំណិន-ចំណេះធ្វើ', isText: true, color: 'text-gray-800' },
-            { key: 'sem_eval_moral', label: 'តម្លៃ-សីលធម៌', isText: true, color: 'text-gray-800' },
-            { key: 'sem_eval_participate', label: 'សាមគ្គីភាព-ការចូលរួម', isText: true, color: 'text-gray-800' }
+            { key: 'sem_kh_reading', label: 'អំណាន', label_en: 'Reading', max: 10, color: 'text-purple-700' },
+            { key: 'sem_kh_listening_speaking', label: 'ស្តាប់-និយាយ', label_en: 'Listen-Speak', max: 10, color: 'text-purple-700' },
+            { key: 'sem_kh_dictation', label: 'សរសេរតាមអាន', label_en: 'Dictation', max: 10, color: 'text-purple-700' },
+            { key: 'sem_kh_essay', label: 'តែងសេចក្តី', label_en: 'Essay', max: 10, color: 'text-purple-700' },
+            { key: 'sem_math', label: 'គណិតវិទ្យា', label_en: 'Mathematics', max: 10, color: 'text-orange-700' },
+            { key: 'sem_science', label: 'វិទ្យាសាស្ត្រ', label_en: 'Science', max: 10, color: 'text-green-700' },
+            { key: 'sem_moral_civics', label: 'សីលធម៌', label_en: 'Morality/Civics', max: 10, color: 'text-sky-700' },
+            { key: 'sem_geo', label: 'ភូមិវិទ្យា', label_en: 'Geography', max: 10, color: 'text-sky-700' },
+            { key: 'sem_hist', label: 'ប្រវត្តិវិទ្យា', label_en: 'History', max: 10, color: 'text-sky-700' },
+            { key: 'sem_home_arts', label: 'គេហវិទ្យា', label_en: 'Home Econ', max: 10, color: 'text-amber-700' },
+            { key: 'sem_life_skills', label: 'បំណិនជីវិត', label_en: 'Life Skills', max: 10, color: 'text-blue-700' },
+            { key: 'sem_foreign', label: 'ភាសាបរទេស', label_en: 'Foreign Lang', max: 10, color: 'text-purple-700' },
+            { key: 'sem_sport', label: 'កីឡា', label_en: 'Sports', max: 10, color: 'text-amber-700' },
+            { key: 'sem_eval_knowledge', label: 'ចំណេះដឹង', label_en: 'Knowledge', isText: true, color: 'text-gray-800' },
+            { key: 'sem_eval_skill', label: 'បំណិន-ចំណេះធ្វើ', label_en: 'Skills', isText: true, color: 'text-gray-800' },
+            { key: 'sem_eval_moral', label: 'តម្លៃ-សីលធម៌', label_en: 'Morals', isText: true, color: 'text-gray-800' },
+            { key: 'sem_eval_participate', label: 'សាមគ្គីភាព-ការចូលរួម', label_en: 'Participation', isText: true, color: 'text-gray-800' }
         ];
 
         let activeMonthlySubjects = [...baseMonthlySubjects];
         let activeSemesterSubjects = [...baseSemesterSubjects];
+
+        // Language Functions
+        window.toggleLanguage = () => {
+            window.currentLang = window.currentLang === 'km' ? 'en' : 'km';
+            localStorage.setItem('appLang', window.currentLang);
+            window.applyLanguageUI();
+            
+            // Re-render select options and table
+            window.updatePeriodOptions();
+            if(studentProfile.id && document.getElementById('results-container').classList.contains('flex')){
+                window.fetchScores();
+            }
+        };
+
+        window.applyLanguageUI = () => {
+            const lang = window.currentLang;
+            
+            // Update Toggle Button Text (Show the opposite language)
+            document.getElementById('langToggleBtn').textContent = lang === 'km' ? 'EN' : 'KM';
+            
+            // Update UI Elements
+            document.getElementById('ui-title').textContent = i18n.title[lang];
+            document.getElementById('ui-student-lbl').textContent = i18n.studentLbl[lang];
+            if(document.getElementById('student-name').textContent === i18n.loadingStudent['km'] || document.getElementById('student-name').textContent === i18n.loadingStudent['en']) {
+                document.getElementById('student-name').textContent = i18n.loadingStudent[lang];
+            }
+            document.getElementById('ui-select-time').textContent = i18n.selectTime[lang];
+            document.getElementById('ui-loading-lbl').textContent = i18n.loadingData[lang];
+            document.getElementById('ui-empty-title').textContent = i18n.emptyTitle[lang];
+            document.getElementById('ui-empty-desc').textContent = i18n.emptyDesc[lang];
+            document.getElementById('ui-zoom-hint').innerHTML = `<i data-lucide="move-horizontal" class="w-3 h-3 inline"></i> ${i18n.zoomHint[lang]}`;
+            
+            // Update Type Select options
+            const typeSelect = document.getElementById('typeSelect');
+            typeSelect.options[0].text = i18n.optMonthly[lang];
+            typeSelect.options[1].text = i18n.optSemester[lang];
+            typeSelect.options[2].text = i18n.optYearly[lang];
+            
+            // Re-init icons if needed
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
+            // Apply font class dynamically
+            if(lang === 'en') {
+                document.getElementById('ui-title').classList.remove('kh-moul');
+                document.getElementById('student-name').classList.remove('kh-moul');
+            } else {
+                document.getElementById('ui-title').classList.add('kh-moul');
+                document.getElementById('student-name').classList.add('kh-moul');
+            }
+        };
 
         // Ensure Theme is applied
         const initTheme = () => {
             if (localStorage.getItem('theme') === 'light') {
                 document.body.classList.add('light-mode');
             }
+            window.applyLanguageUI();
         };
 
         // UI Helpers
@@ -329,22 +413,39 @@
             else if (state === 'empty') { empty.classList.remove('hidden'); empty.classList.add('flex'); }
             else if (state === 'results') { results.classList.remove('hidden'); results.classList.add('flex'); }
             
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         };
 
         window.updatePeriodOptions = () => {
             const type = document.getElementById('typeSelect').value;
             const periodSelect = document.getElementById('periodSelect');
+            const lang = window.currentLang;
+            
+            // Also update Year select format based on language
+            const yearSelect = document.getElementById('yearSelect');
+            for(let i=0; i<yearSelect.options.length; i++) {
+                const val = yearSelect.options[i].value;
+                yearSelect.options[i].text = lang === 'en' ? `Academic Year ${val}` : `ឆ្នាំសិក្សា ${window.toKhmerNum(val)}`;
+            }
+
             periodSelect.innerHTML = '';
             
             if (type === 'monthly') {
                 const months = [
-                    { val: 'nov', label: 'ខែវិច្ឆិកា' }, { val: 'dec', label: 'ខែធ្នូ' },
-                    { val: 'jan', label: 'ខែមករា' }, { val: 'feb', label: 'ខែកុម្ភៈ' },
-                    { val: 'mar', label: 'ខែមីនា' }, { val: 'apr', label: 'ខែមេសា' },
-                    { val: 'may', label: 'ខែឧសភា' }, { val: 'jun', label: 'ខែមិថុនា' },
-                    { val: 'jul', label: 'ខែកក្កដា' }, { val: 'aug', label: 'ខែសីហា' },
-                    { val: 'sep', label: 'ខែកញ្ញា' }, { val: 'oct', label: 'ខែតុលា' }
+                    { val: 'nov', label: lang === 'en' ? 'November' : 'ខែវិច្ឆិកា' }, 
+                    { val: 'dec', label: lang === 'en' ? 'December' : 'ខែធ្នូ' },
+                    { val: 'jan', label: lang === 'en' ? 'January' : 'ខែមករា' }, 
+                    { val: 'feb', label: lang === 'en' ? 'February' : 'ខែកុម្ភៈ' },
+                    { val: 'mar', label: lang === 'en' ? 'March' : 'ខែមីនា' }, 
+                    { val: 'apr', label: lang === 'en' ? 'April' : 'ខែមេសា' },
+                    { val: 'may', label: lang === 'en' ? 'May' : 'ខែឧសភា' }, 
+                    { val: 'jun', label: lang === 'en' ? 'June' : 'ខែមិថុនា' },
+                    { val: 'jul', label: lang === 'en' ? 'July' : 'ខែកក្កដា' }, 
+                    { val: 'aug', label: lang === 'en' ? 'August' : 'ខែសីហា' },
+                    { val: 'sep', label: lang === 'en' ? 'September' : 'ខែកញ្ញា' }, 
+                    { val: 'oct', label: lang === 'en' ? 'October' : 'ខែតុលា' }
                 ];
                 
                 const currentMonthIndex = new Date().getMonth();
@@ -357,15 +458,16 @@
                     periodSelect.add(opt);
                 });
             } else if (type === 'semester') {
-                periodSelect.add(new Option('ឆមាសទី១', 'sem1'));
-                periodSelect.add(new Option('ឆមាសទី២', 'sem2'));
+                periodSelect.add(new Option(i18n.sem1[lang], 'sem1'));
+                periodSelect.add(new Option(i18n.sem2[lang], 'sem2'));
             } else {
-                periodSelect.add(new Option('ប្រចាំឆ្នាំសិក្សា', 'yearly'));
+                periodSelect.add(new Option(i18n.yearly[lang], 'yearly'));
             }
             window.fetchScores();
         };
 
         window.toKhmerNum = function(num) {
+            if(window.currentLang === 'en') return num.toString();
             return num.toString().split('').map(d => khmerNums[parseInt(d)] || d).join('');
         };
 
@@ -373,7 +475,7 @@
             if (num === null || num === undefined || isNaN(num)) return '0';
             let n = parseFloat(num);
             if (Number.isInteger(n)) return n.toString(); 
-            return n.toFixed(2).replace('.', ',');
+            return n.toFixed(2).replace('.', window.currentLang === 'en' ? '.' : ',');
         };
 
         window.calculateGrade = function(score, isAvg = false, type = 'monthly') {
@@ -395,7 +497,7 @@
                 const snap = await getDoc(docRef);
                 if (snap.exists()) {
                     studentProfile = { id: snap.id, ...snap.data() };
-                    document.getElementById('student-name').textContent = studentProfile.name || 'មិនស្គាល់ឈ្មោះ';
+                    document.getElementById('student-name').textContent = studentProfile.name || (window.currentLang === 'en' ? 'Unknown Name' : 'មិនស្គាល់ឈ្មោះ');
                     document.getElementById('student-id').textContent = `ID: ${sid}`;
                     const photoEl = document.getElementById('student-photo');
                     photoEl.src = studentProfile.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${sid}`;
@@ -423,7 +525,7 @@
                     const custom = subjSnap.data().subjects;
                     custom.forEach(sub => {
                         sub.columns.forEach(col => {
-                            const newCol = { key: col.id, label: col.label, max: 10, color: 'text-indigo-700' };
+                            const newCol = { key: col.id, label: col.label, label_en: col.label_en || col.label, max: 10, color: 'text-indigo-700' };
                             if (!sub.type || sub.type === 'both' || sub.type === 'monthly') {
                                 if (!activeMonthlySubjects.find(c => c.key === col.id)) activeMonthlySubjects.push(newCol);
                             }
@@ -488,6 +590,7 @@
             
             let data = {};
             try {
+                // ដោយសារយើងប្រើ db ដែលភ្ជាប់ជាមួយ LocalCache វានឹងទាញយកទិន្នន័យពី Cache មុនគេបើមាន
                 const ref = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'scores', key);
                 const snap = await getDoc(ref);
                 if (snap.exists()) {
@@ -503,7 +606,6 @@
             return data;
         }
 
-        // ជួសជុលបញ្ហានៅទីនេះ ដោយបន្ថែម window. ទៅលើអនុគមន៍
         window.getSubjectRank = function(studentId, year, period, subjectKey) {
             const sData = scoresCache[`${year}_${period}`] || {};
             const scoresList = [];
@@ -632,6 +734,7 @@
             const year = document.getElementById('yearSelect').value;
             const type = document.getElementById('typeSelect').value;
             const period = document.getElementById('periodSelect').value;
+            const lang = window.currentLang;
             
             try {
                 // Pre-fetch all necessary data based on type
@@ -708,12 +811,13 @@
                     activeSemesterSubjects.forEach(col => {
                         let val = studentScores[col.key];
                         if (val !== null && val !== undefined && val !== '') {
+                            let dispLabel = lang === 'en' && col.label_en ? col.label_en : col.label;
                             if (col.isText) {
-                                displayRows.push({ label: col.label, isText: true, textValue: val, key: col.key, color: col.color });
+                                displayRows.push({ label: dispLabel, isText: true, textValue: val, key: col.key, color: col.color });
                             } else {
                                 let numVal = parseFloat(val);
                                 if (!isNaN(numVal)) { 
-                                    displayRows.push({ label: col.label, score: numVal, max: col.max, key: col.key, color: col.color });
+                                    displayRows.push({ label: dispLabel, score: numVal, max: col.max, key: col.key, color: col.color });
                                 }
                             }
                         }
@@ -744,9 +848,10 @@
                     activeMonthlySubjects.forEach(col => {
                         let val = studentScores[col.key];
                         if (val !== null && val !== undefined && val !== '') {
+                            let dispLabel = lang === 'en' && col.label_en ? col.label_en : col.label;
                             let numVal = parseFloat(val);
                             if (!isNaN(numVal)) { 
-                                displayRows.push({ label: col.label, score: numVal, max: col.max, key: col.key, color: col.color });
+                                displayRows.push({ label: dispLabel, score: numVal, max: col.max, key: col.key, color: col.color });
                                 manualTotalScore += numVal;
                                 countSubjects++;
                             }
@@ -785,65 +890,86 @@
                 const parentComment = targetDbRecord.parent_comment || "";
                 window.currentViewContext = { year, period, studentId: student.id };
 
-                // --- HTML CONSTRUCTION ---
+                // --- HTML CONSTRUCTION & TRANSLATIONS ---
                 let titleHtml = '';
                 if (type === 'yearly') {
-                    titleHtml = '<span class="text-red-600" style="-webkit-print-color-adjust: exact;">លទ្ធផលនៃការសិក្សាប្រចាំឆ្នាំ</span>';
+                    titleHtml = lang === 'en' 
+                        ? '<span class="text-red-600" style="-webkit-print-color-adjust: exact;">Annual Study Result</span>'
+                        : '<span class="text-red-600" style="-webkit-print-color-adjust: exact;">លទ្ធផលនៃការសិក្សាប្រចាំឆ្នាំ</span>';
                 } else {
-                    let titlePrefix = type === 'monthly' ? 'ខែ ' : '';
-                    titleHtml = `លទ្ធផលសិក្សា${titlePrefix}${monthLabels[period]}`;
+                    let titlePrefix = type === 'monthly' ? (lang === 'en' ? 'Month of ' : 'ខែ ') : '';
+                    let rLabel = lang === 'en' ? 'Result for ' : 'លទ្ធផលសិក្សា';
+                    titleHtml = `${rLabel}${titlePrefix}${monthLabels[period][lang]}`;
                 }
 
+                // Comment Translation Logic (Simplified)
                 let commentText = "";
                 if (type === 'monthly' || type === 'semester') {
-                    if (studentAvg <= 0) commentText = "គ្មាន.ចំ";
-                    else if (studentAvg < 5) commentText = "សិស្សរៀនក្រោមមធ្យម ត្រូវខិតខំប្រឹងប្រែងរៀនសូត្របន្ថែមទៀតផង";
-                    else if (studentAvg < 6) commentText = "សិស្សរៀនបាននិទ្ទេស E មធ្យម ខិតខំប្រឹងប្រែងរៀនសូត្របន្ថែមទៀត";
-                    else if (studentAvg < 7) commentText = "សិស្សរៀនបាននិទ្ទេស D ល្អបង្គួរ ត្រូវខិតខំប្រឹងរៀនសូត្របន្ថែមទៀត";
-                    else if (studentAvg < 8) commentText = "សិស្សរៀនបាននិទ្ទេស C ល្អ មានវិន័យ និងសីលធម៌ល្អ";
-                    else if (studentAvg < 9) commentText = "សិស្សរៀនបាននិទ្ទេស B ល្អណាស់ មានវិន័យ និងសីលធម៌ល្អ";
-                    else commentText = "សិស្សរៀនបាននិទ្ទេស A ល្អប្រសើរ មានវិន័យ និងសីលធម៌ល្អ";
+                    if (studentAvg <= 0) commentText = lang === 'en' ? "N/A" : "គ្មាន.ចំ";
+                    else if (studentAvg < 5) commentText = lang === 'en' ? "Below average. Needs to study harder." : "សិស្សរៀនក្រោមមធ្យម ត្រូវខិតខំប្រឹងប្រែងរៀនសូត្របន្ថែមទៀតផង";
+                    else if (studentAvg < 6) commentText = lang === 'en' ? "Average. Should try to study more." : "សិស្សរៀនបាននិទ្ទេស E មធ្យម ខិតខំប្រឹងប្រែងរៀនសូត្របន្ថែមទៀត";
+                    else if (studentAvg < 7) commentText = lang === 'en' ? "Fairly good. Keep trying harder." : "សិស្សរៀនបាននិទ្ទេស D ល្អបង្គួរ ត្រូវខិតខំប្រឹងរៀនសូត្របន្ថែមទៀត";
+                    else if (studentAvg < 8) commentText = lang === 'en' ? "Good. Has good discipline and morals." : "សិស្សរៀនបាននិទ្ទេស C ល្អ មានវិន័យ និងសីលធម៌ល្អ";
+                    else if (studentAvg < 9) commentText = lang === 'en' ? "Very Good. Excellent discipline and morals." : "សិស្សរៀនបាននិទ្ទេស B ល្អណាស់ មានវិន័យ និងសីលធម៌ល្អ";
+                    else commentText = lang === 'en' ? "Excellent. Outstanding discipline and morals." : "សិស្សរៀនបាននិទ្ទេស A ល្អប្រសើរ មានវិន័យ និងសីលធម៌ល្អ";
                 } else if (type === 'yearly') {
-                    if (studentAvg < 5) commentText = "សិស្សត្រូវរៀនត្រួតថ្នាក់ សូមមាតាបិតាជួយណែនាំកូនឱ្យរៀនផង";
-                    else commentText = "ត្រូវបានឡើងថ្នាក់ សិស្សមានវិន័យនិងសីលធម៌ល្អ ត្រូវប្រឹងប្រែងរៀនសូត្របន្ថែមទៀត";
+                    if (studentAvg < 5) commentText = lang === 'en' ? "Must repeat the class. Parents please guide." : "សិស្សត្រូវរៀនត្រួតថ្នាក់ សូមមាតាបិតាជួយណែនាំកូនឱ្យរៀនផង";
+                    else commentText = lang === 'en' ? "Promoted. Good morals. Keep studying hard." : "ត្រូវបានឡើងថ្នាក់ សិស្សមានវិន័យនិងសីលធម៌ល្អ ត្រូវប្រឹងប្រែងរៀនសូត្របន្ថែមទៀត";
                 }
+
+                // Common Table Headers Dictionary
+                const th = {
+                    result: lang === 'en' ? 'Result' : 'លទ្ធផល',
+                    avg: lang === 'en' ? 'Average' : 'មធ្យមភាគ',
+                    rank: lang === 'en' ? 'Rank' : 'ចំ.ថ្នាក់',
+                    other: lang === 'en' ? 'Others' : 'ផ្សេងៗ',
+                    no: lang === 'en' ? 'No.' : 'ល.រ',
+                    subject: lang === 'en' ? 'Subject' : 'មុខវិជ្ជា',
+                    score: lang === 'en' ? 'Score' : 'ពិន្ទុ',
+                    maxScore: lang === 'en' ? 'Max Score' : 'ពិន្ទុអតិបរមា',
+                    grade: lang === 'en' ? 'Grade' : 'និទ្ទេស',
+                    absent: lang === 'en' ? 'Absent' : 'អវត្តមាន',
+                    permission: lang === 'en' ? 'Permiss.' : 'មានច្បាប់',
+                    noPermission: lang === 'en' ? 'Unexc.' : 'ឥតច្បាប់',
+                    total: lang === 'en' ? 'Total' : 'សរុប'
+                };
 
                 let theadHtml = '';
                 if (type === 'yearly') {
                     theadHtml = `
                         <tr class="text-[#00a651] font-bold">
-                            <th class="border border-black bg-[#addcf3] py-2 w-[22%]">លទ្ធផល</th>
-                            <th class="border border-black bg-[#addcf3] w-[13%]">មធ្យមភាគ</th>
-                            <th class="border border-black bg-[#addcf3] w-[13%]">ចំ.ថ្នាក់</th>
-                            <th class="border border-black bg-[#addcf3] w-[52%]" colspan="4">ផ្សេងៗ</th>
+                            <th class="border border-black bg-[#addcf3] py-2 w-[22%]">${th.result}</th>
+                            <th class="border border-black bg-[#addcf3] w-[13%]">${th.avg}</th>
+                            <th class="border border-black bg-[#addcf3] w-[13%]">${th.rank}</th>
+                            <th class="border border-black bg-[#addcf3] w-[52%]" colspan="4">${th.other}</th>
                         </tr>
                     `;
                 } else if (type === 'semester') {
                     theadHtml = `
                         <tr>
-                            <th rowspan="2" class="w-[8%] border border-black bg-[#addcf3]">ល.រ</th>
-                            <th rowspan="2" class="w-[30%] border border-black bg-[#addcf3]">មុខវិជ្ជា</th>
-                            <th colspan="3" class="w-[47%] border border-black bg-[#addcf3]">ពិន្ទុ</th>
-                            <th rowspan="2" class="w-[15%] border border-black bg-[#addcf3]">ផ្សេងៗ</th>
+                            <th rowspan="2" class="w-[8%] border border-black bg-[#addcf3]">${th.no}</th>
+                            <th rowspan="2" class="w-[30%] border border-black bg-[#addcf3]">${th.subject}</th>
+                            <th colspan="3" class="w-[47%] border border-black bg-[#addcf3]">${th.score}</th>
+                            <th rowspan="2" class="w-[15%] border border-black bg-[#addcf3]">${th.other}</th>
                         </tr>
                         <tr>
-                            <th class="w-[15%] border border-black bg-[#addcf3]">ពិន្ទុ</th>
-                            <th class="w-[17%] border border-black bg-[#addcf3] text-red-600">ចំ.ថ្នាក់</th>
-                            <th class="w-[15%] border border-black bg-[#addcf3]">និទ្ទេស</th>
+                            <th class="w-[15%] border border-black bg-[#addcf3]">${th.score}</th>
+                            <th class="w-[17%] border border-black bg-[#addcf3] text-red-600">${th.rank}</th>
+                            <th class="w-[15%] border border-black bg-[#addcf3]">${th.grade}</th>
                         </tr>
                     `;
                 } else {
                     theadHtml = `
                         <tr>
-                            <th rowspan="2" class="w-[8%] border border-black bg-[#addcf3]">ល.រ</th>
-                            <th rowspan="2" colspan="2" class="w-[35%] border border-black bg-[#addcf3]">មុខវិជ្ជា</th>
-                            <th colspan="3" class="w-[42%] border border-black bg-[#addcf3]">ពិន្ទុ</th>
-                            <th rowspan="2" class="w-[15%] border border-black bg-[#addcf3]">ផ្សេងៗ</th>
+                            <th rowspan="2" class="w-[8%] border border-black bg-[#addcf3]">${th.no}</th>
+                            <th rowspan="2" colspan="2" class="w-[35%] border border-black bg-[#addcf3]">${th.subject}</th>
+                            <th colspan="3" class="w-[42%] border border-black bg-[#addcf3]">${th.score}</th>
+                            <th rowspan="2" class="w-[15%] border border-black bg-[#addcf3]">${th.other}</th>
                         </tr>
                         <tr>
-                            <th class="w-[14%] border border-black bg-[#addcf3]">ពិន្ទុអតិបរមា</th>
-                            <th class="w-[14%] border border-black bg-[#addcf3]">ពិន្ទុ</th>
-                            <th class="w-[14%] border border-black bg-[#addcf3]">និទ្ទេស</th>
+                            <th class="w-[14%] border border-black bg-[#addcf3]">${th.maxScore}</th>
+                            <th class="w-[14%] border border-black bg-[#addcf3]">${th.score}</th>
+                            <th class="w-[14%] border border-black bg-[#addcf3]">${th.grade}</th>
                         </tr>
                     `;
                 }
@@ -852,11 +978,10 @@
 
                 if (type === 'yearly') {
                     const academicMonths = ['nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug'];
-                    const khAcademicMonths = ['ខែ វិច្ឆិកា', 'ខែ ធ្នូ', 'ខែ មករា', 'ខែ កុម្ភៈ', 'ខែ មីនា', 'ខែ មេសា', 'ខែ ឧសភា', 'ខែ មិថុនា', 'ខែ កក្កដា', 'ខែ សីហា'];
 
                     for (let i = 0; i < academicMonths.length; i++) {
                         let m = academicMonths[i];
-                        let mName = khAcademicMonths[i];
+                        let mName = lang === 'en' ? englishMonths[(i+10)%12] : `ខែ ${khmerMonths[(i+10)%12]}`;
                         let sAvg = computeMonthlyAvg(student.id, year, [m]);
                         let allAvgs = allStudents.map(s => ({ id: String(s.id), avg: computeMonthlyAvg(s.id, year, [m]) }));
                         let sRank = getRank(student.id, allAvgs);
@@ -876,16 +1001,16 @@
                     
                     tbodyHtml += `
                         <tr class="font-bold text-[#00a651]">
-                            <td rowspan="2" class="border border-black bg-white py-1 text-center">លទ្ធផល</td>
-                            <td rowspan="2" class="border border-black bg-white text-center">ម.ភាគ</td>
-                            <td rowspan="2" class="border border-black bg-white text-center">ចំ.ថ្នាក់</td>
-                            <td rowspan="2" class="border border-black bg-white text-center">និទ្ទេស</td>
-                            <td colspan="3" class="border border-black bg-white text-center">អវត្តមាន</td>
+                            <td rowspan="2" class="border border-black bg-white py-1 text-center">${th.result}</td>
+                            <td rowspan="2" class="border border-black bg-white text-center">${th.avg}</td>
+                            <td rowspan="2" class="border border-black bg-white text-center">${th.rank}</td>
+                            <td rowspan="2" class="border border-black bg-white text-center">${th.grade}</td>
+                            <td colspan="3" class="border border-black bg-white text-center">${th.absent}</td>
                         </tr>
                         <tr class="font-bold text-[#00a651]">
-                            <td class="border border-black bg-white py-1 text-center w-[13%]">មានច្បាប់</td>
-                            <td class="border border-black bg-white text-center w-[13%]">ឥតច្បាប់</td>
-                            <td class="border border-black bg-white text-center w-[13%]">សរុប</td>
+                            <td class="border border-black bg-white py-1 text-center w-[13%]">${th.permission}</td>
+                            <td class="border border-black bg-white text-center w-[13%]">${th.noPermission}</td>
+                            <td class="border border-black bg-white text-center w-[13%]">${th.total}</td>
                         </tr>
                     `;
 
@@ -897,18 +1022,30 @@
                     let s2Total = attSem2.permission + attSem2.absent;
                     let yTotal = attYear.permission + attYear.absent;
 
-                    const promotionText = studentAvg >= 5.0 ? 'ឡើងថ្នាក់' : 'ត្រួតថ្នាក់';
+                    const promotionText = lang === 'en' 
+                        ? (studentAvg >= 5.0 ? 'Promoted' : 'Repeated') 
+                        : (studentAvg >= 5.0 ? 'ឡើងថ្នាក់' : 'ត្រួតថ្នាក់');
+
+                    const lbls = {
+                        s1Ex: lang === 'en' ? 'Sem 1 Exam' : 'ប្រឡងឆមាសទី១',
+                        s1Av: lang === 'en' ? 'Sem 1 Average' : 'ប្រចាំឆមាសទី១',
+                        s2Ex: lang === 'en' ? 'Sem 2 Exam' : 'ប្រឡងឆមាសទី២',
+                        s2Av: lang === 'en' ? 'Sem 2 Average' : 'ប្រចាំឆមាសទី២',
+                        yAv: lang === 'en' ? 'Yearly Average' : 'ប្រចាំឆ្នាំ',
+                        s1: lang === 'en' ? 'Sem 1' : 'ឆមាសទី១',
+                        s2: lang === 'en' ? 'Sem 2' : 'ឆមាសទី២'
+                    };
 
                     tbodyHtml += `
                         <tr class="h-[24px] font-bold">
-                            <td class="border border-black text-center text-[#00a651]">ប្រឡងឆមាសទី១</td>
+                            <td class="border border-black text-center text-[#00a651]">${lbls.s1Ex}</td>
                             <td class="border border-black text-blue-700 text-center">${sem1ExamAvg > 0 ? window.formatNum(sem1ExamAvg) : ''}</td>
                             <td class="border border-black text-red-600 text-center">${sem1ExamAvg > 0 ? sem1ExamRank : ''}</td>
                             <td class="border border-black text-blue-700 text-center">${sem1ExamAvg > 0 ? sem1ExamGrade : ''}</td>
-                            <td colspan="3" class="border border-black text-blue-800 text-center bg-[#ffe4e1]">ឆមាសទី១</td>
+                            <td colspan="3" class="border border-black text-blue-800 text-center bg-[#ffe4e1]">${lbls.s1}</td>
                         </tr>
                         <tr class="h-[24px] font-bold">
-                            <td class="border border-black text-center text-[#00a651]">ប្រចាំឆមាសទី១</td>
+                            <td class="border border-black text-center text-[#00a651]">${lbls.s1Av}</td>
                             <td class="border border-black text-blue-700 text-center">${sem1Avg > 0 ? window.formatNum(sem1Avg) : ''}</td>
                             <td class="border border-black text-red-600 text-center">${sem1Avg > 0 ? sem1FinalRank : ''}</td>
                             <td class="border border-black text-blue-700 text-center">${sem1Avg > 0 ? sem1FinalGrade : ''}</td>
@@ -917,14 +1054,14 @@
                             <td class="border border-black text-blue-700 text-center">${s1Total > 0 ? s1Total : '0'}</td>
                         </tr>
                         <tr class="h-[24px] font-bold">
-                            <td class="border border-black text-center text-[#00a651]">ប្រឡងឆមាសទី២</td>
+                            <td class="border border-black text-center text-[#00a651]">${lbls.s2Ex}</td>
                             <td class="border border-black text-blue-700 text-center">${sem2ExamAvg > 0 ? window.formatNum(sem2ExamAvg) : ''}</td>
                             <td class="border border-black text-red-600 text-center">${sem2ExamAvg > 0 ? sem2ExamRank : ''}</td>
                             <td class="border border-black text-blue-700 text-center">${sem2ExamAvg > 0 ? sem2ExamGrade : ''}</td>
-                            <td colspan="3" class="border border-black text-blue-800 text-center bg-[#ffe4e1]">ឆមាសទី២</td>
+                            <td colspan="3" class="border border-black text-blue-800 text-center bg-[#ffe4e1]">${lbls.s2}</td>
                         </tr>
                         <tr class="h-[24px] font-bold">
-                            <td class="border border-black text-center text-[#00a651]">ប្រចាំឆមាសទី២</td>
+                            <td class="border border-black text-center text-[#00a651]">${lbls.s2Av}</td>
                             <td class="border border-black text-blue-700 text-center">${sem2Avg > 0 ? window.formatNum(sem2Avg) : ''}</td>
                             <td class="border border-black text-red-600 text-center">${sem2Avg > 0 ? sem2FinalRank : ''}</td>
                             <td class="border border-black text-blue-700 text-center">${sem2Avg > 0 ? sem2FinalGrade : ''}</td>
@@ -933,7 +1070,7 @@
                             <td class="border border-black text-blue-700 text-center">${s2Total > 0 ? s2Total : '0'}</td>
                         </tr>
                         <tr class="h-[24px] font-bold">
-                            <td class="border border-black text-center text-[#00a651]">ប្រចាំឆ្នាំ</td>
+                            <td class="border border-black text-center text-[#00a651]">${lbls.yAv}</td>
                             <td class="border border-black text-blue-700 text-center">${studentAvg > 0 ? window.formatNum(studentAvg) : ''}</td>
                             <td class="border border-black text-red-600 text-center">${studentAvg > 0 ? yearlyRank : ''}</td>
                             <td class="border border-black text-blue-700 text-center">${studentAvg > 0 ? promotionText : ''}</td>
@@ -947,6 +1084,17 @@
                     let scoredRows = displayRows.filter(r => !r.isText);
                     let textRows = displayRows.filter(r => r.isText);
 
+                    const lbls = {
+                        semScores: lang === 'en' ? 'Semester Scores' : 'ពិន្ទុប្រចាំឆមាស',
+                        noData: lang === 'en' ? 'No exam data available' : 'មិនមានទិន្នន័យពិន្ទុប្រឡងឆមាសទេ',
+                        semResult: lang === 'en' ? 'Semester Result' : 'លទ្ធផលប្រចាំឆមាស',
+                        totScore: lang === 'en' ? 'Total Score' : 'ពិន្ទុសរុប',
+                        examAvg: lang === 'en' ? 'Exam Average' : 'មធ្យមភាគប្រឡងឆមាស',
+                        moAvg: lang === 'en' ? 'Monthly Average' : 'មធ្យមភាគប្រចាំខែ',
+                        semAvg: lang === 'en' ? 'Semester Average' : 'មធ្យមភាគប្រចាំឆមាស',
+                        eval: lang === 'en' ? 'Evaluation' : 'វាយតម្លៃ'
+                    };
+
                     if (scoredRows.length > 0) {
                         scoredRows.forEach((item, index) => {
                             let sRank = window.getSubjectRank(student.id, year, period, item.key);
@@ -954,7 +1102,7 @@
                             
                             tbodyHtml += `<tr>`;
                             if (index === 0) {
-                                tbodyHtml += `<td rowspan="${scoredRows.length}" class="border border-black font-bold kh-moul" style="writing-mode: vertical-rl; transform: rotate(180deg);">ពិន្ទុប្រចាំឆមាស</td>`;
+                                tbodyHtml += `<td rowspan="${scoredRows.length}" class="border border-black font-bold kh-moul" style="writing-mode: vertical-rl; transform: rotate(180deg);">${lbls.semScores}</td>`;
                             }
                             tbodyHtml += `
                                 <td class="text-left font-bold px-3 border border-black text-blue-800">${item.label}</td>
@@ -967,26 +1115,26 @@
                     }
 
                     if (displayRows.length === 0) {
-                        tbodyHtml += `<tr><td colspan="6" class="text-center italic text-gray-500 border border-black py-4">មិនមានទិន្នន័យពិន្ទុប្រឡងឆមាសទេ</td></tr>`;
+                        tbodyHtml += `<tr><td colspan="6" class="text-center italic text-gray-500 border border-black py-4">${lbls.noData}</td></tr>`;
                     }
                     
                     // Always show the summary as long as there is an average computed
                     tbodyHtml += `
                         <tr class="font-bold text-green-700">
-                            <td rowspan="4" class="border border-black kh-moul" style="writing-mode: vertical-rl; transform: rotate(180deg); color: #000;">លទ្ធផលប្រចាំឆមាស</td>
-                            <td class="text-left px-3 border border-black">ពិន្ទុសរុប</td>
+                            <td rowspan="4" class="border border-black kh-moul" style="writing-mode: vertical-rl; transform: rotate(180deg); color: #000;">${lbls.semResult}</td>
+                            <td class="text-left px-3 border border-black">${lbls.totScore}</td>
                             <td colspan="4" class="border border-black text-center text-black">${window.formatNum(examTotalVal)}</td>
                         </tr>
                         <tr class="font-bold text-green-700">
-                            <td class="text-left px-3 border border-black">មធ្យមភាគប្រឡងឆមាស</td>
+                            <td class="text-left px-3 border border-black">${lbls.examAvg}</td>
                             <td colspan="4" class="border border-black text-center text-black">${window.formatNum(examAvgVal)}</td>
                         </tr>
                         <tr class="font-bold text-green-700">
-                            <td class="text-left px-3 border border-black">មធ្យមភាគប្រចាំខែ</td>
+                            <td class="text-left px-3 border border-black">${lbls.moAvg}</td>
                             <td colspan="4" class="border border-black text-center text-black">${window.formatNum(monthlyAvgVal)}</td>
                         </tr>
                         <tr class="font-bold text-green-700">
-                            <td class="text-left px-3 border border-black">មធ្យមភាគប្រចាំឆមាស</td>
+                            <td class="text-left px-3 border border-black">${lbls.semAvg}</td>
                             <td colspan="4" class="border border-black text-center text-black">${window.formatNum(semAvgVal)}</td>
                         </tr>
                     `;
@@ -995,7 +1143,7 @@
                         textRows.forEach((item, index) => {
                             tbodyHtml += `<tr class="font-bold">`;
                             if (index === 0) {
-                                tbodyHtml += `<td rowspan="${textRows.length}" class="border border-black kh-moul" style="writing-mode: vertical-rl; transform: rotate(180deg); color: #00a651;">វាយតម្លៃ</td>`;
+                                tbodyHtml += `<td rowspan="${textRows.length}" class="border border-black kh-moul" style="writing-mode: vertical-rl; transform: rotate(180deg); color: #00a651;">${lbls.eval}</td>`;
                             }
                             tbodyHtml += `
                                 <td class="text-left px-3 border border-black text-black">${item.label}</td>
@@ -1009,12 +1157,12 @@
 
                     tbodyHtml += `
                         <tr class="font-bold text-[11px] bg-[#addcf3]">
-                            <td class="border border-black">អវត្តមាន</td>
-                            <td class="border border-black">មានច្បាប់</td>
-                            <td class="border border-black">អត់ច្បាប់</td>
-                            <td class="border border-black">មធ្យមភាគ</td>
-                            <td class="border border-black">ចំ.ថ្នាក់</td>
-                            <td class="border border-black">និទ្ទេស</td>
+                            <td class="border border-black">${th.absent}</td>
+                            <td class="border border-black">${th.permission}</td>
+                            <td class="border border-black">${th.noPermission}</td>
+                            <td class="border border-black">${th.avg}</td>
+                            <td class="border border-black">${th.rank}</td>
+                            <td class="border border-black">${th.grade}</td>
                         </tr>
                         <tr class="font-bold text-[11px] bg-white text-black">
                             <td class="border border-black">${totalAbs > 0 ? totalAbs : '0'}</td>
@@ -1027,6 +1175,8 @@
                     `;
 
                 } else { // Monthly
+                    const noDataTxt = lang === 'en' ? 'No score data available' : 'មិនមានទិន្នន័យពិន្ទុទេ';
+
                     displayRows.forEach((item, index) => {
                         if (item.isText) {
                             tbodyHtml += `
@@ -1055,7 +1205,7 @@
                     });
 
                     if (displayRows.length === 0) {
-                        tbodyHtml += `<tr><td colspan="7" class="text-center italic text-gray-500 border border-black py-4">មិនមានទិន្នន័យពិន្ទុទេ</td></tr>`;
+                        tbodyHtml += `<tr><td colspan="7" class="text-center italic text-gray-500 border border-black py-4">${noDataTxt}</td></tr>`;
                     }
 
                     const att = window.getAttendanceStats(student.id, period, type);
@@ -1063,13 +1213,13 @@
 
                     tbodyHtml += `
                         <tr class="font-bold bg-summary text-[11px] whitespace-nowrap">
-                            <td class="border border-black px-0.5">អវត្តមាន</td>
-                            <td class="border border-black px-0.5">ច្បាប់</td>
-                            <td class="border border-black px-0.5">ឥតច្បាប់</td>
-                            <td class="border border-black px-0.5 text-[#0054a6]">ពិន្ទុសរុប</td>
-                            <td class="border border-black px-0.5 text-[#0054a6]">មធ្យមភាគ</td>
-                            <td class="border border-black px-0.5 text-red-600 text-[10px]">ចំ.ថ្នាក់</td>
-                            <td class="border border-black px-0.5">និទ្ទេស</td>
+                            <td class="border border-black px-0.5">${th.absent}</td>
+                            <td class="border border-black px-0.5">${th.permission}</td>
+                            <td class="border border-black px-0.5">${th.noPermission}</td>
+                            <td class="border border-black px-0.5 text-[#0054a6]">${th.total}</td>
+                            <td class="border border-black px-0.5 text-[#0054a6]">${th.avg}</td>
+                            <td class="border border-black px-0.5 text-red-600 text-[10px]">${th.rank}</td>
+                            <td class="border border-black px-0.5">${th.grade}</td>
                         </tr>
                         <tr class="text-[12px] font-bold text-black">
                             <td class="border border-black">${totalAbs > 0 ? totalAbs : '0'}</td>
@@ -1092,32 +1242,48 @@
                         lunarDateStr = momentkh.format(m).replace('ពុទ្ធសករាជ', 'ព.ស.');
                     } catch(e) {}
                 }
-                let solarDateStr = `ថ្ងៃទី${window.toKhmerNum(today.getDate())} ខែ${khmerMonths[today.getMonth()]} ឆ្នាំ${window.toKhmerNum(today.getFullYear())}`;
+                
+                let solarDateStr = lang === 'en' 
+                    ? `${englishMonths[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`
+                    : `ថ្ងៃទី${window.toKhmerNum(today.getDate())} ខែ${khmerMonths[today.getMonth()]} ឆ្នាំ${window.toKhmerNum(today.getFullYear())}`;
+
+                const lbls = {
+                    id: lang === 'en' ? 'ID' : 'អត្តលេខ',
+                    name: lang === 'en' ? 'Name' : 'ឈ្មោះសិស្ស',
+                    grade: lang === 'en' ? 'Class' : 'ថ្នាក់ទី',
+                    gender: lang === 'en' ? 'Gender' : 'ភេទ',
+                    genderVal: (student.gender === 'ប្រុស' || student.gender === 'M' || student.gender === 'm') ? (lang === 'en' ? 'M' : 'ប') : (lang === 'en' ? 'F' : 'ស'),
+                    seenApproved: lang === 'en' ? 'Seen and Approved' : 'បានឃើញ និងឯកភាព',
+                    teacherComment: lang === 'en' ? "Teacher's Comment" : 'មូលវិចាររបស់គ្រូប្រចាំថ្នាក់',
+                    wish: lang === 'en' ? "Wishing students and parents good health and luck." : 'សូមជូនពរមាតាបិតា ព្រមទាំងកូនៗមានសុខភាពល្អ និងសំណាងល្អ',
+                    teacherSign: lang === 'en' ? 'Homeroom Teacher' : 'គ្រូប្រចាំថ្នាក់',
+                    location: lang === 'en' ? (classConfig.location_en || 'Phnom Penh') : classConfig.location
+                };
 
                 let html = `
                 <div class="print-container">
-                    <h1 class="kh-moul text-center text-[15px] mb-4 mt-1">${titleHtml}</h1>
+                    <h1 class="${lang === 'en' ? '' : 'kh-moul '}text-center text-[15px] mb-4 mt-1 font-bold">${titleHtml}</h1>
 
                     <div class="flex justify-between text-[11px] font-bold mb-2 px-2">
                         <div class="text-left space-y-1">
                             <div class="flex items-baseline gap-2">
-                                <span class="w-[70px] kh-moul inline-block text-black">អត្តលេខ</span>
+                                <span class="w-[70px] ${lang === 'en' ? '' : 'kh-moul '}inline-block text-black">${lbls.id}</span>
                                 <span class="font-bold text-[11px] text-black">${student.id}</span>
                             </div>
                             <div class="flex items-baseline gap-2">
-                                <span class="w-[70px] kh-moul inline-block text-black">ឈ្មោះសិស្ស</span>
-                                <span class="kh-moul font-normal text-[11px] text-black">${student.name || 'មិនស្គាល់ឈ្មោះ'}</span>
+                                <span class="w-[70px] ${lang === 'en' ? '' : 'kh-moul '}inline-block text-black">${lbls.name}</span>
+                                <span class="${lang === 'en' ? '' : 'kh-moul '}font-normal text-[11px] text-black">${student.name || (lang === 'en' ? 'Unknown' : 'មិនស្គាល់ឈ្មោះ')}</span>
                             </div>
                         </div>
                         
                         <div class="text-right flex flex-col items-end space-y-1">
                             <div class="flex items-baseline justify-between min-w-[100px] gap-2">
-                                <span class="whitespace-nowrap kh-moul text-black">ថ្នាក់ទី</span>
-                                <span class="kh-moul font-normal whitespace-nowrap text-black ml-2">${classConfig.className}</span>
+                                <span class="whitespace-nowrap ${lang === 'en' ? '' : 'kh-moul '}text-black">${lbls.grade}</span>
+                                <span class="${lang === 'en' ? '' : 'kh-moul '}font-normal whitespace-nowrap text-black ml-2">${classConfig.className}</span>
                             </div>
                             <div class="flex items-baseline justify-between min-w-[100px] gap-2">
-                                <span class="whitespace-nowrap kh-moul text-black">ភេទ</span>
-                                <span class="kh-moul font-normal text-black ml-2">${(student.gender === 'ប្រុស' || student.gender === 'M' || student.gender === 'm') ? 'ប' : 'ស'}</span>
+                                <span class="whitespace-nowrap ${lang === 'en' ? '' : 'kh-moul '}text-black">${lbls.gender}</span>
+                                <span class="${lang === 'en' ? '' : 'kh-moul '}font-normal text-black ml-2">${lbls.genderVal}</span>
                             </div>
                         </div>
                     </div>
@@ -1129,29 +1295,29 @@
 
                     <div class="flex justify-between mt-4 text-[10px] px-2 text-center text-black">
                         <div class="w-[45%] flex flex-col items-center">
-                            <p class="mb-0 text-[#00a651] font-bold">បានឃើញ និងឯកភាព</p>
-                            <p class="kh-moul mb-0 text-[#00a651]">${classConfig.managerRole}</p>
+                            <p class="mb-0 text-[#00a651] font-bold">${lbls.seenApproved}</p>
+                            <p class="${lang === 'en' ? 'font-bold' : 'kh-moul'} mb-0 text-[#00a651] mt-1">${classConfig.managerRole}</p>
                             <div class="h-12 w-full mt-1 border-b border-dotted border-gray-400"></div>
                         </div>
                         <div class="w-[55%] flex flex-col items-center">
                             <div class="mb-2 text-center w-full">
-                                <p class="font-bold text-[#00a651] kh-moul mb-0" style="font-size: 10px;">មូលវិចាររបស់គ្រូប្រចាំថ្នាក់</p>
-                                <p class="text-red-600 mb-0 font-bold" style="font-size: 9px;">${commentText}</p>
-                                <p class="text-red-600 mb-0" style="font-size: 9px;">សូមជូនពរមាតាបិតា ព្រមទាំងកូនៗមានសុខភាពល្អ និងសំណាងល្អ</p>
+                                <p class="font-bold text-[#00a651] ${lang === 'en' ? '' : 'kh-moul '}mb-0" style="font-size: 10px;">${lbls.teacherComment}</p>
+                                <p class="text-red-600 mb-0 font-bold mt-1" style="font-size: 9px;">${commentText}</p>
+                                <p class="text-red-600 mb-0 mt-1" style="font-size: 9px;">${lbls.wish}</p>
                             </div>
-                            <p class="mb-0 font-battambang text-[10px] text-blue-700 mt-1">${lunarDateStr}</p>
-                            <p class="mb-0 font-battambang text-[10px] text-blue-700"><span>${classConfig.location}</span>, <span>${solarDateStr}</span></p>
-                            <p class="font-bold text-[#00a651] mb-0 kh-moul">គ្រូប្រចាំថ្នាក់</p>
+                            <p class="mb-0 font-battambang text-[10px] text-blue-700 mt-1">${lang === 'en' ? '' : lunarDateStr}</p>
+                            <p class="mb-0 font-battambang text-[10px] text-blue-700"><span>${lbls.location}</span>, <span>${solarDateStr}</span></p>
+                            <p class="font-bold text-[#00a651] mb-0 mt-1 ${lang === 'en' ? '' : 'kh-moul'}">${lbls.teacherSign}</p>
                             <div class="h-12 w-full mt-1 border-b border-dotted border-gray-400"></div>
                         </div>
                     </div>
 
                     <div class="mt-4 text-[11px] px-2 text-black">
-                        <p class="font-bold text-gray-800 text-sm mb-2 text-left">មតិអាណាព្យាបាល / Parent's Comment:</p>
-                        <textarea id="parentCommentInput" class="w-full border border-gray-300 rounded-xl p-3 text-[13px] focus:outline-none focus:border-emerald-500 bg-gray-50 text-black shadow-sm" rows="2" placeholder="សូមសរសេរមតិ ឬសំណូមពររបស់អ្នកនៅទីនេះ...">${parentComment}</textarea>
+                        <p class="font-bold text-gray-800 text-sm mb-2 text-left">${i18n.commentLbl[lang]}</p>
+                        <textarea id="parentCommentInput" class="w-full border border-gray-300 rounded-xl p-3 text-[13px] focus:outline-none focus:border-emerald-500 bg-gray-50 text-black shadow-sm" rows="2" placeholder="${i18n.commentPlaceholder[lang]}">${parentComment}</textarea>
                         <div class="mt-3 flex justify-end">
                             <button id="saveCommentBtn" onclick="window.saveParentComment()" class="bg-[#00a651] hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition shadow-sm text-xs">
-                                <i data-lucide="save" class="w-4 h-4"></i> រក្សាទុកមតិ
+                                <i data-lucide="save" class="w-4 h-4"></i> <span id="ui-btn-save-lbl">${i18n.btnSave[lang]}</span>
                             </button>
                         </div>
                     </div>
@@ -1163,6 +1329,12 @@
 
             } catch (error) {
                 console.error("Fetch Error:", error);
+                
+                // បង្ហាញសារ Error ទៅកាន់អ្នកប្រើប្រាស់
+                const lang = window.currentLang || 'km';
+                document.getElementById('ui-empty-title').textContent = lang === 'en' ? 'Data Fetch Error' : 'មានបញ្ហាក្នុងការទាញទិន្នន័យ';
+                document.getElementById('ui-empty-desc').textContent = lang === 'en' ? 'Please check your internet connection or start a Local Server.' : 'សូមពិនិត្យអ៊ីនធឺណិត ឬត្រូវប្រាកដថាអ្នកបើកវាតាមរយៈ Local Server។';
+                
                 setUIState('empty');
             }
         };
@@ -1170,12 +1342,13 @@
         window.saveParentComment = async function() {
             const comment = document.getElementById('parentCommentInput').value;
             const { year, period, studentId } = window.currentViewContext;
+            const lang = window.currentLang;
             
             if (!year || !period || !studentId) return;
 
             const btn = document.getElementById('saveCommentBtn');
             const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<div class="spinner border-2 border-white border-t-transparent w-4 h-4 rounded-full"></div> រក្សាទុក...';
+            btn.innerHTML = `<div class="spinner border-2 border-white border-t-transparent w-4 h-4 rounded-full"></div> ${i18n.btnSaving[lang]}`;
             btn.disabled = true;
 
             try {
@@ -1195,25 +1368,25 @@
                     scoresCache[`${year}_${period}`][studentId] = { parent_comment: comment };
                 }
 
-                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> រួចរាល់';
+                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> ${i18n.btnSaved[lang]}`;
                 btn.classList.replace('bg-[#00a651]', 'bg-blue-600');
                 
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
                     btn.classList.replace('bg-blue-600', 'bg-[#00a651]');
                     btn.disabled = false;
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 }, 2000);
 
             } catch (e) {
                 console.error("Error saving parent comment", e);
-                btn.innerHTML = '<i data-lucide="alert-circle" class="w-4 h-4"></i> បរាជ័យ';
+                btn.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4"></i> ${i18n.btnFailed[lang]}`;
                 btn.classList.replace('bg-[#00a651]', 'bg-red-600');
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
                     btn.classList.replace('bg-red-600', 'bg-[#00a651]');
                     btn.disabled = false;
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 }, 2000);
             }
         };
@@ -1221,11 +1394,12 @@
         // Initialize Application
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
 
             if (!tid || !sid) {
-                alert("សូមចូលប្រព័ន្ធឡើងវិញ!");
-                window.location.href = 'index.html';
+                // ដក Alert ចេញ ហើយប្រើការ Redirect ផ្ទាល់ដើម្បីជៀសវាងផ្អាកការដំណើរការរបស់ Browser
+                console.warn("មិនមានទិន្នន័យសម្គាល់គណនី សូមចូលប្រព័ន្ធឡើងវិញ។");
+                window.location.replace('index.html');
                 return;
             }
 
